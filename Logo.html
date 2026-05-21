@@ -1,0 +1,33 @@
+<div class="w-12 h-12 relative rounded-2xl shadow-2xl bg-gradient-to-br from-slate-900 to-black p-1 flex items-center justify-center overflow-hidden border border-slate-700/50">
+    <div class="absolute inset-0 bg-indigo-500/20 blur-xl rounded-full"></div>
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="w-full h-full relative z-10 drop-shadow-lg">
+        <defs>
+            <linearGradient id="neonGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#06b6d4"/>   <stop offset="50%" stop-color="#8b5cf6"/>  <stop offset="100%" stop-color="#ec4899"/> </linearGradient>
+            
+            <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+        </defs>
+
+        <path d="M30,25 L40,75 L60,25 L70,75" fill="none" stroke="rgba(255, 255, 255, 0.15)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <path d="M25,75 C25,40 50,25 50,50 C50,75 75,60 75,25" fill="none" stroke="url(#neonGrad)" stroke-width="5" stroke-linecap="round" filter="url(#neonGlow)"/>
+
+        <line x1="42" y1="50" x2="58" y2="50" stroke="#f59e0b" stroke-width="2" stroke-dasharray="3,3" filter="url(#neonGlow)"/>
+
+        <circle cx="30" cy="25" r="2.5" fill="#94a3b8"/>
+        <circle cx="40" cy="75" r="2.5" fill="#94a3b8"/>
+        <circle cx="60" cy="25" r="2.5" fill="#94a3b8"/>
+        <circle cx="70" cy="75" r="2.5" fill="#94a3b8"/>
+
+        <circle cx="25" cy="75" r="4.5" fill="#06b6d4" filter="url(#neonGlow)"/>
+        <circle cx="50" cy="50" r="5" fill="#8b5cf6" filter="url(#neonGlow)"/>
+        <circle cx="75" cy="25" r="4.5" fill="#ec4899" filter="url(#neonGlow)"/>
+    </svg>
+</div>

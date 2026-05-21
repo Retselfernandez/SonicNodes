@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isomorphic Interconnected Graph - Music Constellations</title>
+    <!-- Tailwind para estilos rápidos y modernos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Librería principal de grafos basada en Canvas -->
+    <script src="https://unpkg.com/force-graph"></script>
+    <!-- D3.js para manipular las físicas del grafo -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; overflow: hidden; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+    </style>
+</head>
+<body class="w-screen h-screen text-slate-800 flex flex-col">
+
+    <!-- Encabezado -->
+    <header class="w-full h-16 glass-panel px-6 flex items-center justify-between z-10 shadow-sm shrink-0 absolute top-0 left-0 right-0">
+        <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-md">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            </div>
+            <div>
+                <h1 class="text-md font-bold text-slate-800">Topología Isomorfa</h1>
+                <p class="text-[10px] text-slate-400 font-medium tracking-wide uppercase">Red de Constelaciones Interconectadas</p>
+            </div>
+        </div>
+        <div class="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+            Estructuras Matemáticamente Equivalentes
+        </div>
+    </header>
+
+    <!-- Panel de Información Flotante -->
+    <div class="absolute left-6 top-24 w-80 glass-panel rounded-2xl shadow-xl z-10 flex flex-col p-5">
+        <h2 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-2 mb-3">Modelo Isomorfo</h2>
+        <p class="text-xs text-slate-600 leading-relaxed mb-4">
+            Cada macro-género (Salsa, Jazz, Electrónica) comparte la misma estructura de grafo subyacente (un núcleo central, conectado a un anillo intermedio, con subnodos satelitales).
+        </p>
+        <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-3 text-xs text-indigo-800 mb-4">
+            <strong>Interconexión:</strong> Observa las líneas punteadas doradas. Representan los "puentes" donde estas estructuras idénticas colisionan y se fusionan, compartiendo ADN (ej. Latin Jazz, Acid House).
+        </div>
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Simbología del Grafo</div>
+        <div class="space-y-2">
+            <div class="flex items-center text-xs"><span class="w-3 h-3 rounded-full bg-slate-800 mr-2 border-2 border-slate-400"></span> Núcleo (Macro-Género)</div>
+            <div class="flex items-center text-xs"><span class="w-3 h-3 rounded-full bg-white mr-2 border-2 border-slate-400"></span> Satélite (Sub-categoría)</div>
+            <div class="flex items-center text-xs mt-2"><div class="w-4 h-0.5 bg-slate-300 mr-2"></div> Enlace Interno (Estructural)</div>
+            <div class="flex items-center text-xs"><div class="w-4 h-0.5 bg-amber-400 mr-2 border-t border-dashed border-amber-600"></div> Puente Transversal</div>
+        </div>
+    </div>
+
+    <!-- Contenedor del Grafo -->
+    <div id="graph-container" class="w-full h-full"></div>
+
+    <script>
+        // Función para generar una estructura isomorfa perfecta (Constelación)
+        // Cada constelación tiene 1 centro, 3 nodos primarios, y 2 satélites por cada primario.
+        // Total: 1 + 3 + 6 = 10 nodos por estructura. Topología idéntica garantizada.
+        function generateIsomorphicCluster(clusterId, rootName, color) {
+            let nodes = [];
+            let links = [];
+            
+            // Núcleo
+            let rootId = `${clusterId}_root`;
+            nodes.push({ id: rootId, label: rootName, group: clusterId, type: 'core', color: color });
+            
+            // Nombres de ejemplo dinámicos basados en el clúster para dar contexto musical
+            const names = {
+                'salsa': { 
+                    p: ['Salsa Dura', 'Salsa Romántica', 'Salsa Fusión'], 
+                    s: [['Willie Colón', 'Héctor Lavoe'], ['Marc Anthony', 'Jerry Rivera'], ['Salsa Choke', 'Timba']] 
+                },
+                'jazz': { 
+                    p: ['Bebop', 'Cool Jazz', 'Jazz Fusión'], 
+                    s: [['Charlie Parker', 'Dizzy'], ['Miles Davis', 'Chet Baker'], ['Weather Report', 'Acid Jazz']] 
+                },
+                'electro': { 
+                    p: ['House', 'Techno', 'Electro Fusión'], 
+                    s: [['Daft Punk', 'Chicago House'], ['Detroit', 'Minimal'], ['Synthwave', 'Electro Swing']] 
+                }
+            };
+            
+            const n = names[clusterId] || { p: ['P1','P2','P3'], s:[['S1','S2'],['S3','S4'],['S5','S6']] };
+
+            for (let i = 0; i < 3; i++) {
+                let pId = `${clusterId}_p${i}`;
+                nodes.push({ id: pId, label: n.p[i], group: clusterId, type: 'primary', color: color });
+                links.push({ source: rootId, target: pId, type: 'internal' });
+                
+                // Forzar conexiones en anillo entre los primarios para dar forma de molécula
+                if (i > 0) {
+                    links.push({ source: `${clusterId}_p${i-1}`, target: pId, type: 'internal' });
+                }
+                if (i === 2) {
+                     links.push({ source: pId, target: `${clusterId}_p0`, type: 'internal' });
+                }
+
+                for (let j = 0; j < 2; j++) {
+                    let sId = `${clusterId}_p${i}_s${j}`;
+                    nodes.push({ id: sId, label: n.s[i][j], group: clusterId, type: 'satellite', color: color });
+                    links.push({ source: pId, target: sId, type: 'internal' });
+                }
+            }
+            return { nodes, links };
+        }
+
+        // Construir los 3 clusters asegurando que los identificadores son únicos
+        const cluster1 = generateIsomorphicCluster('salsa', 'Salsa', '#ef4444');    // Rojo
+        const cluster2 = generateIsomorphicCluster('jazz', 'Jazz', '#8b5cf6');      // Morado
+        const cluster3 = generateIsomorphicCluster('electro', 'Electrónica', '#06b6d4'); // Cyan
+
+        let gData = {
+            nodes: [...cluster1.nodes, ...cluster2.nodes, ...cluster3.nodes],
+            links: [...cluster1.links, ...cluster2.links, ...cluster3.links]
+        };
+
+        // ==========================================
+        // LA MAGIA: CONEXIONES TRANSVERSALES (PUENTES)
+        // ==========================================
+        // Aquí es donde las estructuras isomorfas se conectan entre sí rompiendo el aislamiento.
+        
+        gData.links.push({
+            source: 'salsa_p2', // Salsa Fusión
+            target: 'jazz_p2',  // Jazz Fusión
+            type: 'bridge',
+            label: 'Latin Jazz'
+        });
+
+        gData.links.push({
+            source: 'jazz_p2_s1', // Acid Jazz
+            target: 'electro_p0', // House
+            type: 'bridge',
+            label: 'Acid House / Jazz-House'
+        });
+        
+        gData.links.push({
+            source: 'salsa_p2_s0', // Salsa Choke
+            target: 'electro_p2', // Electro Fusión
+            type: 'bridge',
+            label: 'Música Urbana Electrónica'
+        });
+
+        // Inicializar el grafo
+        const elem = document.getElementById('graph-container');
+        const Graph = ForceGraph()(elem)
+            .graphData(gData)
+            .backgroundColor('#f8fafc')
+            .nodeRelSize(6)
+            // Lógica visual para los enlaces
+            .linkColor(link => link.type === 'bridge' ? '#f59e0b' : '#cbd5e1')
+            .linkWidth(link => link.type === 'bridge' ? 3 : 1.5)
+            .linkLineDash(link => link.type === 'bridge' ? [5, 5] : []) // Puentes punteados
+            .linkDirectionalParticles(link => link.type === 'bridge' ? 4 : 0)
+            .linkDirectionalParticleSpeed(0.01)
+            .linkDirectionalParticleWidth(4)
+            .linkDirectionalParticleColor(() => '#f59e0b')
+            // Renderizado personalizado de nodos
+            .nodeCanvasObject((node, ctx, globalScale) => {
+                const isCore = node.type === 'core';
+                const isPrimary = node.type === 'primary';
+                
+                // Dibujar el nodo
+                ctx.beginPath();
+                const r = isCore ? 10 : (isPrimary ? 6 : 4);
+                ctx.arc(node.x, node.y, r, 0, 2 * Math.PI, false);
+                ctx.fillStyle = isCore ? node.color : '#ffffff';
+                ctx.fill();
+                ctx.lineWidth = isCore ? 0 : 2;
+                ctx.strokeStyle = node.color;
+                if(!isCore) ctx.stroke();
+
+                // Etiquetas de texto
+                const fontSize = isCore ? 14/globalScale : (isPrimary ? 10/globalScale : 8/globalScale);
+                ctx.font = `${isCore ? 'bold' : 'normal'} ${fontSize}px Inter`;
+                ctx.fillStyle = isCore ? '#0f172a' : '#475569';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText(node.label, node.x, node.y + r + 2);
+            });
+
+        // Ajustes del motor de físicas (D3) para forzar las estructuras isomorfas
+        // Usamos distancias estrictas para que las "moléculas" adquieran formas similares
+        Graph.d3Force('link').distance(link => {
+            if (link.type === 'bridge') return 250; // Aleja las moléculas entre sí
+            // Fuerzas internas de la molécula
+            const isCoreLink = (link.source.type === 'core' || link.target.type === 'core');
+            return isCoreLink ? 60 : 40; 
+        }).strength(link => link.type === 'bridge' ? 0.2 : 1);
+
+        Graph.d3Force('charge').strength(-300); // Repulsión general
+        Graph.d3Force('collide', d3.forceCollide(node => node.type === 'core' ? 30 : 15)); // Evita superposiciones
+
+        // Centrado inicial
+        setTimeout(() => {
+            Graph.zoomToFit(800, 50);
+        }, 800);
+
+    </script>
+</body>
+</html>

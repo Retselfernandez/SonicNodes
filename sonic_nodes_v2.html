@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SonicNodes - The Musical Constellation</title>
+    <!-- TailwindCSS para UI Moderna -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Motor de Grafos -->
+    <script src="https://unpkg.com/force-graph"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; overflow: hidden; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+        .progress-bar-fill {
+            transition: width 0.1s linear;
+        }
+    </style>
+</head>
+<body class="w-screen h-screen text-slate-800 flex flex-col relative">
+
+    <!-- TOP BAR: Brand & Búsqueda -->
+    <header class="w-full h-16 glass-panel px-6 flex items-center justify-between z-20 absolute top-0 left-0">
+        <div class="flex items-center space-x-3 w-1/4">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-500 to-indigo-600 flex items-center justify-center shadow-md">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">SonicNodes</h1>
+            </div>
+        </div>
+
+        <!-- Buscador Global -->
+        <div class="relative w-1/2 max-w-xl">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </span>
+            <input type="text" id="global-search" placeholder="Buscar artista, género, subgénero..." class="w-full pl-10 pr-4 py-2 bg-slate-100 border border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all text-sm">
+        </div>
+
+        <div class="w-1/4 flex justify-end">
+            <div class="px-4 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-semibold flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span id="active-nodes-counter">0 Nodos Activos</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- LEFT PANEL: Inspector, Bio y Reproductor -->
+    <aside class="absolute left-4 top-20 bottom-4 w-80 glass-panel rounded-2xl z-10 flex flex-col overflow-hidden">
+        <!-- Portada y Metadatos -->
+        <div class="p-5 border-b border-slate-100 flex-1 overflow-y-auto">
+            <div id="inspector-badge" class="text-[10px] font-bold tracking-wider uppercase px-2 py-1 rounded bg-slate-100 text-slate-500 inline-block mb-2">Selecciona un Nodo</div>
+            <h2 id="inspector-title" class="text-2xl font-bold text-slate-900 leading-tight">Explorador</h2>
+            
+            <div class="mt-4 space-y-4">
+                <div>
+                    <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Biografía / Info</h3>
+                    <p id="inspector-bio" class="text-sm text-slate-600 leading-relaxed">
+                        Navega por el grafo isomorfo y haz clic en cualquier nodo para descubrir su historia, ramificaciones y escuchar una muestra de audio.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reproductor de Audio (Simulado 30s) -->
+        <div class="p-4 bg-slate-50 border-t border-slate-200 shrink-0">
+            <div class="flex items-center space-x-3 mb-3">
+                <div id="player-art" class="w-12 h-12 bg-slate-200 rounded-md shadow-sm border border-slate-300 flex items-center justify-center overflow-hidden">
+                    <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
+                </div>
+                <div class="flex-1 overflow-hidden">
+                    <h4 id="player-track" class="text-sm font-bold text-slate-900 truncate">Pista Demo</h4>
+                    <p id="player-artist" class="text-xs text-slate-500 truncate">Artista</p>
+                </div>
+                <!-- Botón Spotify -->
+                <a href="#" id="spotify-link" target="_blank" class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center hover:bg-green-600 transition-colors shadow-sm" title="Abrir en Spotify">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.24 1.021zM18.84 14.1c-.3.42-.84.54-1.26.24-3.36-2.04-8.52-2.64-12.54-1.44-.48.12-.96-.18-1.08-.66-.12-.48.18-.96.66-1.08 4.56-1.32 10.26-.66 14.04 1.62.48.3.6.84.3 1.26zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.6.18-1.2.72-1.38 4.26-1.26 11.28-1.02 15.72 1.62.54.359.72.96.36 1.5-.36.54-.96.72-1.5.36z"/></svg>
+                </a>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                <button id="play-btn" class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center hover:bg-indigo-700 transition-colors shrink-0">
+                    <svg class="w-4 h-4 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <div class="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden relative">
+                    <div id="progress-bar" class="absolute top-0 left-0 h-full bg-indigo-500 progress-bar-fill" style="width: 0%;"></div>
+                </div>
+                <span id="time-display" class="text-[10px] font-medium text-slate-500 w-8 text-right">0:00</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- RIGHT PANEL: Analytics & Top 10 Explorador -->
+    <aside class="absolute right-4 top-20 bottom-4 w-80 glass-panel rounded-2xl z-10 flex flex-col p-5">
+        <div class="border-b border-slate-100 pb-3 mb-3">
+            <h2 class="text-sm font-bold text-slate-900 flex items-center">
+                <svg class="w-4 h-4 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                Métricas y Tendencias
+            </h2>
+        </div>
+
+        <!-- Filtros -->
+        <div class="space-y-2 mb-4">
+            <div class="flex space-x-2">
+                <select id="filter-location" class="flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-slate-700 outline-none focus:border-indigo-500 cursor-pointer">
+                    <option value="global">Global</option>
+                    <option value="latam">Latinoamérica</option>
+                    <option value="spain">España</option>
+                    <option value="galicia">Galicia (Región)</option>
+                </select>
+                <select id="filter-time" class="flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-slate-700 outline-none focus:border-indigo-500 cursor-pointer">
+                    <option value="now">Actualidad</option>
+                    <option value="2010">Año 2010</option>
+                    <option value="2000">Junio 2000</option>
+                </select>
+            </div>
+            <select id="filter-type" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-slate-700 outline-none focus:border-indigo-500 cursor-pointer">
+                <option value="artists">Top 10 Artistas Más Escuchados</option>
+                <option value="genres">Top 10 Géneros en Crecimiento</option>
+            </select>
+        </div>
+
+        <!-- Lista Top 10 -->
+        <div class="flex-1 overflow-y-auto">
+            <ul id="top-list" class="space-y-2">
+                <!-- Se inyecta por JS -->
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Contenedor del Grafo -->
+    <div id="graph-container" class="w-full h-full"></div>
+
+    <script>
+        // ==========================================
+        // 1. DATASET ENRIQUECIDO (Nodos Isomorfos + Bio)
+        // ==========================================
+        function createNode(id, label, group, type, color, bio, trackData) {
+            return { id, label, group, type, color, bio, trackData, searchTarget: label.toLowerCase() };
+        }
+
+        const nodes = [];
+        const links = [];
+
+        // --- CONSTELACIÓN SALSA ---
+        const c1Color = '#ef4444';
+        const salsaBio = "Un género musical bailable resultante de la síntesis del son cubano y otros géneros de música caribeña y estadounidense como el jazz y el blues. Se consolidó en Nueva York en los años 60.";
+        nodes.push(createNode('salsa_root', 'Salsa', 'salsa', 'core', c1Color, salsaBio, {title: "Muestra Salsera", artist: "Varios", link: "#"}));
+        
+        // Primarios
+        nodes.push(createNode('salsa_p0', 'Salsa Dura', 'salsa', 'primary', c1Color, "Estilo de salsa desarrollado en los 70s, caracterizado por un sonido agresivo, predominio de trombones y temáticas urbanas.", {title: "Callejero", artist: "Orquesta", link: "#"}));
+        nodes.push(createNode('salsa_p1', 'Salsa Romántica', 'salsa', 'primary', c1Color, "Surgida en los 80s, se enfoca en letras de amor y arreglos musicales más suaves y melódicos.", {title: "Balada en Clave", artist: "Orquesta Romántica", link: "#"}));
+        nodes.push(createNode('salsa_p2', 'Salsa Fusión', 'salsa', 'primary', c1Color, "Mezcla de los patrones rítmicos de la salsa con otros géneros contemporáneos.", {title: "Fusión Caribe", artist: "Band Fusión", link: "#"}));
+        links.push({source: 'salsa_root', target: 'salsa_p0', type: 'internal'}, {source: 'salsa_root', target: 'salsa_p1', type: 'internal'}, {source: 'salsa_root', target: 'salsa_p2', type: 'internal'});
+        links.push({source: 'salsa_p0', target: 'salsa_p1', type: 'internal'}, {source: 'salsa_p1', target: 'salsa_p2', type: 'internal'}, {source: 'salsa_p2', target: 'salsa_p0', type: 'internal'}); // Anillo
+
+        // Satélites
+        nodes.push(createNode('salsa_p0_s0', 'Willie Colón', 'salsa', 'satellite', c1Color, "Arquitecto de la salsa urbana, legendario compositor y trombonista que definió el sonido del barrio en Nueva York.", {title: "Idilio", artist: "Willie Colón", link: "https://open.spotify.com/search/Willie+Colon+Idilio"}));
+        nodes.push(createNode('salsa_p0_s1', 'Héctor Lavoe', 'salsa', 'satellite', c1Color, "Conocido como 'El Cantante de los Cantantes', poseedor de un fraseo único y un carisma trágico que lo hizo ícono.", {title: "El Cantante", artist: "Héctor Lavoe", link: "https://open.spotify.com/search/Hector+Lavoe"}));
+        nodes.push(createNode('salsa_p1_s0', 'Marc Anthony', 'salsa', 'satellite', c1Color, "El artista de salsa más vendido de todos los tiempos, modernizó la salsa romántica.", {title: "Vivir Mi Vida", artist: "Marc Anthony", link: "#"}));
+        nodes.push(createNode('salsa_p1_s1', 'Jerry Rivera', 'salsa', 'satellite', c1Color, "El 'Cara de Niño' de la salsa, ídolo juvenil de los 90s.", {title: "Amores Como El Nuestro", artist: "Jerry Rivera", link: "#"}));
+        nodes.push(createNode('salsa_p2_s0', 'Salsa Choke', 'salsa', 'satellite', c1Color, "Género nacido en Colombia que mezcla salsa urbana con sonidos del Pacífico.", {title: "Ras Tas Tas", artist: "Cali Flow Latino", link: "#"}));
+        nodes.push(createNode('salsa_p2_s1', 'Timba', 'salsa', 'satellite', c1Color, "Evolución cubana de la salsa con gran complejidad armónica e influencias del funk.", {title: "Sandunguera", artist: "Los Van Van", link: "#"}));
+        links.push({source: 'salsa_p0', target: 'salsa_p0_s0', type: 'internal'}, {source: 'salsa_p0', target: 'salsa_p0_s1', type: 'internal'});
+        links.push({source: 'salsa_p1', target: 'salsa_p1_s0', type: 'internal'}, {source: 'salsa_p1', target: 'salsa_p1_s1', type: 'internal'});
+        links.push({source: 'salsa_p2', target: 'salsa_p2_s0', type: 'internal'}, {source: 'salsa_p2', target: 'salsa_p2_s1', type: 'internal'});
+
+        // --- CONSTELACIÓN JAZZ ---
+        const c2Color = '#8b5cf6';
+        nodes.push(createNode('jazz_root', 'Jazz', 'jazz', 'core', c2Color, "Familia de géneros musicales originarios de Nueva Orleans, caracterizados por la improvisación y la síncopa.", {title: "Take Five", artist: "Jazz Standard", link: "#"}));
+        nodes.push(createNode('jazz_p0', 'Bebop', 'jazz', 'primary', c2Color, "Estilo de jazz rápido e intrincado, diseñado para ser escuchado más que bailado.", {title: "Bebop Fast", artist: "Quartet", link: "#"}));
+        nodes.push(createNode('jazz_p1', 'Cool Jazz', 'jazz', 'primary', c2Color, "Estilo de jazz relajado y de tempos lentos, contrastante con la agitación del bebop.", {title: "Cool Breeze", artist: "Quintet", link: "#"}));
+        nodes.push(createNode('jazz_p2', 'Jazz Fusión', 'jazz', 'primary', c2Color, "Mezcla de jazz con la potencia rítmica del rock y el uso de instrumentos electrónicos.", {title: "Fusion Jam", artist: "Band", link: "#"}));
+        links.push({source: 'jazz_root', target: 'jazz_p0', type: 'internal'}, {source: 'jazz_root', target: 'jazz_p1', type: 'internal'}, {source: 'jazz_root', target: 'jazz_p2', type: 'internal'});
+        links.push({source: 'jazz_p0', target: 'jazz_p1', type: 'internal'}, {source: 'jazz_p1', target: 'jazz_p2', type: 'internal'}, {source: 'jazz_p2', target: 'jazz_p0', type: 'internal'});
+        nodes.push(createNode('jazz_p0_s0', 'Charlie Parker', 'jazz', 'satellite', c2Color, "Saxofonista brillante y pionero fundamental del Bebop.", {title: "Ornithology", artist: "Charlie Parker", link: "#"}));
+        nodes.push(createNode('jazz_p0_s1', 'Dizzy Gillespie', 'jazz', 'satellite', c2Color, "Trompetista virtuoso y figura clave en el desarrollo del jazz moderno y afrocubano.", {title: "Manteca", artist: "Dizzy Gillespie", link: "#"}));
+        nodes.push(createNode('jazz_p1_s0', 'Miles Davis', 'jazz', 'satellite', c2Color, "Una de las figuras más influyentes del siglo XX, pionero en casi todos los subgéneros del jazz.", {title: "So What", artist: "Miles Davis", link: "#"}));
+        nodes.push(createNode('jazz_p1_s1', 'Chet Baker', 'jazz', 'satellite', c2Color, "Trompetista e ícono del Cool Jazz de la costa oeste, famoso por su tono melancólico.", {title: "My Funny Valentine", artist: "Chet Baker", link: "#"}));
+        nodes.push(createNode('jazz_p2_s0', 'Weather Report', 'jazz', 'satellite', c2Color, "Banda seminal de Jazz Fusión, conocidos por sus complejas composiciones.", {title: "Birdland", artist: "Weather Report", link: "#"}));
+        nodes.push(createNode('jazz_p2_s1', 'Acid Jazz', 'jazz', 'satellite', c2Color, "Fusión de jazz, soul, funk y disco que surgió en los clubes de Londres en los 80s.", {title: "Virtual Insanity", artist: "Jamiroquai", link: "#"}));
+        links.push({source: 'jazz_p0', target: 'jazz_p0_s0', type: 'internal'}, {source: 'jazz_p0', target: 'jazz_p0_s1', type: 'internal'});
+        links.push({source: 'jazz_p1', target: 'jazz_p1_s0', type: 'internal'}, {source: 'jazz_p1', target: 'jazz_p1_s1', type: 'internal'});
+        links.push({source: 'jazz_p2', target: 'jazz_p2_s0', type: 'internal'}, {source: 'jazz_p2', target: 'jazz_p2_s1', type: 'internal'});
+
+        // --- CONSTELACIÓN ELECTRÓNICA ---
+        const c3Color = '#06b6d4';
+        nodes.push(createNode('electro_root', 'Electrónica', 'electro', 'core', c3Color, "Amplia gama de música creada mediante el uso de tecnología e instrumentos musicales electrónicos.", {title: "Synth Wave", artist: "Electronic Artist", link: "#"}));
+        nodes.push(createNode('electro_p0', 'House', 'electro', 'primary', c3Color, "Nacido en Chicago, caracterizado por su ritmo 4/4 y profundas raíces en la música disco.", {title: "House Groove", artist: "DJ", link: "#"}));
+        nodes.push(createNode('electro_p1', 'Techno', 'electro', 'primary', c3Color, "Originario de Detroit, marcado por su enfoque futurista, industrial y repetitivo.", {title: "Industrial Loop", artist: "Producer", link: "#"}));
+        nodes.push(createNode('electro_p2', 'Electro Fusión', 'electro', 'primary', c3Color, "Corrientes modernas que mezclan bases electrónicas con géneros orgánicos.", {title: "Hybrid Track", artist: "Duo", link: "#"}));
+        links.push({source: 'electro_root', target: 'electro_p0', type: 'internal'}, {source: 'electro_root', target: 'electro_p1', type: 'internal'}, {source: 'electro_root', target: 'electro_p2', type: 'internal'});
+        links.push({source: 'electro_p0', target: 'electro_p1', type: 'internal'}, {source: 'electro_p1', target: 'electro_p2', type: 'internal'}, {source: 'electro_p2', target: 'electro_p0', type: 'internal'});
+        nodes.push(createNode('electro_p0_s0', 'Daft Punk', 'electro', 'satellite', c3Color, "El dúo francés más icónico de la electrónica moderna, pioneros del French Touch.", {title: "One More Time", artist: "Daft Punk", link: "#"}));
+        nodes.push(createNode('electro_p0_s1', 'Chicago House', 'electro', 'satellite', c3Color, "El subgénero fundacional, rico en voces soul y pianos rítmicos.", {title: "Your Love", artist: "Frankie Knuckles", link: "#"}));
+        nodes.push(createNode('electro_p1_s0', 'Minimal', 'electro', 'satellite', c3Color, "Subgénero enfocado en la repetición austera y el diseño sonoro microscópico.", {title: "Minimalism", artist: "Plastikman", link: "#"}));
+        nodes.push(createNode('electro_p1_s1', 'Detroit Techno', 'electro', 'satellite', c3Color, "El sonido puro original, influenciado por el funk y el futurismo afrocéntrico.", {title: "Strings of Life", artist: "Derrick May", link: "#"}));
+        nodes.push(createNode('electro_p2_s0', 'Synthwave', 'electro', 'satellite', c3Color, "Nostalgia de los 80s, caracterizada por cajas de ritmos y sintetizadores analógicos.", {title: "Nightcall", artist: "Kavinsky", link: "#"}));
+        nodes.push(createNode('electro_p2_s1', 'Electro Swing', 'electro', 'satellite', c3Color, "Mezcla curiosa de swing vintage y jazz con ritmos house y hip hop.", {title: "Booty Swing", artist: "Parov Stelar", link: "#"}));
+        links.push({source: 'electro_p0', target: 'electro_p0_s0', type: 'internal'}, {source: 'electro_p0', target: 'electro_p0_s1', type: 'internal'});
+        links.push({source: 'electro_p1', target: 'electro_p1_s0', type: 'internal'}, {source: 'electro_p1', target: 'electro_p1_s1', type: 'internal'});
+        links.push({source: 'electro_p2', target: 'electro_p2_s0', type: 'internal'}, {source: 'electro_p2', target: 'electro_p2_s1', type: 'internal'});
+
+        // ENLACES TRANSVERSALES (Puentes Isomorfos)
+        links.push({source: 'salsa_p2', target: 'jazz_p2', type: 'bridge', label: 'Latin Jazz'});
+        links.push({source: 'jazz_p2_s1', target: 'electro_p0', type: 'bridge', label: 'Acid House / Jazz-House'});
+        links.push({source: 'salsa_p2_s0', target: 'electro_p2', type: 'bridge', label: 'Música Urbana Electrónica'});
+
+        const gData = { nodes, links };
+        document.getElementById('active-nodes-counter').innerText = `${nodes.length} Nodos Activos`;
+
+        // ==========================================
+        // 2. INICIALIZACIÓN DEL GRAFO
+        // ==========================================
+        const elem = document.getElementById('graph-container');
+        const Graph = ForceGraph()(elem)
+            .graphData(gData)
+            .backgroundColor('#f8fafc')
+            .nodeRelSize(6)
+            .linkColor(link => link.type === 'bridge' ? '#f59e0b' : '#cbd5e1')
+            .linkWidth(link => link.type === 'bridge' ? 3 : 1.5)
+            .linkLineDash(link => link.type === 'bridge' ? [5, 5] : [])
+            .linkDirectionalParticles(link => link.type === 'bridge' ? 3 : 0)
+            .linkDirectionalParticleSpeed(0.008)
+            .linkDirectionalParticleWidth(3)
+            .linkDirectionalParticleColor(() => '#f59e0b')
+            .nodeCanvasObject((node, ctx, globalScale) => {
+                const isCore = node.type === 'core';
+                const isPrimary = node.type === 'primary';
+                
+                ctx.beginPath();
+                const r = isCore ? 10 : (isPrimary ? 6 : 4);
+                ctx.arc(node.x, node.y, r, 0, 2 * Math.PI, false);
+                ctx.fillStyle = isCore ? node.color : '#ffffff';
+                ctx.fill();
+                ctx.lineWidth = isCore ? 0 : 2;
+                ctx.strokeStyle = node.color;
+                if(!isCore) ctx.stroke();
+
+                const fontSize = isCore ? 14/globalScale : (isPrimary ? 10/globalScale : 8/globalScale);
+                ctx.font = `${isCore ? 'bold' : 'normal'} ${fontSize}px Inter`;
+                ctx.fillStyle = isCore ? '#0f172a' : '#475569';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText(node.label, node.x, node.y + r + 3);
+            })
+            .onNodeClick(node => {
+                // Centrar cámara
+                Graph.centerAt(node.x, node.y, 800);
+                Graph.zoom(3, 800);
+                updateInspector(node);
+            });
+
+        // Físicas Isomorfas
+        Graph.d3Force('link').distance(link => {
+            if (link.type === 'bridge') return 300; 
+            const isCoreLink = (link.source.type === 'core' || link.target.type === 'core');
+            return isCoreLink ? 60 : 40; 
+        }).strength(link => link.type === 'bridge' ? 0.1 : 1);
+        Graph.d3Force('charge').strength(-400);
+        Graph.d3Force('collide', d3.forceCollide(node => node.type === 'core' ? 35 : 20));
+
+        setTimeout(() => Graph.zoomToFit(800, 50), 800);
+
+        // ==========================================
+        // 3. LÓGICA DE UI (Inspector, Reproductor, Buscador)
+        // ==========================================
+        
+        let playInterval;
+        let playTime = 0;
+        let isPlaying = false;
+
+        function updateInspector(node) {
+            // Actualizar Textos
+            document.getElementById('inspector-title').innerText = node.label;
+            document.getElementById('inspector-bio').innerText = node.bio;
+            
+            // Actualizar Badge
+            const badge = document.getElementById('inspector-badge');
+            const typeLabels = { 'core': 'Macro-Género', 'primary': 'Subgénero', 'satellite': 'Artista / Nicho' };
+            badge.innerText = typeLabels[node.type];
+            badge.style.backgroundColor = node.color + '20'; // Hex con transparencia
+            badge.style.color = node.color;
+
+            // Actualizar Player Data
+            document.getElementById('player-track').innerText = node.trackData.title;
+            document.getElementById('player-artist').innerText = node.trackData.artist;
+            document.getElementById('spotify-link').href = node.trackData.link;
+            document.getElementById('player-art').style.backgroundColor = node.color + '40';
+
+            // Auto-play visual (Simulado de 30s)
+            startSimulationPlayer();
+        }
+
+        function startSimulationPlayer() {
+            clearInterval(playInterval);
+            playTime = 0;
+            isPlaying = true;
+            updatePlayBtnIcon();
+            
+            playInterval = setInterval(() => {
+                playTime += 0.1;
+                const percent = (playTime / 30) * 100;
+                document.getElementById('progress-bar').style.width = percent + '%';
+                
+                const secs = Math.floor(playTime);
+                document.getElementById('time-display').innerText = `0:${secs < 10 ? '0'+secs : secs}`;
+
+                if (playTime >= 30) {
+                    clearInterval(playInterval);
+                    isPlaying = false;
+                    updatePlayBtnIcon();
+                }
+            }, 100);
+        }
+
+        function updatePlayBtnIcon() {
+            const btn = document.getElementById('play-btn');
+            if (isPlaying) {
+                btn.innerHTML = `<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+                btn.classList.add('bg-rose-500', 'hover:bg-rose-600');
+                btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+            } else {
+                btn.innerHTML = `<svg class="w-4 h-4 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+                btn.classList.remove('bg-rose-500', 'hover:bg-rose-600');
+                btn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+            }
+        }
+
+        document.getElementById('play-btn').addEventListener('click', () => {
+            if (isPlaying) {
+                clearInterval(playInterval);
+                isPlaying = false;
+            } else {
+                if (playTime >= 30) playTime = 0; // Reiniciar si terminó
+                startSimulationPlayer();
+            }
+            updatePlayBtnIcon();
+        });
+
+        // Buscador Global Fuzzy
+        document.getElementById('global-search').addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase().trim();
+            if (!val) return;
+            const match = nodes.find(n => n.searchTarget.includes(val));
+            if (match) {
+                Graph.centerAt(match.x, match.y, 800);
+                Graph.zoom(3, 800);
+                updateInspector(match);
+            }
+        });
+
+        // ==========================================
+        // 4. LÓGICA DEL PANEL TOP 10 (Simulación de DB)
+        // ==========================================
+        
+        // Base de datos simulada para mostrar cómo los filtros afectan la data
+        const mockDatabase = {
+            artists: {
+                now: {
+                    global: ["The Weeknd", "Taylor Swift", "Bad Bunny", "Drake", "Daft Punk", "Marc Anthony", "Coldplay", "Dua Lipa", "Ed Sheeran", "David Guetta"],
+                    spain: ["Bad Bunny", "Quevedo", "Rosalía", "Rauw Alejandro", "Bizarrap", "C. Tangana", "Morad", "Aitana", "Duki", "Feid"],
+                    galicia: ["Tanxugueiras", "Quevedo", "Rosalía", "Baiuca", "Bad Bunny", "Iván Ferreiro", "C. Tangana", "Xoel López", "Novedades Carminha", "Rauw Alejandro"],
+                    latam: ["Bad Bunny", "Karol G", "Peso Pluma", "Feid", "Shakira", "Bizarrap", "Rauw Alejandro", "Grupo Frontera", "J Balvin", "Daddy Yankee"]
+                },
+                "2010": {
+                    global: ["Lady Gaga", "Eminem", "Rihanna", "Katy Perry", "Justin Bieber", "Black Eyed Peas", "Usher", "Bruno Mars", "Beyoncé", "David Guetta"],
+                    spain: ["Shakira", "David Bisbal", "Alejandro Sanz", "Estopa", "Melendi", "El Canto del Loco", "Dani Martín", "Rihanna", "Carlos Baute", "Pereza"],
+                    galicia: ["Shakira", "Luard Na Lubre", "Los Suaves", "Carlos Nuñez", "Alejandro Sanz", "David Bisbal", "Estopa", "Maná", "Fito & Fitipaldis", "Rihanna"]
+                },
+                "2000": {
+                    global: ["Eminem", "Britney Spears", "Madonna", "N'Sync", "Santana", "Red Hot Chili Peppers", "Coldplay", "Destiny's Child", "Ricky Martin", "U2"],
+                    spain: ["Mónica Naranjo", "La Oreja de Van Gogh", "Estopa", "Alejandro Sanz", "Joaquín Sabina", "Chayanne", "Raúl", "Britney Spears", "Tom Jones", "Ricky Martin"],
+                    galicia: ["La Oreja de Van Gogh", "Estopa", "Siniestro Total", "Os Resentidos", "Alejandro Sanz", "Mónica Naranjo", "Celtas Cortos", "Chayanne", "Joaquín Sabina", "Ricky Martin"]
+                }
+            },
+            genres: {
+                now: { global: ["Pop", "Hip Hop", "Reggaeton", "K-Pop", "EDM", "Rock", "R&B", "Indie", "Afrobeats", "Salsa"], spain: ["Reggaeton", "Pop", "Trap", "Flamenco Urbano", "Indie Pop", "EDM", "Rock", "Bachata", "Salsa", "Hip Hop"], galicia: ["Pop", "Reggaeton", "Indie Pop", "Tradicional Gallega", "Trap", "Rock", "Folk", "EDM", "Salsa", "Hip Hop"], latam: ["Reggaeton", "Trap Latino", "Música Mexicana", "Pop Latino", "Bachata", "Salsa", "Cumbia", "Rock en Español", "Vallenato", "Merengue"] },
+                "2010": { global: ["Electropop", "Hip Hop", "R&B", "Pop Rock", "EDM", "Indie Rock", "Dubstep", "Country", "Salsa", "Reggaeton"], spain: ["Pop Latino", "Pop Rock", "Flamenco Pop", "Dance", "Reggaeton", "Indie", "Rock", "Salsa", "Bachata", "R&B"], galicia: ["Pop Rock", "Pop Latino", "Folk Celta", "Rock", "Dance", "Indie", "Salsa", "Cantautor", "Reggaeton", "Bachata"], latam: ["Pop Latino", "Reggaeton", "Salsa", "Bachata", "Rock en Español", "Balada", "Cumbia", "Merengue", "Vallenato", "Tropicál"] },
+                "2000": { global: ["Teen Pop", "Nu Metal", "R&B", "Hip Hop", "Pop Punk", "Trance", "Alternative Rock", "Salsa", "Latin Pop", "Eurodance"], spain: ["Pop Español", "Pop Latino", "Flamenco Pop", "Rock Español", "Dance", "Salsa", "Cantautor", "Eurobeat", "Techno", "Rumba"], galicia: ["Pop Español", "Rock", "Folk", "Salsa", "Dance", "Cantautor", "Pop Latino", "Heavy Metal", "Techno", "Rumba"], latam: ["Salsa", "Pop Latino", "Balada Romántica", "Rock en Español", "Merengue", "Cumbia", "Vallenato", "Bolero", "Trova", "R&B"] }
+            }
+        };
+
+        function updateTopList() {
+            const loc = document.getElementById('filter-location').value;
+            const time = document.getElementById('filter-time').value;
+            const type = document.getElementById('filter-type').value;
+            
+            const listEl = document.getElementById('top-list');
+            listEl.innerHTML = ''; // Limpiar
+
+            const dataToRender = mockDatabase[type][time][loc];
+            
+            dataToRender.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = "flex items-center space-x-3 p-2 hover:bg-slate-50 rounded-lg border border-transparent hover:border-slate-100 transition-colors group cursor-pointer";
+                li.innerHTML = `
+                    <span class="text-xs font-bold text-slate-400 w-4 text-center group-hover:text-indigo-500">${index + 1}</span>
+                    <span class="text-sm font-medium text-slate-700 group-hover:text-slate-900 truncate flex-1">${item}</span>
+                `;
+                li.onclick = () => {
+                    // Si el usuario hace click en un top, lo escribimos en el buscador global
+                    const searchInput = document.getElementById('global-search');
+                    searchInput.value = item;
+                    searchInput.dispatchEvent(new Event('input'));
+                };
+                listEl.appendChild(li);
+            });
+        }
+
+        // Listeners para los filtros
+        document.getElementById('filter-location').addEventListener('change', updateTopList);
+        document.getElementById('filter-time').addEventListener('change', updateTopList);
+        document.getElementById('filter-type').addEventListener('change', updateTopList);
+
+        // Carga inicial
+        updateTopList();
+    </script>
+</body>
+</html>
