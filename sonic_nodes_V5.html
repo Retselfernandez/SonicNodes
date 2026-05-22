@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SonicNodes V5 — Universo Isomorfo de la Música</title>
+    <script src="https://unpkg.com/force-graph@1.43.5/dist/force-graph.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ===== DESIGN TOKENS ===== */
+        :root[data-theme="dark"] {
+            --bg: #08080e;
+            --bg2: #0f0f1a;
+            --surface: rgba(255,255,255,0.04);
+            --surface2: rgba(255,255,255,0.07);
+            --border: rgba(255,255,255,0.08);
+            --border2: rgba(255,255,255,0.13);
+            --text: #e2e8f0;
+            --text2: #94a3b8;
+            --muted: #475569;
+            --accent: #7c3aed;
+            --accent-glow: rgba(124,58,237,0.35);
+            --accent2: #06b6d4;
+            --green: #10b981;
+            --amber: #f59e0b;
+            --panel-bg: rgba(8,8,14,0.82);
+            --graph-bg: #08080e;
+            --scrollbar: rgba(255,255,255,0.1);
+        }
+        :root[data-theme="light"] {
+            --bg: #f0f2f8;
+            --bg2: #ffffff;
+            --surface: rgba(0,0,0,0.04);
+            --surface2: rgba(0,0,0,0.06);
+            --border: rgba(0,0,0,0.1);
+            --border2: rgba(0,0,0,0.16);
+            --text: #0f172a;
+            --text2: #475569;
+            --muted: #94a3b8;
+            --accent: #6d28d9;
+            --accent-glow: rgba(109,40,217,0.2);
+            --accent2: #0891b2;
+            --green: #059669;
+            --amber: #d97706;
+            --panel-bg: rgba(240,242,248,0.92);
+            --graph-bg: #e8eaf4;
+            --scrollbar: rgba(0,0,0,0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 4px; }
+
+        .panel { background: var(--panel-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--border); }
+
+        #topbar {
+            position: absolute; top: 0; left: 0; right: 0; height: 52px;
+            z-index: 30;
+            display: flex; align-items: center; padding: 0 16px; gap: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo-mark { width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; }
+        .logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.03em; }
+        .logo-ver { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); margin-left: 4px; }
+
+        #menu-btn {
+            width: 34px; height: 34px; border-radius: 9px; background: var(--surface2); border: 1px solid var(--border);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s; color: var(--text2);
+        }
+        #menu-btn:hover { background: var(--surface); }
+
+        .search-wrap { position: relative; flex: 1; max-width: 380px; }
+        .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+        #global-search {
+            width: 100%; padding: 6px 12px 6px 32px;
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 20px; color: var(--text);
+            font-size: 12px; font-family: 'Space Grotesk', sans-serif;
+            outline: none; transition: border-color 0.2s;
+        }
+        #global-search:focus { border-color: var(--accent); }
+
+        #theme-toggle {
+            width: 34px; height: 34px; border-radius: 9px;
+            background: var(--surface2); border: 1px solid var(--border);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s; color: var(--text2);
+        }
+        #theme-toggle:hover { background: var(--surface); }
+
+        /* Hamburger Menu */
+        #hamburger-menu {
+            position: fixed; left: 0; top: 0; width: 280px; height: 100vh;
+            background: var(--panel-bg); border-right: 1px solid var(--border);
+            z-index: 50; display: flex; flex-direction: column; overflow: hidden;
+            transform: translateX(-100%); transition: transform 0.3s;
+        }
+        #hamburger-menu.open { transform: translateX(0); }
+        #menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        #menu-overlay.open { opacity: 1; pointer-events: auto; }
+
+        .menu-header { padding: 20px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .menu-header-title { font-weight: 600; font-size: 15px; }
+        #menu-close { width: 28px; height: 28px; border-radius: 6px; background: var(--surface2); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text2); transition: background 0.2s; }
+        #menu-close:hover { background: var(--surface); }
+
+        .menu-section { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 20px; }
+        .menu-label { font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--muted); letter-spacing: 0.08em; margin-bottom: 8px; }
+        .menu-item { padding: 8px 12px; border-radius: 8px; background: transparent; border: 1px solid transparent; cursor: pointer; font-size: 13px; text-align: left; color: var(--text2); transition: all 0.2s; }
+        .menu-item:hover { background: var(--surface2); border-color: var(--border); color: var(--text); }
+        .menu-item.active { background: rgba(124,58,237,0.15); border-color: var(--accent); color: var(--accent); }
+
+        /* LEFT PANEL */
+        #left-panel {
+            position: absolute; left: 12px; top: 60px; bottom: 12px;
+            width: 300px; z-index: 20; border-radius: 16px;
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+
+        .artwork-wrap {
+            width: 100%; height: 150px; overflow: hidden; position: relative;
+            background: linear-gradient(135deg, var(--surface2), var(--surface));
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .artwork-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .artwork-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 50%, var(--panel-bg)); }
+
+        .inspector-body {
+            padding: 12px 14px; flex: 1; overflow-y: auto;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .label-sm {
+            font-family: 'DM Mono', monospace; font-size: 9px;
+            color: var(--muted); text-transform: uppercase;
+            letter-spacing: 0.08em; margin-bottom: 5px;
+        }
+
+        .type-badge {
+            font-family: 'DM Mono', monospace; font-size: 9px;
+            padding: 3px 8px; border-radius: 4px; border: 1px solid;
+            text-transform: uppercase; letter-spacing: 0.07em;
+            display: inline-block; margin-bottom: 6px;
+        }
+
+        #player-section {
+            padding: 12px 14px; background: var(--bg2);
+            border-top: 1px solid var(--border); flex-shrink: 0;
+        }
+
+        /* RIGHT PANEL */
+        #right-panel {
+            position: absolute; right: 12px; top: 60px; bottom: 12px;
+            width: 272px; z-index: 20; border-radius: 16px;
+            display: flex; flex-direction: column; padding: 14px; gap: 10px;
+        }
+        #right-panel.metrics-mode {
+            padding: 14px;
+        }
+
+        .panel-title { font-size: 13px; font-weight: 600; }
+        .panel-sub { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+        select {
+            appearance: none; background: var(--surface2);
+            border: 1px solid var(--border); color: var(--text);
+            border-radius: 8px; padding: 6px 10px;
+            font-size: 11px; font-family: 'Space Grotesk', sans-serif;
+            cursor: pointer; outline: none; width: 100%;
+        }
+        select:focus { border-color: var(--accent); }
+
+        /* Hide/show modes */
+        .mode-section { display: none; }
+        .mode-section.active { display: flex; flex-direction: column; gap: 10px; }
+
+        #graph-container { position: absolute; inset: 0; z-index: 1; }
+
+        #node-tooltip {
+            position: fixed; z-index: 200; pointer-events: none; display: none;
+            background: var(--bg2); border: 1px solid var(--border2);
+            border-radius: 8px; padding: 7px 11px; font-size: 11px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        .neon-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse-nd 2s ease-in-out infinite; }
+        @keyframes pulse-nd { 0%,100%{opacity:1;box-shadow:0 0 6px var(--green);} 50%{opacity:.5;box-shadow:0 0 14px var(--green);} }
+
+        .tag-pill {
+            font-family: 'DM Mono', monospace; font-size: 9px;
+            padding: 3px 8px; border-radius: 5px; border: 1px solid;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+<div id="node-tooltip"></div>
+
+<!-- TOPBAR -->
+<header id="topbar" class="panel">
+    <button id="menu-btn" title="Menú">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+
+    <div class="logo-mark">
+        <svg width="18" height="18" viewBox="0 0 100 100" fill="none">
+            <path d="M25,75 C25,40 50,25 50,50 C50,75 75,60 75,25" stroke="white" stroke-width="10" stroke-linecap="round"/>
+            <circle cx="25" cy="75" r="8" fill="white" opacity="0.9"/>
+            <circle cx="50" cy="50" r="6" fill="white" opacity="0.7"/>
+            <circle cx="75" cy="25" r="8" fill="white" opacity="0.9"/>
+        </svg>
+    </div>
+    <span class="logo-text">SonicNodes</span>
+    <span class="logo-ver">v5.0</span>
+
+    <div class="search-wrap">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" id="global-search" placeholder="Buscar artista, género…">
+    </div>
+
+    <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+        <div class="neon-dot"></div>
+        <span style="font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);" id="node-counter">0 nodos</span>
+        <button id="theme-toggle" title="Cambiar tema">
+            <svg id="theme-icon-dark" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+            <svg id="theme-icon-light" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none;"><circle cx="12" cy="12" r="5" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </button>
+    </div>
+</header>
+
+<!-- HAMBURGER MENU -->
+<div id="menu-overlay"></div>
+<nav id="hamburger-menu" class="panel">
+    <div class="menu-header">
+        <span class="menu-header-title">Menú</span>
+        <button id="menu-close">✕</button>
+    </div>
+    <div class="menu-section">
+        <div>
+            <div class="menu-label">Vista</div>
+            <button class="menu-item active" data-mode="graph">🎵 Mapa de Géneros</button>
+            <button class="menu-item" data-mode="metrics">📊 Métricas Históricas</button>
+        </div>
+        <div>
+            <div class="menu-label">Géneros (Mapa)</div>
+            <button class="menu-item" data-genre="rock">🎸 Rock</button>
+            <button class="menu-item" data-genre="electronica">⚡ Electrónica</button>
+            <button class="menu-item" data-genre="hiphop">🎤 Hip-Hop & R&B</button>
+            <button class="menu-item" data-genre="reggaeton">🔥 Reggaeton</button>
+            <button class="menu-item" data-genre="kpop">🌟 K-Pop</button>
+            <button class="menu-item" data-genre="jazz">🎷 Jazz</button>
+            <button class="menu-item" data-genre="latina">💃 Latina</button>
+        </div>
+    </div>
+</nav>
+
+<!-- LEFT PANEL -->
+<aside id="left-panel" class="panel">
+    <div class="artwork-wrap" id="inspector-artwork">
+        <svg width="44" height="44" fill="none" stroke="rgba(124,58,237,0.3)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+        <div class="artwork-overlay"></div>
+    </div>
+    <div class="inspector-body">
+        <span class="type-badge" id="inspector-badge" style="background:rgba(124,58,237,0.15);color:#a78bfa;border-color:rgba(124,58,237,0.3);">Macro-Género</span>
+        <h2 id="inspector-title" style="font-size:20px;font-weight:700;letter-spacing:-0.03em;line-height:1.2;margin-bottom:3px;">Explorar</h2>
+        <p id="inspector-subtitle" style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:10px;">Haz clic en un nodo para comenzar</p>
+        <div class="label-sm">Descripción</div>
+        <p id="inspector-bio" style="font-size:11.5px;line-height:1.65;color:var(--text2);">Navega el universo musical por constelaciones isomorfas con géneros expandidos.</p>
+    </div>
+    <div id="player-section">
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:9px;">
+            <div style="width:42px;height:42px;border-radius:8px;background:var(--surface2);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:18px;">🎵</div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Selecciona un nodo</div>
+                <div style="font-size:10px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">—</div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- RIGHT PANEL -->
+<aside id="right-panel" class="panel">
+    <!-- Modo Grafo -->
+    <div class="mode-section active" data-mode="graph">
+        <div>
+            <div class="panel-title">Métricas</div>
+            <div class="panel-sub">Datos por región</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+            <select id="filter-region">
+                <option value="global">🌐 Global</option>
+                <option value="latam">🌎 LATAM</option>
+                <option value="spain">🇪🇸 España</option>
+                <option value="us">🇺🇸 USA</option>
+            </select>
+            <select id="filter-year">
+                <option value="now">Ahora</option>
+                <option value="2020">2020</option>
+                <option value="2015">2015</option>
+            </select>
+            <select id="filter-type">
+                <option value="artists">Top 10 Artistas</option>
+                <option value="genres">Top 10 Géneros</option>
+            </select>
+        </div>
+        <div style="flex:1;overflow-y:auto;">
+            <ul id="top-list" style="list-style:none;display:flex;flex-direction:column;gap:3px;"></ul>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:10px;">
+            <div class="label-sm" style="margin-bottom:7px;">Profundidad</div>
+            <div style="display:flex;gap:4px;">
+                <button class="depth-btn active" onclick="setDepth('macro',this)" style="flex:1;font-size:10px;font-family:'DM Mono',monospace;padding:6px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all 0.15s;">Macro</button>
+                <button class="depth-btn" onclick="setDepth('sub',this)" style="flex:1;font-size:10px;font-family:'DM Mono',monospace;padding:6px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all 0.15s;">Sub</button>
+                <button class="depth-btn" onclick="setDepth('artist',this)" style="flex:1;font-size:10px;font-family:'DM Mono',monospace;padding:6px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all 0.15s;">Artista</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modo Métricas -->
+    <div class="mode-section" data-mode="metrics">
+        <div>
+            <div class="panel-title">Métricas Históricas</div>
+            <div class="panel-sub">Datos por región y época</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+            <select id="metrics-region" style="flex:1;">
+                <option value="global">🌐 Global</option>
+                <option value="latam">🌎 LATAM</option>
+                <option value="spain">🇪🇸 España</option>
+            </select>
+            <select id="metrics-year" style="flex:1;">
+                <option value="now">Actualidad</option>
+                <option value="2010">Año 2010</option>
+                <option value="2000">Año 2000</option>
+            </select>
+        </div>
+        <div style="flex:1;overflow-y:auto;">
+            <div id="metrics-display" style="font-size:12px;color:var(--text2);line-height:1.6;"></div>
+        </div>
+    </div>
+</aside>
+
+<!-- GRAPH -->
+<div id="graph-container"></div>
+
+<script>
+// ============================================================
+// THEME
+// ============================================================
+let isDark = true;
+function toggleTheme() {
+    isDark = !isDark;
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    document.getElementById('theme-icon-dark').style.display = isDark ? 'block' : 'none';
+    document.getElementById('theme-icon-light').style.display = isDark ? 'none' : 'block';
+    if (currentGraph) {
+        currentGraph.backgroundColor(isDark ? '#08080e' : '#e8eaf4');
+    }
+}
+
+// ============================================================
+// MENU HANDLING
+// ============================================================
+const menuBtn = document.getElementById('menu-btn');
+const menuClose = document.getElementById('menu-close');
+const menu = document.getElementById('hamburger-menu');
+const overlay = document.getElementById('menu-overlay');
+
+menuBtn.addEventListener('click', () => {
+    menu.classList.add('open');
+    overlay.classList.add('open');
+});
+
+menuClose.addEventListener('click', () => {
+    menu.classList.remove('open');
+    overlay.classList.remove('open');
+});
+
+overlay.addEventListener('click', () => {
+    menu.classList.remove('open');
+    overlay.classList.remove('open');
+});
+
+// Mode switching
+document.querySelectorAll('.menu-item[data-mode]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const mode = btn.getAttribute('data-mode');
+        switchMode(mode);
+        document.querySelectorAll('.menu-item[data-mode]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        menu.classList.remove('open');
+        overlay.classList.remove('open');
+    });
+});
+
+function switchMode(mode) {
+    document.querySelectorAll('.mode-section').forEach(s => s.classList.remove('active'));
+    document.querySelector(`.mode-section[data-mode="${mode}"]`).classList.add('active');
+
+    if (mode === 'metrics') {
+        if (currentGraph) try { currentGraph._destructor?.(); } catch(e) {}
+    } else {
+        if (!currentGraph) initGraph('macro');
+    }
+}
+
+// Genre highlighting
+document.querySelectorAll('.menu-item[data-genre]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const genre = btn.getAttribute('data-genre');
+        if (currentGraph && selectedNode) {
+            const data = currentGraph.graphData();
+            const genreNode = data.nodes.find(n => n.id === genre);
+            if (genreNode) {
+                currentGraph.centerAt(genreNode.x, genreNode.y, 700);
+                currentGraph.zoom(2.5, 700);
+                updateInspector(genreNode);
+            }
+        }
+        menu.classList.remove('open');
+        overlay.classList.remove('open');
+    });
+});
+
+// ============================================================
+// GENRE DATA (Expandido con K-pop, Reggaeton, Hip-Hop)
+// ============================================================
+const GENRES = {
+    rock: { label:'Rock', color:'#ef4444', bio:'Género nacido en los 50s mezclando rhythm & blues, country y gospel.', tags:['guitarra','blues','1950s'], itunesQuery:'rock classic' },
+    electronica: { label:'Electrónica', color:'#06b6d4', bio:'Música creada electrónicamente. Del experimento académico de los 50s a los clubs del siglo XXI.', tags:['sintetizador','digital'], itunesQuery:'daft punk electronic' },
+    hiphop: { label:'Hip Hop', color:'#f59e0b', bio:'El Bronx, Nueva York, 1973. Rap, DJing, breakdance como pilares culturales.', tags:['Bronx','sampling','rimas'], itunesQuery:'grandmaster flash hip hop' },
+    reggaeton: { label:'Reggaeton', color:'#ec4899', bio:'Puerto Rico, 90s. Dembow + reggae + hip hop latino. Daddy Yankee lo globalizó.', tags:['dembow','Puerto Rico'], itunesQuery:'daddy yankee gasolina' },
+    kpop: { label:'K-Pop', color:'#f97316', bio:'Género musical surcoreano que combina pop, hip-hop, R&B y danza. Fenómeno global.', tags:['Corea','K-Pop','global'], itunesQuery:'bts dynamite' },
+    jazz: { label:'Jazz', color:'#8b5cf6', bio:'Nueva Orleans, siglo XIX. Blues + ragtime. La improvisación como alma.', tags:['improvisación','New Orleans'], itunesQuery:'miles davis jazz' },
+    latina: { label:'Latina', color:'#10b981', bio:'Siglos de música del Caribe, Sudamérica. Ritmos africanos, melodías europeas.', tags:['ritmo','percusión'], itunesQuery:'latin music' },
+};
+
+const GENRE_ARTISTS = {
+    rock: [
+        {id:'led_zeppelin',name:'Led Zeppelin',q:'led zeppelin'},
+        {id:'beatles',name:'The Beatles',q:'beatles'},
+        {id:'pink_floyd',name:'Pink Floyd',q:'pink floyd'},
+    ],
+    jazz: [
+        {id:'miles_davis',name:'Miles Davis',q:'miles davis'},
+        {id:'john_coltrane',name:'John Coltrane',q:'john coltrane'},
+    ],
+    reggaeton: [
+        {id:'bad_bunny',name:'Bad Bunny',q:'bad bunny'},
+        {id:'karol_g',name:'Karol G',q:'karol g'},
+        {id:'daddy_yankee',name:'Daddy Yankee',q:'daddy yankee'},
+    ],
+    kpop: [
+        {id:'bts',name:'BTS',q:'bts'},
+        {id:'blackpink',name:'BLACKPINK',q:'blackpink'},
+        {id:'iu',name:'IU',q:'iu kpop'},
+    ],
+    hiphop: [
+        {id:'eminem',name:'Eminem',q:'eminem'},
+        {id:'nas',name:'Nas',q:'nas'},
+        {id:'jay_z',name:'Jay-Z',q:'jay z'},
+    ],
+};
+
+// ============================================================
+// GRAPH STATE
+// ============================================================
+let currentGraph = null;
+let currentDepth = 'macro';
+let selectedNode = null;
+let expandedNodes = new Set();
+
+function buildGraphData(depth) {
+    const nodes = [];
+    const links = [];
+    const macroGenres = [
+        { id:'rock', children:['rock'] },
+        { id:'electronica', children:['electronica'] },
+        { id:'hiphop', children:['hiphop'] },
+        { id:'reggaeton', children:['reggaeton'] },
+        { id:'kpop', children:['kpop'] },
+        { id:'jazz', children:['jazz'] },
+        { id:'latina', children:['latina'] },
+    ];
+
+    macroGenres.forEach(m => {
+        const g = GENRES[m.id];
+        nodes.push({ id:m.id, label:g.label, type:'core', color:g.color, bio:g.bio, tags:g.tags, itunesQuery:g.itunesQuery, searchTarget:g.label.toLowerCase() });
+    });
+
+    if (depth === 'sub' || depth === 'artist') {
+        macroGenres.forEach((m, mi) => {
+            m.children.forEach((cid, ci) => {
+                const g = GENRES[cid];
+                if (!g) return;
+                nodes.push({ id:cid, label:g.label, type:'primary', color:g.color, bio:g.bio, tags:g.tags, itunesQuery:g.itunesQuery, searchTarget:g.label.toLowerCase(), hasArtists: !!(GENRE_ARTISTS[cid]) });
+                links.push({source:m.id, target:cid, type:'internal'});
+            });
+            if (mi > 0) links.push({source:macroGenres[mi-1].id, target:m.id, type:'ring'});
+        });
+    }
+
+    if (depth === 'artist') {
+        Object.keys(GENRE_ARTISTS).forEach(genreId => {
+            (GENRE_ARTISTS[genreId] || []).forEach(a => {
+                nodes.push({ id:a.id, label:a.name, type:'satellite', color:GENRES[genreId].color, bio:'', tags:[], itunesQuery:a.q, searchTarget:a.name.toLowerCase(), parentGenre:genreId });
+                links.push({source:genreId, target:a.id, type:'internal'});
+            });
+        });
+    }
+
+    return { nodes, links };
+}
+
+function initGraph(depth) {
+    currentDepth = depth;
+    const { nodes, links } = buildGraphData(depth);
+    renderGraph(nodes, links);
+}
+
+function renderGraph(nodes, links) {
+    document.getElementById('node-counter').textContent = `${nodes.length} nodos`;
+    const isDarkMode = isDark;
+    const container = document.getElementById('graph-container');
+
+    if (currentGraph) {
+        try { currentGraph._destructor?.(); } catch(e) {}
+        container.innerHTML = '';
+    }
+
+    currentGraph = ForceGraph()(container)
+        .graphData({ nodes: [...nodes], links: [...links] })
+        .backgroundColor(isDarkMode ? '#08080e' : '#e8eaf4')
+        .nodeRelSize(5)
+        .linkColor(l => l.type === 'ring' ? (isDarkMode ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.22)') : (isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.28)'))
+        .linkWidth(l => l.type === 'ring' ? 0.4 : 1.5)
+        .nodeCanvasObject((node, ctx, gs) => {
+            const isCore = node.type === 'core', isPrimary = node.type === 'primary';
+            const r = isCore ? 12 : isPrimary ? 7 : 5;
+
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, r, 0, 2 * Math.PI);
+            if (isCore) {
+                ctx.fillStyle = node.color;
+                ctx.fill();
+            } else {
+                ctx.fillStyle = isDarkMode ? '#08080e' : '#f0f2f8';
+                ctx.fill();
+                ctx.strokeStyle = node.color;
+                ctx.lineWidth = isPrimary ? 2 : 1.5;
+                ctx.stroke();
+            }
+
+            const fontSize = isCore ? Math.max(13/gs, 2.5) : Math.max(9/gs, 2);
+            ctx.font = `${isCore ? '600' : '400'} ${fontSize}px 'Space Grotesk',sans-serif`;
+            ctx.fillStyle = isCore ? (isDarkMode ? '#fff' : '#0f172a') : (isDarkMode ? '#94a3b8' : '#475569');
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            ctx.fillText(node.label, node.x, node.y + r + 2.5);
+        })
+        .onNodeClick(node => {
+            selectedNode = node;
+            currentGraph.centerAt(node.x, node.y, 700);
+            currentGraph.zoom(3.5, 700);
+            updateInspector(node);
+        });
+
+    currentGraph.d3Force('link').distance(l => l.type === 'ring' ? 90 : 90).strength(l => l.type === 'ring' ? 0.25 : 0.8);
+    currentGraph.d3Force('charge').strength(-550);
+    currentGraph.d3Force('collide', d3.forceCollide(n => n.type === 'core' ? 42 : 24));
+    setTimeout(() => currentGraph.zoomToFit(900, 80), 1000);
+}
+
+// ============================================================
+// INSPECTOR
+// ============================================================
+function updateInspector(node) {
+    const typeMap = { core: 'Macro-Género', primary: 'Subgénero', satellite: 'Artista' };
+    const badge = document.getElementById('inspector-badge');
+    badge.textContent = typeMap[node.type] || 'Nodo';
+    badge.style.background = node.color + '22';
+    badge.style.color = node.color;
+    badge.style.borderColor = node.color + '44';
+
+    document.getElementById('inspector-title').textContent = node.label;
+    document.getElementById('inspector-subtitle').textContent = node.itunesQuery ? 'iTunes disponible' : 'Información disponible';
+    document.getElementById('inspector-bio').textContent = node.bio || 'Nodo musical en el universo isomorfo.';
+}
+
+// ============================================================
+// TOP LIST
+// ============================================================
+const historicalData = {
+    artists: {
+        now: {
+            global: [['Bad Bunny', '🇵🇷'], ['Taylor Swift', '🇺🇸'], ['The Weeknd', '🇨🇦'], ['Drake', '🇨🇦'], ['Karol G', '🇨🇴'], ['BTS', '🇰🇷'], ['BLACKPINK', '🇰🇷'], ['Eminem', '🇺🇸'], ['SZA', '🇺🇸'], ['Morgan Wallen', '🇺🇸']],
+            latam: [['Bad Bunny', '🇵🇷'], ['Karol G', '🇨🇴'], ['Peso Pluma', '🇲🇽'], ['Feid', '🇨🇴'], ['BTS', '🇰🇷'], ['J Balvin', '🇨🇴'], ['Rauw Alejandro', '🇵🇷'], ['Shakira', '🇨🇴'], ['Bizarrap', '🇦🇷'], ['Daddy Yankee', '🇵🇷']],
+            spain: [['Bad Bunny', '🇵🇷'], ['Quevedo', '🇪🇸'], ['Rosalía', '🇪🇸'], ['Bizarrap', '🇦🇷'], ['BLACKPINK', '🇰🇷'], ['C. Tangana', '🇪🇸'], ['BTS', '🇰🇷'], ['Morad', '🇲🇦'], ['Duki', '🇦🇷'], ['Aitana', '🇪🇸']],
+        },
+        '2010': {
+            global: [['Lady Gaga', '🇺🇸'], ['Eminem', '🇺🇸'], ['Rihanna', '🇧🇧'], ['Katy Perry', '🇺🇸'], ['Justin Bieber', '🇨🇦'], ['Bruno Mars', '🇺🇸'], ['Beyoncé', '🇺🇸'], ['David Guetta', '🇫🇷'], ['B.o.B', '🇺🇸'], ['Taio Cruz', '🇬🇧']],
+            latam: [['Shakira', '🇨🇴'], ['Daddy Yankee', '🇵🇷'], ['Wisin & Yandel', '🇵🇷'], ['Don Omar', '🇵🇷'], ['Marc Anthony', '🇺🇸'], ['Pitbull', '🇺🇸'], ['J Alvarez', '🇵🇷'], ['Plan B', '🇵🇷'], ['Enrique Iglesias', '🇪🇸'], ['Ricky Martin', '🇵🇷']],
+            spain: [['Shakira', '🇨🇴'], ['David Bisbal', '🇪🇸'], ['Alejandro Sanz', '🇪🇸'], ['Estopa', '🇪🇸'], ['Melendi', '🇪🇸'], ['El Canto del Loco', '🇪🇸'], ['Rihanna', '🇧🇧'], ['Carlos Baute', '🇻🇪'], ['Dani Martín', '🇪🇸'], ['Pereza', '🇪🇸']],
+        },
+        '2000': {
+            global: [['Eminem', '🇺🇸'], ['Britney Spears', '🇺🇸'], ['Madonna', '🇺🇸'], ["N'Sync", '🇺🇸'], ['Santana', '🇲🇽'], ['Ricky Martin', '🇵🇷'], ['Shakira', '🇨🇴'], ["Destiny's Child", '🇺🇸'], ['U2', '🇮🇪'], ['Coldplay', '🇬🇧']],
+            latam: [['Ricky Martin', '🇵🇷'], ['Shakira', '🇨🇴'], ['Marc Anthony', '🇺🇸'], ['Chayanne', '🇵🇷'], ['Alejandro Sanz', '🇪🇸'], ['Celia Cruz', '🇨🇺'], ['Maná', '🇲🇽'], ['Gilberto Santa Rosa', '🇵🇷'], ['Paulina Rubio', '🇲🇽'], ['Luis Miguel', '🇲🇽']],
+            spain: [['Alejandro Sanz', '🇪🇸'], ['La Oreja de Van Gogh', '🇪🇸'], ['Estopa', '🇪🇸'], ['Joaquín Sabina', '🇪🇸'], ['Ricky Martin', '🇵🇷'], ['Shakira', '🇨🇴'], ['Mónica Naranjo', '🇪🇸'], ['Britney Spears', '🇺🇸'], ['Raúl', '🇪🇸'], ['Tom Jones', '🇬🇧']],
+        },
+    },
+    genres: {
+        now: { global: ['Pop', 'Hip Hop', 'Reggaeton', 'K-Pop', 'EDM', 'Rock', 'R&B', 'Indie', 'Afrobeats', 'Jazz'], latam: ['Reggaeton', 'Trap', 'Pop Latino', 'Bachata', 'Salsa', 'Rock', 'Cumbia', 'Hip Hop', 'Merengue', 'K-Pop'], spain: ['Reggaeton', 'Pop', 'Trap', 'Indie Pop', 'EDM', 'Rock', 'Jazz', 'Salsa', 'Hip Hop', 'K-Pop'] },
+        '2010': { global: ['Pop', 'Hip Hop', 'R&B', 'Rock', 'EDM', 'Indie Rock', 'Dubstep', 'Country', 'Reggaeton', 'Jazz'], latam: ['Pop Latino', 'Reggaeton', 'Salsa', 'Bachata', 'Rock', 'Balada', 'Cumbia', 'Hip Hop', 'Merengue', 'Jazz'], spain: ['Pop Latino', 'Rock', 'Flamenco', 'Dance', 'Reggaeton', 'Indie', 'Jazz', 'Salsa', 'Bachata', 'R&B'] },
+        '2000': { global: ['Pop', 'R&B', 'Hip Hop', 'Rock', 'Salsa', 'Latin Pop', 'Jazz', 'Country', 'Techno', 'Reggaeton'], latam: ['Salsa', 'Pop Latino', 'Balada', 'Rock', 'Merengue', 'Cumbia', 'Vallenato', 'Jazz', 'Reggaeton', 'Bolero'], spain: ['Pop Español', 'Rock', 'Flamenco', 'Jazz', 'Salsa', 'Cantautor', 'Pop Latino', 'Reggaeton', 'Bachata', 'Dance'] },
+    }
+};
+
+function renderTopList() {
+    const region = document.getElementById('filter-region').value;
+    const year = document.getElementById('filter-year').value;
+    const type = document.getElementById('filter-type').value;
+    const db = historicalData[type];
+    const yearData = db[year] || db['now'];
+    const items = yearData[region] || yearData['global'];
+    const list = document.getElementById('top-list');
+    list.innerHTML = '';
+    items.forEach((item, i) => {
+        const li = document.createElement('li');
+        li.style.cssText = 'display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:8px;cursor:pointer;transition:background 0.15s;border:1px solid transparent;';
+        li.onmouseover = () => li.style.background = 'var(--surface2)';
+        li.onmouseout = () => li.style.background = 'transparent';
+        const isArtist = type === 'artists';
+        const name = isArtist ? item[0] : item;
+        const flag = isArtist ? item[1] : '';
+        li.innerHTML = `<span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);width:16px;text-align:center;">${i+1}</span><span style="flex:1;font-size:12px;color:var(--text2);">${name}</span>${flag ? `<span style="font-size:13px;">${flag}</span>` : ''}`;
+        li.onclick = () => {
+            document.getElementById('global-search').value = name;
+            document.getElementById('global-search').dispatchEvent(new Event('input'));
+        };
+        list.appendChild(li);
+    });
+}
+
+['filter-region', 'filter-year', 'filter-type'].forEach(id => document.getElementById(id).addEventListener('change', renderTopList));
+
+// ============================================================
+// SEARCH
+// ============================================================
+function setDepth(depth, btn) {
+    document.querySelectorAll('.depth-btn').forEach(b => b.style.background = 'transparent');
+    btn.style.background = 'rgba(124,58,237,0.2)';
+    btn.style.borderColor = 'var(--accent)';
+    btn.style.color = 'var(--text)';
+    initGraph(depth);
+}
+
+document.getElementById('global-search').addEventListener('input', e => {
+    const val = e.target.value.toLowerCase().trim();
+    if (!val || !currentGraph) return;
+    const data = currentGraph.graphData();
+    const match = data.nodes.find(n => n.searchTarget && n.searchTarget.includes(val));
+    if (match) {
+        currentGraph.centerAt(match.x, match.y, 700);
+        currentGraph.zoom(4, 700);
+        selectedNode = match;
+        updateInspector(match);
+    }
+});
+
+// ============================================================
+// THEME TOGGLE
+// ============================================================
+document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+
+// ============================================================
+// INIT
+// ============================================================
+initGraph('macro');
+renderTopList();
+</script>
+</body>
+</html>
