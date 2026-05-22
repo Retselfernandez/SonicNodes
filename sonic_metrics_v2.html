@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SonicNodes — Métricas Históricas</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ===== SAME TOKENS AS V6 ===== */
+:root[data-theme="dark"]{
+  --bg:#08080e;--bg2:#0f0f1a;--sf2:rgba(255,255,255,0.07);
+  --bd:rgba(255,255,255,0.08);--bd2:rgba(255,255,255,0.18);
+  --tx:#e2e8f0;--tx2:#94a3b8;--mu:#475569;
+  --ac:#7c3aed;--ac2:#06b6d4;--gr:#10b981;--am:#f59e0b;
+  --pan:rgba(8,8,14,0.85);
+  --scr:rgba(255,255,255,0.1);--chov:rgba(255,255,255,0.08);
+}
+:root[data-theme="light"]{
+  --bg:#eef0f7;--bg2:#ffffff;--sf2:rgba(0,0,0,0.07);
+  --bd:rgba(0,0,0,0.12);--bd2:rgba(0,0,0,0.28);
+  --tx:#0f172a;--tx2:#334155;--mu:#94a3b8;
+  --ac:#6d28d9;--ac2:#0891b2;--gr:#059669;--am:#d97706;
+  --pan:rgba(238,240,247,0.93);
+  --scr:rgba(0,0,0,0.15);--chov:rgba(0,0,0,0.07);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;transition:background .25s,color .25s;}
+::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--scr);border-radius:4px;}
+.panel{background:var(--pan);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--bd);}
+
+/* TOPBAR — identical to v6 */
+#topbar{position:sticky;top:0;left:0;right:0;height:50px;z-index:30;display:flex;align-items:center;padding:0 14px;gap:10px;border-top:none;border-left:none;border-right:none;border-bottom:1px solid var(--bd);}
+.logo-mark{width:30px;height:30px;border-radius:8px;flex-shrink:0;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;}
+.logo-text{font-size:15px;font-weight:700;letter-spacing:-.03em;}
+.logo-ver{font-family:'DM Mono',monospace;font-size:9px;color:var(--mu);margin-left:3px;}
+.tpill{font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;border:1px solid;white-space:nowrap;}
+#tbtn{width:32px;height:32px;border-radius:8px;background:var(--sf2);border:1px solid var(--bd);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--tx2);}
+.nav-link{font-family:'DM Mono',monospace;font-size:10px;padding:5px 10px;border-radius:6px;border:1px solid var(--bd);color:var(--tx2);text-decoration:none;transition:all .15s;cursor:pointer;}
+.nav-link:hover{border-color:var(--ac);color:var(--ac);}
+.nav-link.active-page{background:rgba(124,58,237,.15);border-color:var(--ac);color:var(--ac);}
+
+/* SHELL */
+.shell{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 50px);}
+
+/* SIDEBAR */
+.sidebar{border-right:1px solid var(--bd);padding:20px 16px;display:flex;flex-direction:column;gap:20px;position:sticky;top:50px;height:calc(100vh - 50px);overflow-y:auto;background:var(--pan);backdrop-filter:blur(24px);}
+.sidebar::-webkit-scrollbar{width:2px;}
+.ctrl-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);border-bottom:1px solid var(--bd);padding-bottom:5px;margin-bottom:8px;}
+
+/* Country search */
+.search-input{width:100%;padding:6px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-size:12px;font-family:'Space Grotesk',sans-serif;outline:none;}
+.search-input:focus{border-color:var(--ac);}
+.search-input::placeholder{color:var(--mu);}
+
+/* Country grid */
+#country-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;max-height:260px;overflow-y:auto;}
+#country-grid::-webkit-scrollbar{width:2px;}
+.cbtn{padding:5px 7px;border:1px solid var(--bd);background:transparent;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:10.5px;text-align:left;display:flex;align-items:center;gap:4px;transition:all .12s;white-space:nowrap;overflow:hidden;border-radius:6px;color:var(--tx2);}
+.cbtn:hover{border-color:var(--ac2);color:var(--tx);background:var(--chov);}
+.cbtn.active{border-color:var(--ac);background:rgba(124,58,237,.2);color:var(--tx);}
+.cflag{font-size:12px;flex-shrink:0;}
+.cname{overflow:hidden;text-overflow:ellipsis;font-size:10px;}
+
+/* Year list */
+#year-list{display:flex;flex-direction:column;gap:0;max-height:220px;overflow-y:auto;border:1px solid var(--bd);border-radius:8px;overflow:hidden;}
+#year-list::-webkit-scrollbar{width:2px;}
+.ybtn{padding:6px 10px;border:none;border-bottom:1px solid var(--bd);background:transparent;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;text-align:left;display:flex;align-items:center;justify-content:space-between;color:var(--tx2);transition:background .1s;}
+.ybtn:last-child{border-bottom:none;}
+.ybtn:hover{background:var(--chov);color:var(--tx);}
+.ybtn.active{background:rgba(124,58,237,.2);color:var(--tx);}
+.ybtn .dtag{font-size:8px;opacity:.5;letter-spacing:.06em;}
+
+/* Generate button */
+.gen-btn{width:100%;padding:10px 14px;background:linear-gradient(135deg,var(--ac),#5b21b6);color:white;border:none;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;border-radius:8px;display:flex;align-items:center;justify-content:center;gap:7px;transition:opacity .15s;}
+.gen-btn:hover{opacity:.9;}
+.gen-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* CONTENT */
+.content{padding:24px;display:flex;flex-direction:column;gap:20px;min-height:calc(100vh - 50px);}
+
+/* Period hero */
+.period-hero{display:none;flex-direction:column;gap:5px;padding-bottom:20px;border-bottom:1px solid var(--bd);}
+.period-hero.on{display:flex;}
+.period-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);}
+.period-title{font-size:40px;font-weight:700;letter-spacing:-.04em;line-height:1;}
+.period-title span{color:var(--ac);}
+.period-ctx{font-size:13px;line-height:1.65;color:var(--tx2);max-width:640px;}
+
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--bd);border-radius:10px;overflow:hidden;}
+.stat-cell{padding:14px;border-right:1px solid var(--bd);}
+.stat-cell:last-child{border-right:none;}
+.stat-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin-bottom:4px;}
+.stat-val{font-size:18px;font-weight:700;letter-spacing:-.02em;line-height:1.2;}
+.stat-unit{font-family:'DM Mono',monospace;font-size:9px;color:var(--mu);margin-top:2px;}
+
+/* Metrics grid */
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+/* Metric card — same glass style as panels */
+.mcard{border:1px solid var(--bd);border-radius:10px;overflow:hidden;background:var(--pan);backdrop-filter:blur(12px);}
+.mcard-hd{padding:10px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.02);}
+[data-theme="light"] .mcard-hd{background:rgba(0,0,0,0.02);}
+.mcard-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2);}
+.mcard-meta{font-family:'DM Mono',monospace;font-size:8px;color:var(--mu);}
+
+/* Rank list */
+.rlist{list-style:none;}
+.ri{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--bd);transition:background .1s;}
+.ri:last-child{border-bottom:none;}
+.ri:hover{background:var(--chov);}
+.rnum{font-family:'DM Mono',monospace;font-size:10px;color:var(--mu);width:16px;text-align:right;flex-shrink:0;}
+.rnum.t3{color:var(--ac);font-weight:500;}
+.rbw{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0;}
+.rname{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rsub{font-size:10px;color:var(--mu);}
+.rbar{height:2px;background:var(--bd);border-radius:1px;overflow:hidden;margin-top:1px;}
+.rbf{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:1px;transition:width .5s ease;}
+.rflag{font-size:13px;flex-shrink:0;}
+
+/* Song card */
+.song-card{border:1px solid var(--bd);border-radius:10px;overflow:hidden;display:flex;grid-column:1/-1;background:var(--pan);backdrop-filter:blur(12px);}
+.song-stripe{width:5px;background:linear-gradient(to bottom,var(--ac),var(--ac2));flex-shrink:0;}
+.song-body{padding:14px 18px;flex:1;}
+.song-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-bottom:3px;}
+.song-title{font-size:20px;font-weight:700;letter-spacing:-.03em;}
+.song-artist{font-size:12px;color:var(--tx2);margin-top:2px;}
+.song-fact{font-size:11.5px;line-height:1.6;color:var(--tx2);margin-top:10px;border-top:1px solid var(--bd);padding-top:10px;}
+
+/* Curiosities */
+.curio-card{border:1px solid var(--bd);border-radius:10px;overflow:hidden;grid-column:1/-1;background:var(--pan);backdrop-filter:blur(12px);}
+.curio-body{padding:16px;display:flex;flex-direction:column;gap:10px;}
+.curio-item{display:flex;gap:12px;align-items:flex-start;}
+.curio-ico{width:28px;height:28px;border:1px solid var(--bd);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:1px;background:var(--sf2);}
+.curio-txt{font-size:12px;line-height:1.65;color:var(--tx2);}
+.curio-txt strong{color:var(--tx);}
+
+/* Empty / loading / error */
+.estate{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;gap:12px;text-align:center;flex:1;}
+.estate-icon{font-size:32px;opacity:.3;}
+.estate-title{font-size:14px;font-weight:600;}
+.estate-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--mu);}
+.spin{width:28px;height:28px;border:2px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.errbox{padding:12px 16px;border:1px solid rgba(239,68,68,.4);border-radius:8px;background:rgba(239,68,68,.08);font-family:'DM Mono',monospace;font-size:11px;color:#f87171;display:none;}
+.errbox.on{display:block;}
+
+/* Fade in */
+@keyframes fup{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.fi{animation:fup .35s ease forwards;opacity:0;}
+.fi:nth-child(1){animation-delay:.04s}.fi:nth-child(2){animation-delay:.1s}.fi:nth-child(3){animation-delay:.16s}.fi:nth-child(4){animation-delay:.22s}.fi:nth-child(5){animation-delay:.28s}.fi:nth-child(6){animation-delay:.34s}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR — same as v6 -->
+<header id="topbar" class="panel">
+  <div class="logo-mark">
+    <svg width="17" height="17" viewBox="0 0 100 100" fill="none">
+      <path d="M25,75 C25,40 50,25 50,50 C50,75 75,60 75,25" stroke="white" stroke-width="10" stroke-linecap="round"/>
+      <circle cx="25" cy="75" r="8" fill="white" opacity=".9"/>
+      <circle cx="50" cy="50" r="6" fill="white" opacity=".7"/>
+      <circle cx="75" cy="25" r="8" fill="white" opacity=".9"/>
+    </svg>
+  </div>
+  <span class="logo-text">SonicNodes</span>
+  <span class="logo-ver">v6.0</span>
+
+  <div style="display:flex;gap:6px;margin-left:10px;">
+    <span class="nav-link" onclick="window.location='sonic_nodes_v2.html'">← Mapa de Géneros</span>
+    <span class="nav-link active-page">Métricas Históricas</span>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:7px;margin-left:auto;">
+    <span class="tpill" style="background:rgba(124,58,237,.15);color:#a78bfa;border-color:rgba(124,58,237,.3);">Claude AI</span>
+    <span class="tpill" style="background:rgba(6,182,212,.1);color:#06b6d4;border-color:rgba(6,182,212,.25);">50+ países</span>
+    <button id="tbtn" onclick="toggleTheme()" title="Cambiar tema">
+      <svg id="ti-d" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+      <svg id="ti-l" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none;"><circle cx="12" cy="12" r="5" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="ctrl-label">País / Región</div>
+      <input class="search-input" type="text" id="csearch" placeholder="Buscar país…" oninput="filterC(this.value)" style="margin-bottom:8px;">
+      <div id="country-grid"></div>
+    </div>
+    <div>
+      <div class="ctrl-label">Año clave</div>
+      <div id="year-list"></div>
+    </div>
+    <div class="errbox" id="errbox"></div>
+    <button class="gen-btn" id="gbtn" onclick="generate()">
+      <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      Generar métricas
+    </button>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content" id="content">
+    <div class="estate" id="estate">
+      <div class="estate-icon">📡</div>
+      <div class="estate-title">Selecciona país y año</div>
+      <div class="estate-sub">Datos generados por Claude AI · 50+ países · 1950–2024</div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ================================================================
+// THEME
+// ================================================================
+let isDark = true;
+function toggleTheme(){
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('ti-d').style.display = isDark ? 'block' : 'none';
+  document.getElementById('ti-l').style.display = isDark ? 'none' : 'block';
+}
+
+// ================================================================
+// DATA
+// ================================================================
+const COUNTRIES = [
+  {id:'global',     name:'Global',           flag:'🌐', r:'Global'},
+  {id:'latam',      name:'Latinoamérica',     flag:'🌎', r:'Global'},
+  {id:'europe',     name:'Europa',            flag:'🌍', r:'Global'},
+  {id:'asia',       name:'Asia',              flag:'🌏', r:'Global'},
+  {id:'africa',     name:'África',            flag:'🌍', r:'Global'},
+  {id:'spain',      name:'España',            flag:'🇪🇸', r:'Europa'},
+  {id:'galicia',    name:'Galicia',           flag:'🏴', r:'Europa'},
+  {id:'uk',         name:'Reino Unido',       flag:'🇬🇧', r:'Europa'},
+  {id:'france',     name:'Francia',           flag:'🇫🇷', r:'Europa'},
+  {id:'germany',    name:'Alemania',          flag:'🇩🇪', r:'Europa'},
+  {id:'italy',      name:'Italia',            flag:'🇮🇹', r:'Europa'},
+  {id:'portugal',   name:'Portugal',          flag:'🇵🇹', r:'Europa'},
+  {id:'netherlands',name:'Países Bajos',      flag:'🇳🇱', r:'Europa'},
+  {id:'sweden',     name:'Suecia',            flag:'🇸🇪', r:'Europa'},
+  {id:'norway',     name:'Noruega',           flag:'🇳🇴', r:'Europa'},
+  {id:'denmark',    name:'Dinamarca',         flag:'🇩🇰', r:'Europa'},
+  {id:'poland',     name:'Polonia',           flag:'🇵🇱', r:'Europa'},
+  {id:'russia',     name:'Rusia',             flag:'🇷🇺', r:'Europa'},
+  {id:'greece',     name:'Grecia',            flag:'🇬🇷', r:'Europa'},
+  {id:'belgium',    name:'Bélgica',           flag:'🇧🇪', r:'Europa'},
+  {id:'switzerland',name:'Suiza',             flag:'🇨🇭', r:'Europa'},
+  {id:'us',         name:'Estados Unidos',    flag:'🇺🇸', r:'Américas'},
+  {id:'canada',     name:'Canadá',            flag:'🇨🇦', r:'Américas'},
+  {id:'mexico',     name:'México',            flag:'🇲🇽', r:'Américas'},
+  {id:'brazil',     name:'Brasil',            flag:'🇧🇷', r:'Américas'},
+  {id:'argentina',  name:'Argentina',         flag:'🇦🇷', r:'Américas'},
+  {id:'colombia',   name:'Colombia',          flag:'🇨🇴', r:'Américas'},
+  {id:'chile',      name:'Chile',             flag:'🇨🇱', r:'Américas'},
+  {id:'peru',       name:'Perú',              flag:'🇵🇪', r:'Américas'},
+  {id:'venezuela',  name:'Venezuela',         flag:'🇻🇪', r:'Américas'},
+  {id:'cuba',       name:'Cuba',              flag:'🇨🇺', r:'Américas'},
+  {id:'puertorico', name:'Puerto Rico',       flag:'🇵🇷', r:'Américas'},
+  {id:'domrep',     name:'Rep. Dominicana',   flag:'🇩🇴', r:'Américas'},
+  {id:'jamaica',    name:'Jamaica',           flag:'🇯🇲', r:'Américas'},
+  {id:'japan',      name:'Japón',             flag:'🇯🇵', r:'Asia'},
+  {id:'southkorea', name:'Corea del Sur',     flag:'🇰🇷', r:'Asia'},
+  {id:'china',      name:'China',             flag:'🇨🇳', r:'Asia'},
+  {id:'india',      name:'India',             flag:'🇮🇳', r:'Asia'},
+  {id:'indonesia',  name:'Indonesia',         flag:'🇮🇩', r:'Asia'},
+  {id:'philippines',name:'Filipinas',         flag:'🇵🇭', r:'Asia'},
+  {id:'thailand',   name:'Tailandia',         flag:'🇹🇭', r:'Asia'},
+  {id:'turkey',     name:'Turquía',           flag:'🇹🇷', r:'Asia'},
+  {id:'israel',     name:'Israel',            flag:'🇮🇱', r:'Asia'},
+  {id:'nigeria',    name:'Nigeria',           flag:'🇳🇬', r:'África'},
+  {id:'southafrica',name:'Sudáfrica',         flag:'🇿🇦', r:'África'},
+  {id:'ghana',      name:'Ghana',             flag:'🇬🇭', r:'África'},
+  {id:'ethiopia',   name:'Etiopía',           flag:'🇪🇹', r:'África'},
+  {id:'egypt',      name:'Egipto',            flag:'🇪🇬', r:'África'},
+  {id:'senegal',    name:'Senegal',           flag:'🇸🇳', r:'África'},
+  {id:'australia',  name:'Australia',         flag:'🇦🇺', r:'Oceanía'},
+  {id:'newzealand', name:'Nueva Zelanda',     flag:'🇳🇿', r:'Oceanía'},
+];
+
+const YEARS = [
+  {y:1950,d:'50s'},{y:1955,d:'50s'},
+  {y:1960,d:'60s'},{y:1963,d:'60s'},{y:1967,d:'60s'},
+  {y:1970,d:'70s'},{y:1973,d:'70s'},{y:1977,d:'70s'},
+  {y:1980,d:'80s'},{y:1983,d:'80s'},{y:1985,d:'80s'},{y:1988,d:'80s'},
+  {y:1991,d:'90s'},{y:1994,d:'90s'},{y:1997,d:'90s'},{y:1999,d:'90s'},
+  {y:2001,d:'00s'},{y:2004,d:'00s'},{y:2007,d:'00s'},
+  {y:2010,d:'10s'},{y:2012,d:'10s'},{y:2015,d:'10s'},{y:2018,d:'10s'},
+  {y:2020,d:'20s'},{y:2022,d:'20s'},{y:2024,d:'20s'},
+];
+
+// Cache so same queries don't hit API twice
+const CACHE = {};
+
+let selC = null, selY = null, loading = false;
+
+// ================================================================
+// RENDER CONTROLS
+// ================================================================
+function renderC(filter='') {
+  const grid = document.getElementById('country-grid');
+  const list = COUNTRIES.filter(c =>
+    c.name.toLowerCase().includes(filter.toLowerCase()) ||
+    c.r.toLowerCase().includes(filter.toLowerCase())
+  );
+  grid.innerHTML = list.map(c => `
+    <button class="cbtn ${selC?.id===c.id?'active':''}" onclick="pickC('${c.id}')" title="${c.r}">
+      <span class="cflag">${c.flag}</span>
+      <span class="cname">${c.name}</span>
+    </button>
+  `).join('');
+}
+
+function renderY() {
+  document.getElementById('year-list').innerHTML = YEARS.map(y => `
+    <button class="ybtn ${selY===y.y?'active':''}" onclick="pickY(${y.y})">
+      <span>${y.y}</span><span class="dtag">${y.d}</span>
+    </button>
+  `).join('');
+}
+
+function filterC(v) { renderC(v); }
+function pickC(id) { selC = COUNTRIES.find(c=>c.id===id); renderC(document.getElementById('csearch').value); }
+function pickY(y) { selY = y; renderY(); }
+
+// ================================================================
+// GENERATE — uses Anthropic API via artifact proxy
+// ================================================================
+async function generate() {
+  if (!selC || !selY) { showErr('Selecciona un país y un año primero.'); return; }
+  if (loading) return;
+
+  const cacheKey = `${selC.id}_${selY}`;
+  if (CACHE[cacheKey]) { renderResults(CACHE[cacheKey]); return; }
+
+  loading = true;
+  const btn = document.getElementById('gbtn');
+  btn.disabled = true;
+  btn.innerHTML = `<div class="spin" style="width:14px;height:14px;border-width:2px;"></div> Generando…`;
+  hideErr();
+  showLoading();
+
+  const prompt = `You are a precise music historian. Generate accurate historical music data for ${selC.name} (${selC.r}) in the year ${selY}.
+
+Return ONLY a valid JSON object with this exact structure. No markdown, no code blocks, no explanation:
+
+{"context":"2-3 sentences describing the musical and cultural moment in ${selC.name} in ${selY}. Include social/political context that influenced music.","top_artists":[{"name":"string","origin":"City, Country","flag":"emoji flag","genre":"string","popularity":85}],"top_genres":[{"name":"string","description":"brief description","popularity":80}],"song_of_the_year":{"title":"string","artist":"string","fact":"One specific fascinating fact about this song's cultural impact in ${selC.name} or globally in ${selY}"},"market_stats":{"format":"dominant format (vinyl/cassette/CD/digital/streaming)","global_rank":"e.g. #3 world music market","market_context":"brief note on music industry in ${selC.name} at this time"},"curiosities":[{"icon":"🎵","text":"Specific fascinating music fact about ${selC.name} in ${selY} with real names and events"},{"icon":"📻","text":"A radio moment, concert, ban, scandal, or cultural event in ${selC.name} around ${selY}"},{"icon":"💿","text":"A specific album, artist breakthrough, or industry milestone in ${selC.name} near ${selY}"},{"icon":"🌍","text":"How music from ${selC.name} interacted with or influenced international music in ${selY}"}]}
+
+Rules: top_artists must have exactly 10 items with popularity 40-100. top_genres must have exactly 8 items. Be historically accurate and specific to ${selC.name}, not just global trends. Use real names and real events.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!resp.ok) throw new Error(`API error ${resp.status}`);
+    const data = await resp.json();
+    const raw = data.content?.find(b => b.type === 'text')?.text || '';
+
+    // Robust JSON extraction
+    let parsed;
+    const m = raw.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('Respuesta inválida de la IA');
+    parsed = JSON.parse(m[0]);
+
+    CACHE[cacheKey] = parsed;
+    renderResults(parsed);
+
+  } catch(e) {
+    hideLoading();
+    showErr(e.message || 'Error al conectar. Intenta de nuevo.');
+  } finally {
+    loading = false;
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Generar métricas`;
+  }
+}
+
+// ================================================================
+// RENDER
+// ================================================================
+function renderResults(d) {
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <!-- Hero -->
+    <div class="period-hero on fi">
+      <div class="period-eyebrow">${selC.flag} ${selC.name} · Archivo Musical · ${selC.r}</div>
+      <div class="period-title">${selY}<span>.</span></div>
+      <div class="period-ctx">${d.context || ''}</div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="stats-row fi">
+      <div class="stat-cell">
+        <div class="stat-lbl">Formato dominante</div>
+        <div class="stat-val" style="font-size:14px;margin-top:2px;">${d.market_stats?.format || '—'}</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-lbl">Mercado musical</div>
+        <div class="stat-val" style="font-size:14px;margin-top:2px;">${d.market_stats?.global_rank || '—'}</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-lbl">Contexto industria</div>
+        <div class="stat-val" style="font-size:11px;font-weight:500;color:var(--tx2);line-height:1.4;margin-top:2px;">${d.market_stats?.market_context || '—'}</div>
+      </div>
+      <div class="stat-cell" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+        <div style="font-size:32px;">${selC.flag}</div>
+        <div class="stat-unit">${selC.name}</div>
+      </div>
+    </div>
+
+    <!-- Grid -->
+    <div class="mgrid">
+
+      <!-- Artists -->
+      <div class="mcard fi">
+        <div class="mcard-hd">
+          <span class="mcard-title">Top Artistas</span>
+          <span class="mcard-meta">${selC.name} · ${selY}</span>
+        </div>
+        <ul class="rlist">
+          ${(d.top_artists||[]).slice(0,10).map((a,i)=>`
+            <li class="ri">
+              <span class="rnum ${i<3?'t3':''}">${i+1}</span>
+              <div class="rbw">
+                <div class="rname">${a.name}</div>
+                <div class="rsub">${[a.origin,a.genre].filter(Boolean).join(' · ')}</div>
+                <div class="rbar"><div class="rbf" style="width:${a.popularity||70}%"></div></div>
+              </div>
+              <span class="rflag">${a.flag||'🎵'}</span>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+
+      <!-- Genres -->
+      <div class="mcard fi">
+        <div class="mcard-hd">
+          <span class="mcard-title">Géneros Dominantes</span>
+          <span class="mcard-meta">${selC.name} · ${selY}</span>
+        </div>
+        <ul class="rlist">
+          ${(d.top_genres||[]).slice(0,8).map((g,i)=>`
+            <li class="ri">
+              <span class="rnum ${i<3?'t3':''}">${i+1}</span>
+              <div class="rbw">
+                <div class="rname">${g.name}</div>
+                <div class="rsub">${g.description||''}</div>
+                <div class="rbar"><div class="rbf" style="width:${g.popularity||60}%"></div></div>
+              </div>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+
+      <!-- Song of the year -->
+      <div class="song-card fi">
+        <div class="song-stripe"></div>
+        <div class="song-body">
+          <div class="song-lbl">Canción del año · ${selY}</div>
+          <div class="song-title">${d.song_of_the_year?.title||'—'}</div>
+          <div class="song-artist">${d.song_of_the_year?.artist||''}</div>
+          <div class="song-fact">${d.song_of_the_year?.fact||''}</div>
+        </div>
+      </div>
+
+      <!-- Curiosities -->
+      <div class="curio-card fi">
+        <div class="mcard-hd">
+          <span class="mcard-title">Curiosidades históricas</span>
+          <span class="mcard-meta">Contexto · ${selY}</span>
+        </div>
+        <div class="curio-body">
+          ${(d.curiosities||[]).map(cu=>`
+            <div class="curio-item">
+              <div class="curio-ico">${cu.icon||'🎵'}</div>
+              <div class="curio-txt">${fmtTxt(cu.text||'')}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+    </div>
+  `;
+}
+
+function fmtTxt(t) {
+  return t
+    .replace(/"([^"]+)"/g,'<strong>"$1"</strong>')
+    .replace(/\b(19\d\d|20\d\d)\b/g,'<strong>$1</strong>');
+}
+
+// ================================================================
+// UI
+// ================================================================
+function showLoading() {
+  document.getElementById('content').innerHTML = `
+    <div class="estate">
+      <div class="spin"></div>
+      <div class="estate-title">Consultando el archivo musical…</div>
+      <div class="estate-sub">${selC.flag} ${selC.name} · ${selY} · Claude AI</div>
+    </div>
+  `;
+}
+function hideLoading() {}
+function showErr(msg) {
+  const e = document.getElementById('errbox');
+  e.textContent = '⚠ ' + msg; e.classList.add('on');
+}
+function hideErr() { document.getElementById('errbox').classList.remove('on'); }
+
+// ================================================================
+// INIT
+// ================================================================
+renderC();
+renderY();
+</script>
+</body>
+</html>
