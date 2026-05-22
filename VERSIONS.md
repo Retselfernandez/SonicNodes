@@ -2,7 +2,28 @@
 
 ## Releases
 
-### v4.5 (Mayo 2026) - ACTUAL ⭐
+### v13.0 (Mayo 2026) - ACTUAL ⭐
+**Título**: "The Time Machine Era"
+
+**Cambios Principales**:
+- ✅ **La Máquina del Tiempo Inmersiva**: Reestructuración total del panel lateral derecho. Extraída la funcionalidad de métricas históricas de la barra lateral para convertirla en un espectacular modal superpuesto a pantalla completa (ocupando el 90% de la ventana) con un sofisticado diseño Glassmorphism y fondo difuminado (backdrop blur).
+- ✅ **Selector Geográfico en Cascada (OLAP)**: Sistema dinámico multidimensional donde elegir un Continente (Europa, América) desbloquea y filtra inmediatamente los Países correspondientes (Reino Unido, España / EE.UU., Argentina), ofreciendo a su vez las décadas de los 2020s, 1980s y 1940s.
+- ✅ **Interacción Cruzada con ForceGraph**: Conexión interactiva bidireccional. Al hacer clic en cualquier tarjeta del top de éxitos del modal, este se cierra de forma fluida, coloca el nombre del artista en el cuadro de búsqueda principal (`#global-search`) y ejecuta automáticamente una búsqueda que centra, enfoca y amplía el nodo en el grafo interactivo.
+- ✅ **Base de Datos Multidimensional Robusta**: Inyección de un objeto de datos estructurado (`timeMachineData`) con exactamente 20 artistas detallados por país/década (más de 240 registros de primer nivel como Taylor Swift, Queen, Soda Stereo, Rosalía, etc.) alineados con los nombres del ForceGraph.
+- ✅ **Tarjetas de Éxitos con Tendencias**: Cada registro presenta su posición histórica (1-20), avatar con inicial del artista, género asociado, y una flecha indicativa de tendencia en colores dinámicos (subida en verde, bajada en rojo y estable en amarillo).
+- ✅ **Estado Vacío Informativo (Fallback)**: Diseño premium para décadas sin datos (como las décadas de 1990 o 1970) mostrando un hermoso aviso centrado indicando que no hay métricas cargadas para ese periodo específico.
+- ✅ **Limpieza y Optimización del Panel Derecho**: El panel derecho ahora luce extremadamente limpio y profesional, mostrando únicamente la "Profundidad del Grafo" y la "Simbología", permitiendo al usuario enfocarse en la navegación estructural.
+
+**Archivos**:
+- `Sonic_nodes_V13.html` (versión principal y completa de producción)
+
+**Estadísticas**:
+- Registros OLAP: 240+ artistas indexados.
+- Líneas de código: ~2900 (incluyendo base de datos estructurada, estilos CSS y lógica interactiva).
+
+---
+
+### v4.5 (Mayo 2026) - Anterior
 **Título**: "The 21 Genres Expansion"
 
 **Cambios Principales**:
@@ -114,20 +135,20 @@
 
 ## 📊 Comparativa de Evolución
 
-| Aspecto | v1.0 | v2.0 | v4.0 | v4.5 |
-|---------|------|------|------|------|
-| **Macro-Géneros** | 5 | 8 | 5 | 21 |
-| **Total Nodos** | ~20 | ~40 | 25 | 90+ |
-| **Profundidades** | 1 | 1 | 2 | 3 |
-| **Búsqueda** | ✗ | ✓ | ✓ | ✓ |
-| **iTunes API** | ✗ | ✓ | ✓ | ✓ |
-| **Spotify API** | ✗ | ✗ | ✓ | ✓ |
-| **Temas** | ✗ | Básico | Avanzado | Avanzado + |
-| **Métricas** | ✗ | ✗ | ✓ | ✓ |
-| **Auto-expand** | ✗ | ✗ | ✗ | ✓ |
-| **Bridges** | ✗ | ✗ | Limitados | Completos |
-| **Light Mode** | ✗ | ✓ (tenue) | ✓ (tenue) | ✓ (mejorado) |
-| **Líneas Código** | ~800 | ~1200 | ~2000 | ~2400 |
+| Aspecto | v1.0 | v2.0 | v4.0 | v4.5 | v13.0 |
+|---------|------|------|------|------|-------|
+| **Macro-Géneros** | 5 | 8 | 5 | 21 | 21 |
+| **Total Nodos** | ~20 | ~40 | 25 | 90+ | 90+ |
+| **Profundidades** | 1 | 1 | 2 | 3 | 3 |
+| **Búsqueda** | ✗ | ✓ | ✓ | ✓ | ✓ |
+| **iTunes API** | ✗ | ✓ | ✓ | ✓ | ✓ |
+| **Spotify API** | ✗ | ✗ | ✓ | ✓ | ✓ |
+| **Temas** | ✗ | Básico | Avanzado | Avanzado + | Premium Glassmorphism |
+| **Métricas** | ✗ | ✗ | ✓ | ✓ | Máquina del Tiempo Fullscreen |
+| **Auto-expand** | ✗ | ✗ | ✗ | ✓ | ✓ |
+| **Bridges** | ✗ | ✗ | Limitados | Completos | Completos |
+| **Light Mode** | ✗ | ✓ (tenue) | ✓ (tenue) | ✓ (mejorado) | ✓ (espectacular con blur) |
+| **Líneas Código** | ~800 | ~1200 | ~2000 | ~2400 | ~2900 |
 
 ---
 

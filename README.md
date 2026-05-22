@@ -1,6 +1,6 @@
 # 🎵 SonicNodes — Visualización Interactiva del Universo Musical
 
-![Version](https://img.shields.io/badge/version-4.5-blue.svg)
+![Version](https://img.shields.io/badge/version-13.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Status](https://img.shields.io/badge/status-active-brightgreen.svg)
 
@@ -64,10 +64,12 @@ La aplicación permite explorar la **arquitectura del universo musical moderno**
 - **Zoom y Navegación**: Centrado automático en nodos seleccionados
 - **Auto-expand**: Al hacer clic en macro-género, expande automáticamente a subgéneros
 
-### 📊 Métricas Históricas
-- Selector de región: Global, LATAM, España, Galicia, USA
-- Selector de período: Ahora, 2020, 2015, 2010, 2005, 2000, 1995
-- Top 10 artistas y géneros por región/época
+### ⏳ La Máquina del Tiempo Inmersiva (Time Machine v13.0)
+- **Modal a Pantalla Completa (90% Viewport)**: Un menú hamburguesa elegante (`#btn-time-machine`) en el topbar que activa un sofisticado panel superpuesto con diseño esmerilado Premium Glassmorphic y desenfoque de fondo.
+- **Selector Geográfico en Cascada (OLAP)**: Jerarquía dimensional interactiva. Permite filtrar por **Continente** (Europa, América), lo que habilita y puebla en cascada el selector de **País** (Reino Unido, España / EE.UU., Argentina), junto con la **Década** (2020s, 1980s, 1940s).
+- **Puente Interactivo con ForceGraph**: Conexión interactiva directa. Al presionar sobre un artista en el Top 20, el modal se cierra fluidamente y enfoca, hace zoom y resalta automáticamente ese nodo en el ForceGraph mediante el sistema de búsqueda interactiva.
+- **Gráficos de Éxitos Detallados con Tendencias**: Muestra un Top 20 de artistas destacados de la década y país seleccionados, incluyendo tendencia (subida en verde, bajada en rojo y estable en amarillo) e inicial del artista en un avatar circular.
+- **Visualización Limpia**: Optimización del panel lateral derecho, que se reduce a los controles de profundidad del grafo y simbología, delegando las métricas al modal inmersivo a pantalla completa.
 
 ---
 
@@ -166,10 +168,10 @@ git clone https://github.com/Retselfernandez/SonicNodes.git
 cd SonicNodes
 
 # Abrir en navegador (archivo local o servidor web)
-open Sonic_nodes_V4.html
+open Sonic_nodes_V13.html
 # O usar un servidor local:
 python -m http.server 8000
-# Luego acceder a: http://localhost:8000/Sonic_nodes_V4.html
+# Luego acceder a: http://localhost:8000/Sonic_nodes_V13.html
 ```
 
 ### Variables de Configuración (en código)
