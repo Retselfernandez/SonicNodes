@@ -2,8 +2,25 @@
 
 ## Releases
 
-### v13.2 (Mayo 2026) - ACTUAL ⭐
-**Título**: "The ForceGraph Deep-Link Era"
+### v13.3 (Mayo 2026) - ACTUAL ⭐
+**Título**: "The Universal Search & Deep-Link Era"
+
+**Cambios Principales**:
+- ✅ **Buscador Predictivo Flotante (Glassmorphism)**: Se sustituyó el buscador lineal instantáneo (que solo operaba en nodos presentes en el grafo activo) por un motor de búsqueda recursivo universal que escanea la base de datos de macro-géneros, subgéneros, artistas curados y artistas del OLAP en tiempo real.
+- ✅ **Sugerencias Predictivas Segmentadas**: Al escribir se despliega un panel flotante con Glassmorphism que divide los resultados en "Macro-género", "Género" (Subgénero) y "Artista", indicando la procedencia/género de este último.
+- ✅ **Enlace Profundo Multi-nivel Completo**: Al seleccionar una sugerencia:
+  - *Macro-género*: Se enfoca el nodo de inmediato (siempre presente).
+  - *Subgénero*: Se cambia la profundidad del grafo a "Subgénero" y se hace zoom/centrado sobre el nodo en el grafo.
+  - *Artista*: Se inyecta al artista en la base de datos dinámica en caliente (ej: "The Doors" se registra en el subgénero "psychedelic"), se cambia la profundidad a "Artista", y se enfoca con un zoom de 4x.
+- ✅ **Navegación e Interactividad Mejoradas**: Se incorporó soporte de teclado (tecla `Enter` ejecuta la primera sugerencia), ocultado al hacer clic fuera y re-enfoque automático.
+
+**Archivos**:
+- `Sonic_nodes_V13_3.html` (versión principal y completa de producción v13.3)
+- `Sonic_nodes_V13.html` (versión principal y completa de producción)
+
+---
+
+### v13.2 (Mayo 2026) - Anterior
 
 **Cambios Principales**:
 - ✅ **Enlace Profundo e Inteligente con el Grafo ("Ver en el Grafo")**: Se solucionó el problema por el cual el botón en la pantalla de discografía no lograba enfocar a artistas que no estaban cargados por defecto en el grafo. Se inyectó un resolvedor de géneros interactivo con mapeo heurístico multikeyword y registro dinámico en base de datos.
@@ -163,20 +180,20 @@
 
 ## 📊 Comparativa de Evolución
 
-| Aspecto | v1.0 | v2.0 | v4.0 | v4.5 | v13.0 | v13.1 | v13.2 |
-|---------|------|------|------|------|-------|-------|-------|
-| **Macro-Géneros** | 5 | 8 | 5 | 21 | 21 | 21 | 21 |
-| **Total Nodos** | ~20 | ~40 | 25 | 90+ | 90+ | 90+ | 90+ (dinámicos) |
-| **Profundidades** | 1 | 1 | 2 | 3 | 3 | 3 | 3 |
-| **Búsqueda** | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| **iTunes API** | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ (Búsqueda + Discografía) | ✓ (Autoplay + Discografía) |
-| **Spotify API** | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| **Temas** | ✗ | Básico | Avanzado | Avanzado + | Premium Glassmorphism | Premium Glassmorphism | Premium Glassmorphism |
-| **Métricas** | ✗ | ✗ | ✓ | ✓ | Máquina del Tiempo Fullscreen | M. Tiempo + Discografía en vivo | Deep-Link + Discografía en vivo |
-| **Auto-expand** | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ |
-| **Bridges** | ✗ | ✗ | Limitados | Completos | Completos | Completos | Completos |
-| **Light Mode** | ✗ | ✓ (tenue) | ✓ (tenue) | ✓ (mejorado) | ✓ (espectacular con blur) | ✓ (espectacular con blur) | ✓ (espectacular con blur) |
-| **Líneas Código** | ~800 | ~1200 | ~2000 | ~2400 | ~2900 | ~3400 | ~3500 |
+| Aspecto | v1.0 | v2.0 | v4.0 | v4.5 | v13.0 | v13.1 | v13.2 | v13.3 |
+|---------|------|------|------|------|-------|-------|-------|-------|
+| **Macro-Géneros** | 5 | 8 | 5 | 21 | 21 | 21 | 21 | 21 |
+| **Total Nodos** | ~20 | ~40 | 25 | 90+ | 90+ | 90+ | 90+ (dinámicos) | 90+ (dinámicos) |
+| **Profundidades** | 1 | 1 | 2 | 3 | 3 | 3 | 3 | 3 |
+| **Búsqueda** | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Universal Predictiva ⭐ |
+| **iTunes API** | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ (Búsqueda + Discografía) | ✓ (Autoplay + Discografía) | ✓ (Autoplay + Discografía) |
+| **Spotify API** | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| **Temas** | ✗ | Básico | Avanzado | Avanzado + | Premium Glassmorphism | Premium Glassmorphism | Premium Glassmorphism | Premium Glassmorphism |
+| **Métricas** | ✗ | ✗ | ✓ | ✓ | Máquina del Tiempo Fullscreen | M. Tiempo + Discografía en vivo | Deep-Link + Discografía en vivo | Deep-Link + Discografía en vivo |
+| **Auto-expand** | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| **Bridges** | ✗ | ✗ | Limitados | Completos | Completos | Completos | Completos | Completos |
+| **Light Mode** | ✗ | ✓ (tenue) | ✓ (tenue) | ✓ (mejorado) | ✓ (espectacular con blur) | ✓ (espectacular con blur) | ✓ (espectacular con blur) | ✓ (espectacular con blur) |
+| **Líneas Código** | ~800 | ~1200 | ~2000 | ~2400 | ~2900 | ~3400 | ~3500 | ~3700 |
 
 ---
 

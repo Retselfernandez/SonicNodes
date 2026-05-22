@@ -1,6 +1,6 @@
 # 🎵 SonicNodes — Visualización Interactiva del Universo Musical
 
-![Version](https://img.shields.io/badge/version-13.2-blue.svg)
+![Version](https://img.shields.io/badge/version-13.3-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Status](https://img.shields.io/badge/status-active-brightgreen.svg)
 
@@ -58,7 +58,7 @@ La aplicación permite explorar la **arquitectura del universo musical moderno**
   - Paleta armónica de 21+ colores
 
 ### 🎧 Características Interactivas
-- **Búsqueda en Tiempo Real**: Filtrar géneros y artistas
+- **Búsqueda Universal Predictiva (v13.3)**: Motor de búsqueda predictivo multi-nivel que autocompleta géneros, subgéneros y artistas mediante un elegante menú flotante con Glassmorphism. Soporta enlaces profundos nativos y registro dinámico de artistas en caliente en el grafo D3 (p. ej. buscando "The Doors").
 - **Audio Preview**: Escuchar previsualizaciones de iTunes
 - **Información Detallada**: Bio de géneros, tags, conexiones
 - **Zoom y Navegación**: Centrado automático en nodos seleccionados
