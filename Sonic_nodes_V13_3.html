@@ -178,15 +178,15 @@
             white-space: nowrap;
         }
 
-        /* Theme toggle */
-        /* Theme toggle & Time Machine Toggle */
-        #theme-toggle, #btn-time-machine {
+        /* Theme toggle & Time Machine & Language Toggle */
+        #theme-toggle, #btn-time-machine, #btn-lang-toggle {
             width: 34px; height: 34px; border-radius: 9px;
             background: var(--surface2); border: 1px solid var(--border);
             cursor: pointer; display: flex; align-items: center; justify-content: center;
             transition: background 0.2s; color: var(--text2);
+            font-size: 11px; font-weight: 700; font-family: 'Space Grotesk', sans-serif;
         }
-        #theme-toggle:hover, #btn-time-machine:hover { background: var(--surface); border-color: var(--border2); }
+        #theme-toggle:hover, #btn-time-machine:hover, #btn-lang-toggle:hover { background: var(--surface); border-color: var(--border2); }
 
         /* ===== LEFT PANEL ===== */
         #left-panel {
@@ -1017,6 +1017,136 @@
             border: 1px solid rgba(124, 58, 237, 0.3);
             opacity: 1;
         }
+
+        /* ===== ACTUAL SECTION (LO MAS NUEVO) ===== */
+        .actual-section {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            gap: 8px;
+        }
+        .actual-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .actual-select-wrapper {
+            position: relative;
+            flex: 1;
+            max-width: 140px;
+        }
+        #actual-country-select {
+            padding: 4px 20px 4px 8px;
+            font-size: 10px;
+            border-radius: 6px;
+            height: 24px;
+        }
+        .actual-select-wrapper::after {
+            content: '▼';
+            font-size: 8px;
+            color: var(--text2);
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+        #actual-songs-container {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 240px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-right: 2px;
+        }
+        .actual-song-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px;
+            border-radius: 8px;
+            background: var(--artist-card-bg);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .actual-song-item:hover {
+            background: var(--artist-card-hover);
+            border-color: var(--border2);
+            transform: translateY(-1px);
+        }
+        .actual-song-item.playing-now {
+            border-color: var(--accent);
+            background: rgba(124, 58, 237, 0.08);
+            box-shadow: 0 0 12px rgba(124, 58, 237, 0.15);
+        }
+        .actual-song-art-container {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .actual-song-art {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .actual-song-play {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .actual-song-item:hover .actual-song-play {
+            opacity: 1;
+        }
+        .actual-song-item.playing-now .actual-song-play {
+            opacity: 1;
+            background: rgba(124, 58, 237, 0.3);
+            color: var(--accent);
+        }
+        .actual-song-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .actual-song-name {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .actual-song-artist {
+            font-size: 9px;
+            color: var(--text2);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 1px;
+        }
+        .actual-spinner {
+            display: none;
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
     </style>
 </head>
 <body>
@@ -1034,11 +1164,11 @@
         </svg>
     </div>
     <span class="logo-text">SonicNodes</span>
-    <span class="logo-ver">v13.3</span>
+    <span class="logo-ver">v13.4</span>
 
     <div class="search-wrap">
         <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        <input type="text" id="global-search" placeholder="Buscar artista, género…">
+        <input type="text" id="global-search" placeholder="Buscar artista, género…" data-i18n-placeholder="search-placeholder">
         <div id="search-suggestions" class="search-suggestions panel"></div>
     </div>
 
@@ -1048,6 +1178,14 @@
 
         <span class="tag-pill" style="background:rgba(252,60,68,0.12);color:#FC3C44;border-color:rgba(252,60,68,0.25);">iTunes API</span>
         <span class="tag-pill" style="background:rgba(29,185,84,0.1);color:#1db954;border-color:rgba(29,185,84,0.2);">Spotify</span>
+
+        <!-- Language toggle -->
+        <button id="btn-lang-toggle" title="Cambiar idioma / Switch language" onclick="toggleLanguage()">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:4px;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 5c-.772-2.203-2.32-4.227-4.5-5.5m3.5 5.5l-2-.5m-4.5 1.5s.5-2.5 2-4.5M4 19h16" />
+            </svg>
+            <span id="lang-toggle-text">EN</span>
+        </button>
 
         <!-- Theme toggle -->
         <button id="theme-toggle" title="Cambiar tema" onclick="toggleTheme()">
@@ -1145,22 +1283,43 @@
 <!-- ===== RIGHT PANEL ===== -->
 <aside id="right-panel" class="panel">
     <div>
-        <div class="label-sm" style="margin-bottom:7px;">Profundidad del Grafo</div>
+        <div class="label-sm" style="margin-bottom:7px;" data-i18n="depth-label">Profundidad del Grafo</div>
         <div class="depth-row">
-            <button class="depth-btn active" onclick="setDepth('macro',this)">Macro</button>
-            <button class="depth-btn" onclick="setDepth('sub',this)">Sub</button>
-            <button class="depth-btn" onclick="setDepth('artist',this)">Artista</button>
+            <button class="depth-btn active" onclick="setDepth('macro',this)" data-i18n="depth-macro">Macro</button>
+            <button class="depth-btn" onclick="setDepth('sub',this)" data-i18n="depth-sub">Sub</button>
+            <button class="depth-btn" onclick="setDepth('artist',this)" data-i18n="depth-artist">Artista</button>
         </div>
     </div>
 
     <div style="margin-top: 15px;">
-        <div class="label-sm" style="margin-bottom:7px;">Simbología</div>
+        <div class="label-sm" style="margin-bottom:7px;" data-i18n="symbology-label">Simbología</div>
         <div style="display:flex;flex-direction:column;gap:5px;">
-            <div class="legend-row"><span style="width:11px;height:11px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>Macro-Género</div>
-            <div class="legend-row"><span style="width:9px;height:9px;border-radius:50%;background:transparent;border:2px solid var(--accent);flex-shrink:0;"></span>Subgénero</div>
-            <div class="legend-row"><span style="width:7px;height:7px;border-radius:50%;background:transparent;border:1.5px solid var(--muted);flex-shrink:0;"></span>Artista</div>
-            <div class="legend-row"><div style="width:14px;border-top:2px dashed var(--amber);"></div>Puente transversal</div>
-            <div class="legend-row"><div style="width:14px;border-top:2px solid rgba(252,60,68,0.6);"></div>Expandido iTunes</div>
+            <div class="legend-row"><span style="width:11px;height:11px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span><span data-i18n="symbology-macro">Macro-Género</span></div>
+            <div class="legend-row"><span style="width:9px;height:9px;border-radius:50%;background:transparent;border:2px solid var(--accent);flex-shrink:0;"></span><span data-i18n="symbology-sub">Subgénero</span></div>
+            <div class="legend-row"><span style="width:7px;height:7px;border-radius:50%;background:transparent;border:1.5px solid var(--muted);flex-shrink:0;"></span><span data-i18n="symbology-artist">Artista</span></div>
+            <div class="legend-row"><div style="width:14px;border-top:2px dashed var(--amber);"></div><span data-i18n="symbology-bridge">Puente transversal</span></div>
+            <div class="legend-row"><div style="width:14px;border-top:2px solid rgba(252,60,68,0.6);"></div><span data-i18n="symbology-itunes">Expandido iTunes</span></div>
+        </div>
+    </div>
+
+    <!-- Lo Más Nuevo (Actual) -->
+    <div class="actual-section">
+        <div class="actual-header">
+            <div class="label-sm" data-i18n="actual-title">Lo Más Nuevo</div>
+            <div class="actual-spinner" id="actual-spinner"></div>
+            <div class="actual-select-wrapper">
+                <select id="actual-country-select" onchange="changeActualCountry(this.value)">
+                    <option value="es" selected data-i18n="country-es">España</option>
+                    <option value="us" data-i18n="country-us">Estados Unidos</option>
+                    <option value="gb" data-i18n="country-gb">Reino Unido</option>
+                    <option value="ar" data-i18n="country-ar">Argentina</option>
+                    <option value="mx" data-i18n="country-mx">México</option>
+                    <option value="co" data-i18n="country-co">Colombia</option>
+                </select>
+            </div>
+        </div>
+        <div id="actual-songs-container">
+            <!-- Canciones cargadas dinámicamente -->
         </div>
     </div>
 </aside>
@@ -1180,16 +1339,16 @@
 
         <!-- Left Controls Column -->
         <aside class="time-controls">
-            <h2>Máquina del Tiempo</h2>
-            <p style="font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 10px 0;">
+            <h2 data-i18n="tm-title">Máquina del Tiempo</h2>
+            <p style="font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 10px 0;" data-i18n="tm-desc">
                 Viaja por las constelaciones de éxitos históricos para descubrir cómo evolucionaron los géneros.
             </p>
 
             <!-- Continent Selector -->
             <div class="control-group">
-                <label for="time-select-continent">Continente</label>
+                <label for="time-select-continent" data-i18n="tm-label-continent">Continente</label>
                 <select id="time-select-continent">
-                    <option value="" disabled selected>Selecciona Continente</option>
+                    <option value="" disabled selected data-i18n="tm-select-continent">Selecciona Continente</option>
                     <option value="Europa">Europa</option>
                     <option value="América">América</option>
                 </select>
@@ -1197,21 +1356,21 @@
 
             <!-- Country Selector -->
             <div class="control-group">
-                <label for="time-select-country">País</label>
+                <label for="time-select-country" data-i18n="tm-label-country">País</label>
                 <select id="time-select-country" disabled>
-                    <option value="" disabled selected>Elige un continente primero</option>
+                    <option value="" disabled selected data-i18n="tm-select-country-placeholder">Elige un continente primero</option>
                 </select>
             </div>
 
             <!-- Decade Selector -->
             <div class="control-group">
-                <label for="time-select-decade">Década</label>
+                <label for="time-select-decade" data-i18n="tm-label-decade">Década</label>
                 <select id="time-select-decade">
-                    <option value="2020s" selected>Década 2020s</option>
-                    <option value="1980s">Década 1980s</option>
-                    <option value="1940s">Década 1940s</option>
-                    <option value="1990s">Década 1990s (Sin datos)</option>
-                    <option value="1970s">Década 1970s (Sin datos)</option>
+                    <option value="2020s" selected data-i18n="tm-decade-2020s">Década 2020s</option>
+                    <option value="1980s" data-i18n="tm-decade-1980s">Década 1980s</option>
+                    <option value="1940s" data-i18n="tm-decade-1940s">Década 1940s</option>
+                    <option value="1990s" data-i18n="tm-decade-1990s">Década 1990s (Sin datos)</option>
+                    <option value="1970s" data-i18n="tm-decade-1970s">Década 1970s (Sin datos)</option>
                 </select>
             </div>
         </aside>
@@ -1219,7 +1378,7 @@
         <!-- Right Results Column -->
         <section class="time-results">
             <div class="time-results-header">
-                <h3 id="time-results-title">Top Hits Históricos</h3>
+                <h3 id="time-results-title" data-i18n="tm-results-title">Top Hits Históricos</h3>
                 <span class="results-count" id="time-results-count">0 items</span>
             </div>
             
@@ -1229,7 +1388,7 @@
                 </div>
             </div>
         </section>
-
+ 
         <!-- Artist Detail & Discography Slide-in View -->
         <div class="time-artist-detail-view" id="time-artist-detail-view">
             <!-- Header with Back Button -->
@@ -1238,15 +1397,15 @@
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
-                    Volver a la Máquina del Tiempo
+                    <span data-i18n="tm-back-btn">Volver a la Máquina del Tiempo</span>
                 </button>
             </div>
-
+ 
             <!-- Hero Banner -->
             <div class="time-artist-detail-hero">
                 <img id="artist-detail-hero-img" class="time-artist-detail-hero-img" src="" alt="">
                 <div class="time-artist-detail-hero-info">
-                    <span class="genre-pill" id="artist-detail-genre">Género</span>
+                    <span class="genre-pill" id="artist-detail-genre" data-i18n="tm-artist-detail-genre">Género</span>
                     <h1 id="artist-detail-name">Nombre Artista</h1>
                 </div>
                 <div class="time-artist-detail-hero-actions">
@@ -1255,23 +1414,23 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                         </svg>
-                        Ver en el Grafo
+                        <span data-i18n="tm-artist-detail-focus">Ver en el Grafo</span>
                     </button>
                 </div>
             </div>
-
+ 
             <!-- Detail Body -->
             <div class="time-artist-detail-body">
                 <!-- Left Sidebar: Player Panel -->
                 <aside class="time-artist-detail-sidebar">
                     <div>
-                        <h4>Reproduciendo Ahora</h4>
+                        <h4 data-i18n="tm-playing-now">Reproduciendo Ahora</h4>
                         <div class="time-detail-player-card">
                             <img id="time-detail-player-art" class="time-detail-player-card-art" src="" alt="Album Art">
                             <div style="display:flex;align-items:center;">
                                 <div class="time-detail-player-card-info" style="flex:1; min-width:0;">
-                                    <div id="time-detail-player-title" class="time-detail-player-card-title">Canción</div>
-                                    <div id="time-detail-player-artist" class="time-detail-player-card-artist">Artista</div>
+                                    <div id="time-detail-player-title" class="time-detail-player-card-title" data-i18n="tm-playing-song">Canción</div>
+                                    <div id="time-detail-player-artist" class="time-detail-player-card-artist" data-i18n="tm-playing-artist">Artista</div>
                                 </div>
                                 <div class="eq-animation" id="time-detail-eq" style="display:none;">
                                     <span class="eq-bar"></span>
@@ -1283,11 +1442,11 @@
                         </div>
                     </div>
                 </aside>
-
+ 
                 <!-- Right Content: Discography List -->
                 <section class="time-artist-detail-tracks">
-                    <h3 style="margin:0 0 4px 0;font-size:18px;font-weight:700;color:var(--text);letter-spacing:-0.02em;">Discografía & Temas Clave</h3>
-                    <p style="font-size:12px;color:var(--muted);margin:0 0 10px 0;">Selecciona cualquier tema para escuchar una previsualización de iTunes.</p>
+                    <h3 style="margin:0 0 4px 0;font-size:18px;font-weight:700;color:var(--text);letter-spacing:-0.02em;" data-i18n="tm-discography-title">Discografía & Temas Clave</h3>
+                    <p style="font-size:12px;color:var(--muted);margin:0 0 10px 0;" data-i18n="tm-discography-desc">Selecciona cualquier tema para escuchar una previsualización de iTunes.</p>
                     
                     <div style="flex:1; overflow-y:auto; padding-right:4px;">
                         <div class="time-discography-list" id="time-discography-list">
@@ -1305,6 +1464,7 @@
 // THEME
 // ============================================================
 let isDark = true;
+let currentLanguage = 'es';
 function toggleTheme() {
     isDark = !isDark;
     document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
@@ -1515,19 +1675,21 @@ function buildGraphData(depth) {
     const nodes = [];
     const links = [];
     const bridges = [
-        {s:'jazz_fusion',t:'rock_alt',   l:'Jazz-Rock Fusion'},
-        {s:'funk',       t:'trap',       l:'Funk en el Hip Hop'},
-        {s:'reggaeton',  t:'trap',       l:'Crossover Latino'},
-        {s:'bossa_nova', t:'jazz_fusion', l:'Bossa Jazz'},
-        {s:'flamenco',   t:'indie_rock', l:'Flamenco Moderno'},
-        {s:'dubstep',    t:'drum_bass',  l:'UK Bass Heritage'},
-        {s:'soul',       t:'funk',       l:'Soul-Funk Groove'},
-        {s:'reggae',     t:'lofi',       l:'Reggae Vibes'},
+        {s:'jazz_fusion',t:'rock_alt',   l: currentLanguage === 'en' ? 'Jazz-Rock Fusion' : 'Jazz-Rock Fusión'},
+        {s:'funk',       t:'trap',       l: currentLanguage === 'en' ? 'Funk in Hip Hop' : 'Funk en el Hip Hop'},
+        {s:'reggaeton',  t:'trap',       l: currentLanguage === 'en' ? 'Latin Crossover' : 'Crossover Latino'},
+        {s:'bossa_nova', t:'jazz_fusion', l: 'Bossa Jazz'},
+        {s:'flamenco',   t:'indie_rock', l: currentLanguage === 'en' ? 'Modern Flamenco' : 'Flamenco Moderno'},
+        {s:'dubstep',    t:'drum_bass',  l: 'UK Bass Heritage'},
+        {s:'soul',       t:'funk',       l: 'Soul-Funk Groove'},
+        {s:'reggae',     t:'lofi',       l: 'Reggae Vibes'},
     ];
 
     macroGenres.forEach(m => {
         const g = GENRES[m.id];
-        nodes.push({ id:m.id, label:g.label, type:'core', color:g.color, bio:g.bio, tags:g.tags, itunesQuery:g.itunesQuery, spotifySearch:g.spotifySearch, searchTarget:g.label.toLowerCase() });
+        const displayLabel = currentLanguage === 'en' && g.labelEn ? g.labelEn : g.label;
+        const displayBio = currentLanguage === 'en' && g.bioEn ? g.bioEn : g.bio;
+        nodes.push({ id:m.id, label:displayLabel, type:'core', color:g.color, bio:displayBio, tags:g.tags, itunesQuery:g.itunesQuery, spotifySearch:g.spotifySearch, searchTarget:displayLabel.toLowerCase() });
     });
 
     if (depth === 'sub' || depth === 'artist') {
@@ -1535,7 +1697,9 @@ function buildGraphData(depth) {
             m.children.forEach((cid, i) => {
                 const g = GENRES[cid];
                 if (!g) return;
-                nodes.push({ id:cid, label:g.label, type:'primary', color:g.color, bio:g.bio, tags:g.tags, itunesQuery:g.itunesQuery, spotifySearch:g.spotifySearch, searchTarget:g.label.toLowerCase(), hasArtists: !!(GENRE_ARTISTS[cid]) });
+                const displayLabel = currentLanguage === 'en' && g.labelEn ? g.labelEn : g.label;
+                const displayBio = currentLanguage === 'en' && g.bioEn ? g.bioEn : g.bio;
+                nodes.push({ id:cid, label:displayLabel, type:'primary', color:g.color, bio:displayBio, tags:g.tags, itunesQuery:g.itunesQuery, spotifySearch:g.spotifySearch, searchTarget:displayLabel.toLowerCase(), hasArtists: !!(GENRE_ARTISTS[cid]) });
                 links.push({source:m.id, target:cid, type:'internal'});
                 if (i > 0) links.push({source:m.children[i-1], target:cid, type:'ring'});
             });
@@ -1771,7 +1935,9 @@ async function loadArtistList(genreId) {
 
     document.getElementById('artist-section').style.display='block';
     document.getElementById('expand-artists-btn').style.display='flex';
-    document.getElementById('expand-artists-btn').textContent = expandedNodes.has(genreId) ? '✓ Expandido en el grafo' : '＋ Expandir en el grafo';
+    document.getElementById('expand-artists-btn').textContent = expandedNodes.has(genreId) ?
+        (currentLanguage === 'en' ? '✓ Expanded on graph' : '✓ Expandido en el grafo') :
+        (currentLanguage === 'en' ? '＋ Expand on graph' : '＋ Expandir en el grafo');
     document.getElementById('expand-artists-btn').onclick = expandedNodes.has(genreId) ? null : expandArtistsOnGraph;
 
     const listEl = document.getElementById('artist-list');
@@ -1789,7 +1955,7 @@ async function loadArtistList(genreId) {
             </div>
             <div style="flex:1;min-width:0;">
                 <div class="artist-name">${a.name}</div>
-                <div class="artist-meta" id="am_${a.id}">Cargando…</div>
+                <div class="artist-meta" id="am_${a.id}">${currentLanguage === 'en' ? 'Loading...' : 'Cargando…'}</div>
             </div>
             <button class="mini-play-btn" id="mpb_${a.id}" onclick="playArtist('${a.id}','${a.q}',this)" title="Preview">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
@@ -1840,14 +2006,20 @@ async function playArtist(artistId, query, btn) {
 
     if (data.previewUrl) {
         audioEl.src = data.previewUrl;
-        audioEl.play().then(() => { isPlaying=true; updatePlayBtn(); startProgressTracker(); }).catch(()=>{});
-        document.getElementById('source-label').textContent = '✓ Preview real — iTunes';
+        audioEl.play().then(() => { 
+            isPlaying=true; 
+            updatePlayBtn(); 
+            startProgressTracker(); 
+            if (typeof syncPlayingStates === 'function') syncPlayingStates();
+        }).catch(()=>{});
+        document.getElementById('source-label').textContent = currentLanguage === 'en' ? '✓ Real Preview — iTunes' : '✓ Preview real — iTunes';
         document.getElementById('source-label').style.color = '#10b981';
     } else {
-        document.getElementById('source-label').textContent = 'Sin preview disponible';
+        document.getElementById('source-label').textContent = currentLanguage === 'en' ? 'No preview available' : 'Sin preview disponible';
         document.getElementById('source-label').style.color = 'var(--muted)';
         btn.classList.remove('active');
         btn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>';
+        if (typeof syncPlayingStates === 'function') syncPlayingStates();
     }
 }
 
@@ -1870,16 +2042,21 @@ function setPlayerUI(data, itunesQuery) {
 async function updateInspector(node) {
     currentExpandNode = (node.type === 'primary') ? node : null;
 
-    const typeMap = {core:'Macro-Género', primary:'Subgénero', satellite:'Artista', artist_node:'Artista'};
+    const typeMap = currentLanguage === 'en' ? 
+        {core:'Macro-Genre', primary:'Subgenre', satellite:'Artist', artist_node:'Artist'} :
+        {core:'Macro-Género', primary:'Subgénero', satellite:'Artista', artist_node:'Artista'};
     const badge = document.getElementById('inspector-badge');
-    badge.textContent = typeMap[node.type]||'Nodo';
+    badge.textContent = typeMap[node.type] || (currentLanguage === 'en' ? 'Node' : 'Nodo');
     badge.style.background = node.color+'22';
     badge.style.color = node.color;
     badge.style.borderColor = node.color+'44';
 
-    document.getElementById('inspector-title').textContent = node.label;
-    document.getElementById('inspector-subtitle').textContent = 'Cargando datos…';
-    document.getElementById('inspector-bio').textContent = node.bio || 'Información adicional no disponible.';
+    const displayLabel = (currentLanguage === 'en' && node.labelEn) ? node.labelEn : node.label;
+    const displayBio = (currentLanguage === 'en' && node.bioEn) ? node.bioEn : (node.bio || (currentLanguage === 'en' ? 'Additional information not available.' : 'Información adicional no disponible.'));
+
+    document.getElementById('inspector-title').textContent = displayLabel;
+    document.getElementById('inspector-subtitle').textContent = currentLanguage === 'en' ? 'Loading data...' : 'Cargando datos…';
+    document.getElementById('inspector-bio').textContent = displayBio;
 
     const tagsEl = document.getElementById('inspector-tags');
     tagsEl.innerHTML = '';
@@ -1912,8 +2089,8 @@ async function updateInspector(node) {
             setPlayerUI(data, node.itunesQuery);
             if (data.previewUrl) {
                 audioEl.src = data.previewUrl;
-                audioEl.play().then(()=>{ isPlaying=true; updatePlayBtn(); startProgressTracker(); }).catch(()=>{});
-                document.getElementById('source-label').textContent = '✓ Preview real — iTunes';
+                audioEl.play().then(()=>{ isPlaying=true; updatePlayBtn(); startProgressTracker(); if (typeof syncPlayingStates === 'function') syncPlayingStates(); }).catch(()=>{});
+                document.getElementById('source-label').textContent = currentLanguage === 'en' ? '✓ Real Preview — iTunes' : '✓ Preview real — iTunes';
                 document.getElementById('source-label').style.color = '#10b981';
             }
         }
@@ -1925,22 +2102,22 @@ async function updateInspector(node) {
     document.getElementById('api-spinner').classList.remove('on');
     if (data) {
         if (data.artworkUrl) aw.innerHTML = `<img src="${data.artworkUrl}" style="width:100%;height:100%;object-fit:cover;"><div class="artwork-overlay"></div>`;
-        document.getElementById('inspector-subtitle').textContent = data.trackName ? `${data.trackName} — ${data.artistName}` : node.label;
+        document.getElementById('inspector-subtitle').textContent = data.trackName ? `${data.trackName} — ${data.artistName}` : displayLabel;
         if (!document.getElementById('artist-section').style.display || document.getElementById('artist-section').style.display==='none') {
             stopAudio();
             setPlayerUI(data, node.itunesQuery);
             if (data.previewUrl) {
                 audioEl.src = data.previewUrl;
-                audioEl.play().then(()=>{ isPlaying=true; updatePlayBtn(); startProgressTracker(); }).catch(()=>{});
-                document.getElementById('source-label').textContent = '✓ Preview real — iTunes';
+                audioEl.play().then(()=>{ isPlaying=true; updatePlayBtn(); startProgressTracker(); if (typeof syncPlayingStates === 'function') syncPlayingStates(); }).catch(()=>{});
+                document.getElementById('source-label').textContent = currentLanguage === 'en' ? '✓ Real Preview — iTunes' : '✓ Preview real — iTunes';
                 document.getElementById('source-label').style.color = '#10b981';
             } else {
-                document.getElementById('source-label').textContent = 'Sin preview disponible';
+                document.getElementById('source-label').textContent = currentLanguage === 'en' ? 'No preview available' : 'Sin preview disponible';
                 document.getElementById('source-label').style.color = 'var(--muted)';
             }
         }
     } else {
-        document.getElementById('inspector-subtitle').textContent = 'Sin datos de iTunes';
+        document.getElementById('inspector-subtitle').textContent = currentLanguage === 'en' ? 'No iTunes data' : 'Sin datos de iTunes';
         document.getElementById('api-spinner').classList.remove('on');
     }
 }
@@ -1961,6 +2138,7 @@ function stopAudio() {
     if (currentArtistBtn) { currentArtistBtn.classList.remove('active'); currentArtistBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>'; }
     document.querySelectorAll('.artist-item').forEach(el=>el.classList.remove('playing-now'));
     currentArtistBtn=null;
+    if (typeof syncPlayingStates === 'function') syncPlayingStates();
 }
 
 function startProgressTracker() {
@@ -1972,7 +2150,16 @@ function startProgressTracker() {
         const cur=Math.floor(audioEl.currentTime), dur=Math.floor(audioEl.duration);
         const fmt = s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
         document.getElementById('time-display').textContent=`${fmt(cur)} / ${fmt(dur)}`;
-        if (audioEl.ended) { isPlaying=false; updatePlayBtn(); clearInterval(progressInterval); if(currentArtistBtn){currentArtistBtn.classList.remove('active');currentArtistBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>';} }
+        if (audioEl.ended) { 
+            isPlaying=false; 
+            updatePlayBtn(); 
+            clearInterval(progressInterval); 
+            if(currentArtistBtn){
+                currentArtistBtn.classList.remove('active');
+                currentArtistBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>';
+            } 
+            if (typeof syncPlayingStates === 'function') syncPlayingStates();
+        }
     },150);
 }
 
@@ -1984,15 +2171,523 @@ function updatePlayBtn() {
 
 function togglePlay() {
     if (!audioEl.src) return;
-    if (isPlaying) { audioEl.pause(); isPlaying=false; clearInterval(progressInterval); }
-    else { audioEl.play().then(()=>{ isPlaying=true; startProgressTracker(); }).catch(()=>{}); }
+    if (isPlaying) { 
+        audioEl.pause(); 
+        isPlaying=false; 
+        clearInterval(progressInterval); 
+    }
+    else { 
+        audioEl.play().then(()=>{ 
+            isPlaying=true; 
+            startProgressTracker(); 
+            if (typeof syncPlayingStates === 'function') syncPlayingStates();
+        }).catch(()=>{}); 
+    }
     updatePlayBtn();
+    if (typeof syncPlayingStates === 'function') syncPlayingStates();
 }
 
 document.getElementById('progress-track').addEventListener('click', e=>{
     const rect=e.target.getBoundingClientRect();
     if (audioEl.duration) audioEl.currentTime=(e.clientX-rect.left)/rect.width*audioEl.duration;
 });
+
+// ============================================================
+// BILINGUAL & ITUNES RSS INTEGRATION (V13.4)
+// ============================================================
+const GENRES_EN_EXTRA = {
+    rock: { labelEn: 'Rock', bioEn: 'Genre born in the 50s mixing rhythm & blues, country, and gospel. The most influential genre of the 20th century.' },
+    electronica: { labelEn: 'Electronica', bioEn: 'All music created electronically. From the academic experiment of the 50s to the clubs of the 21st century.' },
+    hiphop: { labelEn: 'Hip Hop', bioEn: 'The Bronx, New York, 1973. Rap, DJing, breakdancing, and graffiti as four cultural pillars.' },
+    reggaeton: { labelEn: 'Reggaeton', bioEn: 'Puerto Rico, 90s. Dembow + reggae + Latin hip hop. Daddy Yankee globalized it with Gasolina.' },
+    afrobeats_gen: { labelEn: 'Afrobeats', bioEn: 'Nigeria and Ghana, 2010s. Highlife + hip hop + African dancehall. Burna Boy, Wizkid, Davido.' },
+    latina: { labelEn: 'Latin', bioEn: 'Centuries of music from the Caribbean, South America, and Central America. African rhythms, European and indigenous melodies.' },
+    jazz: { labelEn: 'Jazz', bioEn: 'New Orleans, 19th century. Blues + ragtime + European music. Improvisation as the soul.' },
+    rock_alt_gen: { labelEn: 'Alternative Rock', bioEn: 'Experimental and urban rock. From indie to post-punk, new forms of musical expression.' },
+    metal_gen: { labelEn: 'Metal', bioEn: 'Heavy distorted guitars, speed, and virtuosity. From heavy to black metal.' },
+    ambient_gen: { labelEn: 'Ambient & Synth', bioEn: 'Electronic atmospheres. Brian Eno, analog synthesizers, immersive textures.' },
+    drum_bass_gen: { labelEn: 'Drum & Bass', bioEn: 'UK 90s, speed and bass. Jungle, DnB, grime, and dubstep as evolution.' },
+    funk_soul_gen: { labelEn: 'Funk & Soul', bioEn: 'Groove and soul. James Brown, Ray Charles, the rhythmic heart of black music.' },
+    bossa_latino: { labelEn: 'Bossa & Rhythms', bioEn: 'Brazil and Latin America. Samba, bossa nova, saudade, and movement.' },
+    flamenco_span: { labelEn: 'Iberian Flamenco', bioEn: 'Andalusia and Spain. Cante jondo, flamenco guitar, duende gitano.' },
+    reggae_gen: { labelEn: 'Reggae & Roots', bioEn: 'Jamaica. Bob Marley, Rastafari, reggae, dancehall, and ska.' },
+    jazz_avant: { labelEn: 'Experimental Jazz', bioEn: 'Avant-garde jazz. Free jazz, modern bebop, experimentation.' },
+    electronic_exp: { labelEn: 'Tech Electronic', bioEn: 'House, techno, trance. Dancefloors, synthesizers, hypnotic rhythm.' },
+    indie_alt: { labelEn: 'Indie & Alt Pop', bioEn: 'Indie rock, art rock, post-punk. Alternative made mainstream.' },
+    blues_roots: { labelEn: 'Blues & Roots', bioEn: 'Traditional blues, delta blues, Chicago blues. The root of everything.' },
+    country_folk: { labelEn: 'Country & Folk', bioEn: 'Rural USA and music of the people. Banjo, narrative, oral tradition.' },
+    world_fusion: { labelEn: 'World & Fusion', bioEn: 'World music, global fusions. Ethno-jazz, world fusion, crossover.' },
+    rock_clasico: { labelEn: 'Classic Rock', bioEn: 'The golden era 1960-1980: Led Zeppelin, Rolling Stones, Hendrix, The Who. Riffs that defined an era.' },
+    rock_alt: { labelEn: 'Alternative Rock', bioEn: 'Emerging in the 80s as a reaction to the mainstream. From grunge to indie, Sonic Youth to Radiohead.' },
+    punk: { labelEn: 'Punk', bioEn: '70s cultural and musical movement. DIY, speed, attitude. Sex Pistols, Ramones, The Clash.' },
+    metal: { labelEn: 'Metal', bioEn: 'Heavy distorted guitars, speed, and virtuosity. Black Sabbath invented it, Metallica massified it.' },
+    grunge: { labelEn: 'Grunge', bioEn: 'Seattle, late 80s. Blending metal and punk with introspective lyrics. Nirvana took it to the world.' },
+    indie_rock: { labelEn: 'Indie Rock', bioEn: 'Independently produced rock. Emphasis on authenticity and experimentation. The Strokes, Arctic Monkeys.' },
+    house: { labelEn: 'House', bioEn: 'Chicago, early 80s. Deconstruction of disco with Roland 909 and deep bass. Frankie Knuckles.' },
+    techno: { labelEn: 'Techno', bioEn: 'Detroit, industrial futurism and Afrocentric funk. Juan Atkins, Derrick May, Kevin Saunderson.' },
+    drum_bass: { labelEn: 'Drum & Bass', bioEn: 'UK 90s, 160-180 BPM and complex basslines. Born from the London rave and jungle scene.' },
+    ambient: { labelEn: 'Ambient', bioEn: 'Brian Eno (1978): music designed to be as ignorable as it is interesting. Atmospheres over melodies.' },
+    synthwave: { labelEn: 'Synthwave', bioEn: '80s sound nostalgia recreated with analog synthesizers. Kavinsky, Perturbator, Carpenter Brut.' },
+    dubstep: { labelEn: 'Dubstep', bioEn: 'South London, late 90s. Jamaican dub + 2-step garage. Syncopated wobble bass. Skream, Benga.' },
+    rap_east: { labelEn: 'East Coast Rap', bioEn: 'New York. Complex lyrics, jazz samples. Notorious B.I.G., Nas, Jay-Z, Wu-Tang Clan.' },
+    trap: { labelEn: 'Trap', bioEn: 'Atlanta, 2000s. Fast hi-hats, 808s, and street-oriented lyrics. Gucci Mane, T.I., Young Jeezy.' },
+    lofi: { labelEn: 'Lo-Fi Hip Hop', bioEn: 'Slow beats, jazz samples, analog aesthetics. Soundtrack of the modern study.' },
+    salsa: { labelEn: 'Salsa', bioEn: 'Cuban son + jazz in New York, 60s. Fania Records was its cathedral. Celia Cruz, Héctor Lavoe.' },
+    cumbia: { labelEn: 'Cumbia', bioEn: 'Colombian Caribbean coast. African rhythms + indigenous melodies + European accordion.' },
+    bossa_nova: { labelEn: 'Bossa Nova', bioEn: 'Rio de Janeiro, 1958. Renewed samba. João Gilberto, Tom Jobim, Vinícius de Moraes. Saudade.' },
+    flamenco: { labelEn: 'Flamenco', bioEn: 'Andalusia. Gypsy + Arabic + Jewish + Castilian. UNESCO Heritage. Paco de Lucía, Camarón.' },
+    reggae: { labelEn: 'Reggae', bioEn: 'Jamaica, 60s. Ska + rocksteady. Bob Marley made it global. UNESCO Heritage 2018.' },
+    bebop: { labelEn: 'Bebop', bioEn: '40s revolution. For listening, not dancing. Created by Charlie Parker and Dizzy Gillespie.' },
+    jazz_fusion: { labelEn: 'Jazz Fusion', bioEn: '"Bitches Brew" (1970) by Miles Davis opened the door. Jazz + electric rock + funk. Weather Report.' },
+    soul: { labelEn: 'Soul', bioEn: 'R&B + gospel. Detroit Motown, Memphis Stax. Ray Charles and Aretha Franklin are its ultimate voices.' },
+    funk: { labelEn: 'Funk', bioEn: 'James Brown and Sly Stone. The groove as law. Foundational influence of hip hop and electronic music.' },
+    r_and_b: { labelEn: 'R&B', bioEn: 'Rhythm & Blues. Fusion of soul, funk, and pop. Usher, Alicia Keys, The Weeknd.' },
+    alternative: { labelEn: 'Alternative', bioEn: 'Sounds differing from the mainstream. From new wave to shoegaze and post-rock.' },
+    electronic_exp: { labelEn: 'Exp. Electronic', bioEn: 'Pure electronic experimentation. Kraftwerk, Autechre, Aphex Twin.' },
+    uk_bass: { labelEn: 'UK Bass Music', bioEn: 'UK bass scene. 2-step, grime, jungle, dubstep.' },
+    samba: { labelEn: 'Samba', bioEn: 'Brazil. African rhythms with roots in the diaspora. Carnival and joy.' },
+    rumba_espanola: { labelEn: 'Spanish Rumba', bioEn: 'Spanish adaptation of Cuban rumba with flamenco. Song and dance from Andalusia.' },
+    cante_jondo: { labelEn: 'Cante Jondo', bioEn: 'Deep song of flamenco. Lyrics about sorrow, love, and gypsy pain.' },
+    roots_reggae: { labelEn: 'Roots Reggae', bioEn: 'Reggae with a spiritual and social message. Rastafari and consciousness.' },
+    dancehall: { labelEn: 'Dancehall', bioEn: 'Modern Jamaica. Fast riddims and dance movement. Sean Paul, Busy Signal.' },
+    free_jazz: { labelEn: 'Free Jazz', bioEn: 'Improvisation without structure. Ornette Coleman and Sun Ra broke limits.' },
+    cool_jazz: { labelEn: 'Cool Jazz', bioEn: 'Smooth and sophisticated jazz. Miles Davis Birth of the Cool. West Coast Jazz.' },
+    trance: { labelEn: 'Trance', bioEn: 'Hypnotic electronic music with builds and breakdowns. Paul Oakenfold, Tiësto.' },
+    art_rock: { labelEn: 'Art Rock', bioEn: 'Experimental and progressive rock. Yes, Genesis, King Crimson. Musical complexity.' },
+    post_punk: { labelEn: 'Post-Punk', bioEn: 'Evolved punk. Joy Division, Bauhaus, Wire. Sophistication and darkness.' },
+    delta_blues: { labelEn: 'Delta Blues', bioEn: 'Mississippi blues. Roots of all blues music. Muddy Waters, Son House.' },
+    chicago_blues: { labelEn: 'Chicago Blues', bioEn: 'Urban electric blues. Amplification and power. Willie Dixon, John Lee Hooker.' },
+    blues: { labelEn: 'Blues', bioEn: 'Father genre of rock and modern music. Emotion, note bending, 12-bar blues.' },
+    country: { labelEn: 'Country', bioEn: 'Rural USA. Stories of life, twang, and banjo. Hank Williams, Johnny Cash.' },
+    folk: { labelEn: 'Folk', bioEn: 'Music of the people. Oral tradition, acoustic instruments. Dylan, Guthrie.' },
+    singer_songwriter: { labelEn: 'Singer-Songwriter', bioEn: 'Artist-composer. Deep personal narrative. Leonard Cohen, Joni Mitchell.' },
+    world_music: { labelEn: 'World Music', bioEn: 'Non-Western traditional music. Afrobeat, raï, raga, gamelan.' },
+    fusion: { labelEn: 'Musical Fusion', bioEn: 'Blending genres. Jazz + rock, funk + electronic, world + pop.' },
+    ethno_jazz: { labelEn: 'Ethno-Jazz', bioEn: 'Jazz with world traditional music elements. Thad Jones, Randy Weston.' },
+    psychedelic: { labelEn: 'Psychedelic Rock', bioEn: '60s psychedelic rock. Pink Floyd, The Doors. Liquid sound, analog synths.' },
+    stoner_rock: { labelEn: 'Stoner Rock', bioEn: 'Heavy and slow riffs. Kyuss, Sleep, Queens of the Stone Age.' },
+    hard_rock: { labelEn: 'Hard Rock', bioEn: 'Hard Rock. AC/DC, Aerosmith, KISS.' },
+    glam_rock: { labelEn: 'Glam Rock', bioEn: '70s rock with extravagant visuals. David Bowie, T. Rex, Queen.' },
+    prog_metal: { labelEn: 'Progressive Metal', bioEn: 'Progressive metal. Dream Theater, Tool, Meshuggah.' },
+    liquid_drum: { labelEn: 'Liquid Drum & Bass', bioEn: 'Smooth drum & bass. Calibre, High Contrast.' },
+    vaporwave: { labelEn: 'Vaporwave', bioEn: 'Nostalgic digital aesthetics. Early 2000s internet.' },
+    witch_house: { labelEn: 'Witch House', bioEn: 'Dark electronic experimental.' },
+    grime: { labelEn: 'Grime', bioEn: 'London 2000s. Garage + urban hip hop. Wiley, Dizzee Rascal, Skepta.' },
+    west_coast: { labelEn: 'West Coast Hip Hop', bioEn: 'Los Angeles. G-funk, laid-back. NWA, Tupac, Snoop Dogg, Dr. Dre.' },
+    conscious_hip: { labelEn: 'Conscious Hip Hop', bioEn: 'Reflective hip hop. Talib Kweli, Common, Mos Def.' },
+    emo_rap: { labelEn: 'Emo Rap', bioEn: 'Emotional hip hop. XXXTentacion, Juice WRLD, Lil Peep.' },
+    pop_urbano: { labelEn: 'Urban Pop', bioEn: 'Pop + urban. Bad Bunny, Rosalía, Rauw Alejandro.' },
+    indie_pop: { labelEn: 'Indie Pop', bioEn: 'Independent pop. Mac DeMarco, Clairo.' },
+    dark_wave: { labelEn: 'Darkwave', bioEn: 'Dark post-punk. Depeche Mode, Neue Deutsche Härte.' },
+    gothic_rock: { labelEn: 'Gothic Rock', bioEn: 'Gothic rock. The Cure, Siouxsie, Fields of the Nephilim.' },
+    nu_metal: { labelEn: 'Nu Metal', bioEn: '90s-2000s. Limp Bizkit, Deftones, Linkin Park.' },
+    metal_sinfon: { labelEn: 'Symphonic Metal', bioEn: 'Symphonic metal. Epica, Therion, Nightwish.' },
+    doom_metal: { labelEn: 'Doom Metal', bioEn: 'Slow apocalyptic metal. Sleep, Electric Wizard.' },
+    djent: { labelEn: 'Djent', bioEn: 'Math metal. Meshuggah, Periphery, Animals as Leaders.' },
+    noise_rock: { labelEn: 'Noise Rock', bioEn: 'Abrasive experimental rock. Sonic Youth, Merzbow.' },
+    funk_moderno: { labelEn: 'Modern Funk', bioEn: 'Contemporary funk. Anderson .Paak, Bruno Mars, Thundercat.' },
+    disco: { labelEn: 'Disco', bioEn: '1970s dancefloor. Bee Gees, Donna Summer, Gloria Gaynor.' },
+    new_wave: { labelEn: 'New Wave', bioEn: '80s minimalist. Blondie, Talking Heads, New Order.' },
+    shoegaze: { labelEn: 'Shoegaze', bioEn: '1990s UK. My Bloody Valentine, Slowdive.' },
+    slowcore: { labelEn: 'Slowcore', bioEn: 'Slow and emotional indie-rock. Galaxie 500, Low, Tortoise.' },
+    folk_punk: { labelEn: 'Folk Punk', bioEn: 'Folk + punk DIY. Andrew Jackson Jihad, Ramshackle Glory.' },
+    dark_folk: { labelEn: 'Dark Folk', bioEn: 'Dark Nordic folk. Wardruna, Heilung.' },
+    techno_industrial: { labelEn: 'Industrial Techno', bioEn: 'Techno + industrial. Throbbing Gristle, Test Dept, Coil.' },
+    breakcore: { labelEn: 'Breakcore', bioEn: 'Fast fragmented beats. Venetian Snares, Kid606.' },
+    chillwave: { labelEn: 'Chillwave', bioEn: 'Relaxing nostalgic electronic. Neon Indian, Washed Out.' },
+    future_bass: { labelEn: 'Future Bass', bioEn: 'Experimental electronic. SOPHIE, PC Music.' },
+    darkrap: { labelEn: 'Dark Rap', bioEn: 'Dark hip hop. Earl Sweatshirt, Navy Blue, MF DOOM.' },
+    latinrap: { labelEn: 'Latin Trap Rap', bioEn: 'Modern Latin trap. Almighty, Yng Lvcas, C.R.O.' },
+    afrobeats: { labelEn: 'Modern Afrobeats', bioEn: 'Contemporary Afrobeats. Wizkid, Burna Boy, CKay.' },
+    dark_gothic: { labelEn: 'Dark & Gothic', bioEn: 'Dark and experimental music styles. From post-punk and gothic rock to abrasive noise rock.' }
+};
+
+const TRANSLATIONS = {
+    es: {
+        'search-placeholder': "Buscar artista, género…",
+        'depth-label': "Profundidad del Grafo",
+        'depth-macro': "Macro",
+        'depth-sub': "Sub",
+        'depth-artist': "Artista",
+        'symbology-label': "Simbología",
+        'symbology-macro': "Macro-Género",
+        'symbology-sub': "Subgénero",
+        'symbology-artist': "Artista",
+        'symbology-bridge': "Puente transversal",
+        'symbology-itunes': "Expandido iTunes",
+        'actual-title': "Lo Más Nuevo",
+        'country-es': "España",
+        'country-us': "Estados Unidos",
+        'country-gb': "Reino Unido",
+        'country-ar': "Argentina",
+        'country-mx': "México",
+        'country-co': "Colombia",
+        'tm-title': "Máquina del Tiempo",
+        'tm-desc': "Viaja por la historia de la música. Explora los artistas y canciones que definieron continentes y épocas enteras.",
+        'tm-label-continent': "Continente",
+        'tm-select-continent': "Selecciona Continente",
+        'tm-label-country': "País",
+        'tm-select-country-placeholder': "Elige un continente primero",
+        'tm-label-decade': "Década",
+        'tm-decade-2020s': "Década 2020s",
+        'tm-decade-1980s': "Década 1980s",
+        'tm-decade-1940s': "Década 1940s",
+        'tm-decade-1990s': "Década 1990s (Sin datos)",
+        'tm-decade-1970s': "Década 1970s (Sin datos)",
+        'tm-results-title': "Top Hits Históricos",
+        'tm-back-btn': "Volver a la Máquina del Tiempo",
+        'tm-artist-detail-genre': "Género",
+        'tm-artist-detail-focus': "Ver en el Grafo",
+        'tm-playing-now': "Reproduciendo Ahora",
+        'tm-playing-song': "Canción",
+        'tm-playing-artist': "Artista",
+        'tm-discography-title': "Discografía & Temas Clave",
+        'tm-discography-desc': "Selecciona cualquier tema para escuchar una previsualización de iTunes.",
+        'inspector-desc': "Descripción",
+        'inspector-artists': "Artistas del género",
+        'inspector-expand': "Expandir en el grafo",
+        'player-no-selection': "Sin selección",
+        'player-itunes-preview': "iTunes Preview",
+        'player-real-preview': "✓ Preview real — iTunes",
+        'player-no-preview': "Sin preview disponible",
+        'loading': "Cargando...",
+        'error-itunes': "Error al cargar la discografía de iTunes.",
+        'error-trending': "Error al cargar tendencias.",
+        'no-results': "Sin resultados",
+        'no-songs': "No se encontraron canciones.",
+        'back-time-machine': "Volver a la Máquina del Tiempo"
+    },
+    en: {
+        'search-placeholder': "Search artist, genre...",
+        'depth-label': "Graph Depth",
+        'depth-macro': "Macro",
+        'depth-sub': "Sub",
+        'depth-artist': "Artist",
+        'symbology-label': "Symbology",
+        'symbology-macro': "Macro-Genre",
+        'symbology-sub': "Subgenre",
+        'symbology-artist': "Artist",
+        'symbology-bridge': "Transversal Bridge",
+        'symbology-itunes': "iTunes Expanded",
+        'actual-title': "Trending Now",
+        'country-es': "Spain",
+        'country-us': "United States",
+        'country-gb': "United Kingdom",
+        'country-ar': "Argentina",
+        'country-mx': "Mexico",
+        'country-co': "Colombia",
+        'tm-title': "Time Machine",
+        'tm-desc': "Travel through music history. Explore the artists and songs that defined entire continents and eras.",
+        'tm-label-continent': "Continent",
+        'tm-select-continent': "Select Continent",
+        'tm-label-country': "Country",
+        'tm-select-country-placeholder': "Select a continent first",
+        'tm-label-decade': "Decade",
+        'tm-decade-2020s': "Decade 2020s",
+        'tm-decade-1980s': "Decade 1980s",
+        'tm-decade-1940s': "Decade 1940s",
+        'tm-decade-1990s': "Decade 1990s (No data)",
+        'tm-decade-1970s': "Decade 1970s (No data)",
+        'tm-results-title': "Historical Top Hits",
+        'tm-back-btn': "Back to Time Machine",
+        'tm-artist-detail-genre': "Genre",
+        'tm-artist-detail-focus': "View on Graph",
+        'tm-playing-now': "Now Playing",
+        'tm-playing-song': "Song",
+        'tm-playing-artist': "Artist",
+        'tm-discography-title': "Discography & Key Tracks",
+        'tm-discography-desc': "Select any track to listen to an iTunes preview.",
+        'inspector-desc': "Description",
+        'inspector-artists': "Artists of the genre",
+        'inspector-expand': "Expand in graph",
+        'player-no-selection': "No selection",
+        'player-itunes-preview': "iTunes Preview",
+        'player-real-preview': "✓ Real Preview — iTunes",
+        'player-no-preview': "No preview available",
+        'loading': "Loading...",
+        'error-itunes': "Error loading iTunes discography.",
+        'error-trending': "Error loading trends.",
+        'no-results': "No results",
+        'no-songs': "No songs found.",
+        'back-time-machine': "Back to Time Machine"
+    }
+};
+
+function toggleLanguage() {
+    currentLanguage = currentLanguage === 'es' ? 'en' : 'es';
+    updateLanguageUI();
+}
+
+function updateLanguageUI() {
+    document.getElementById('lang-toggle-text').textContent = currentLanguage === 'es' ? 'EN' : 'ES';
+    
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (TRANSLATIONS[currentLanguage] && TRANSLATIONS[currentLanguage][key]) {
+            const svg = el.querySelector('svg');
+            if (svg) {
+                const textNode = Array.from(el.childNodes).find(n => n.nodeType === Node.TEXT_NODE);
+                if (textNode) {
+                    textNode.textContent = ' ' + TRANSLATIONS[currentLanguage][key];
+                } else {
+                    el.innerHTML = svg.outerHTML + ' ' + TRANSLATIONS[currentLanguage][key];
+                }
+            } else {
+                el.textContent = TRANSLATIONS[currentLanguage][key];
+            }
+        }
+    });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (TRANSLATIONS[currentLanguage] && TRANSLATIONS[currentLanguage][key]) {
+            el.setAttribute('placeholder', TRANSLATIONS[currentLanguage][key]);
+        }
+    });
+
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const key = el.getAttribute('data-i18n-title');
+        if (TRANSLATIONS[currentLanguage] && TRANSLATIONS[currentLanguage][key]) {
+            el.setAttribute('title', TRANSLATIONS[currentLanguage][key]);
+        }
+    });
+    
+    if (currentGraph) {
+        const count = currentGraph.graphData().nodes.length;
+        document.getElementById('node-counter').textContent = currentLanguage === 'en' ? `${count} nodes` : `${count} nodos`;
+    }
+    
+    initGraph(currentDepth);
+    renderActualSongsList(currentActualSongs);
+    
+    if (selectedNode) {
+        updateInspector(selectedNode);
+    }
+}
+
+let currentActualSongs = [];
+
+async function fetchActualSongs(countryCode) {
+    const spinner = document.getElementById('actual-spinner');
+    if (spinner) spinner.style.display = 'block';
+    
+    try {
+        const url = `https://itunes.apple.com/${countryCode}/rss/topsongs/limit=10/json`;
+        const response = await fetch(url);
+        const data = await response.json();
+        const entries = data.feed && data.feed.entry ? data.feed.entry : [];
+        
+        currentActualSongs = entries.map((item, index) => {
+            const trackName = item['im:name'] ? item['im:name'].label : '';
+            const artistName = item['im:artist'] ? item['im:artist'].label : '';
+            
+            let artworkUrl = '';
+            if (item['im:image'] && item['im:image'].length > 0) {
+                const lastImg = item['im:image'][item['im:image'].length - 1].label;
+                artworkUrl = lastImg.replace('170x170bb', '300x300bb').replace('60x60bb', '300x300bb').replace('55x55bb', '300x300bb');
+            }
+            
+            let previewUrl = null;
+            if (Array.isArray(item.link)) {
+                const previewLink = item.link.find(l => l.attributes && (l.attributes.title === 'Preview' || l.attributes.rel === 'enclosure' || (l.attributes.href && l.attributes.href.includes('.m4a'))));
+                if (previewLink) previewUrl = previewLink.attributes.href;
+            }
+            
+            let trackViewUrl = '';
+            if (item.id && item.id.label) {
+                trackViewUrl = item.id.label;
+            } else if (Array.isArray(item.link) && item.link[0] && item.link[0].attributes) {
+                trackViewUrl = item.link[0].attributes.href;
+            }
+            
+            return {
+                id: `trend_${index}`,
+                trackName,
+                artistName,
+                artworkUrl,
+                previewUrl,
+                trackViewUrl
+            };
+        });
+        
+        renderActualSongsList(currentActualSongs);
+    } catch(err) {
+        console.error('Error fetching trending songs:', err);
+        const container = document.getElementById('actual-songs-container');
+        if (container) {
+            container.innerHTML = `<div style="color:var(--muted);font-size:10px;text-align:center;padding:10px;">${TRANSLATIONS[currentLanguage]['error-trending'] || 'Error al cargar tendencias.'}</div>`;
+        }
+    } finally {
+        if (spinner) spinner.style.display = 'none';
+    }
+}
+
+function renderActualSongsList(songs) {
+    const container = document.getElementById('actual-songs-container');
+    if (!container) return;
+    
+    if (!songs || songs.length === 0) {
+        container.innerHTML = `<div style="color:var(--muted);font-size:10px;text-align:center;padding:10px;">${TRANSLATIONS[currentLanguage]['no-songs'] || 'No se encontraron canciones.'}</div>`;
+        return;
+    }
+    
+    container.innerHTML = '';
+    songs.forEach(song => {
+        const div = document.createElement('div');
+        div.className = 'actual-song-item';
+        div.setAttribute('data-preview-url', song.previewUrl || '');
+        
+        const isCurrent = audioEl.src === song.previewUrl && isPlaying;
+        if (isCurrent) {
+            div.className += ' playing-now';
+        }
+        
+        const playIconContent = isCurrent 
+            ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>'
+            : '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+            
+        div.innerHTML = `
+            <div class="actual-song-art-container">
+                <img src="${song.artworkUrl}" class="actual-song-art" alt="${song.trackName}">
+                <div class="actual-song-play">
+                    ${playIconContent}
+                </div>
+            </div>
+            <div class="actual-song-info">
+                <div class="actual-song-name">${song.trackName}</div>
+                <div class="actual-song-artist">${song.artistName}</div>
+            </div>
+        `;
+        
+        div.addEventListener('click', () => {
+            playSongFromActual(song);
+        });
+        
+        container.appendChild(div);
+    });
+}
+
+function changeActualCountry(countryCode) {
+    fetchActualSongs(countryCode);
+}
+
+function playSongFromActual(song) {
+    if (!song.previewUrl) return;
+    
+    if (audioEl.src === song.previewUrl) {
+        if (isPlaying) {
+            audioEl.pause();
+            isPlaying = false;
+        } else {
+            audioEl.play().then(() => {
+                isPlaying = true;
+                startProgressTracker();
+            }).catch(() => {});
+        }
+        updatePlayBtn();
+        syncPlayingStates();
+    } else {
+        stopAudio();
+        
+        const dummyTrack = {
+            trackName: song.trackName,
+            artistName: song.artistName,
+            previewUrl: song.previewUrl,
+            artworkUrl: song.artworkUrl,
+            trackViewUrl: song.trackViewUrl
+        };
+        setPlayerUI(dummyTrack, song.artistName);
+        
+        audioEl.src = song.previewUrl;
+        audioEl.play().then(() => {
+            isPlaying = true;
+            updatePlayBtn();
+            startProgressTracker();
+            syncPlayingStates();
+        }).catch(() => {});
+        
+        const sourceLabel = document.getElementById('source-label');
+        if (sourceLabel) {
+            sourceLabel.textContent = currentLanguage === 'en' ? '✓ Real Preview — iTunes' : '✓ Preview real — iTunes';
+            sourceLabel.style.color = '#10b981';
+        }
+    }
+}
+
+function syncPlayingStates() {
+    const currentSrc = audioEl.src;
+    
+    document.querySelectorAll('.time-discography-item').forEach(item => {
+        const trackUrl = item.getAttribute('data-preview-url');
+        if (trackUrl && trackUrl === currentSrc && isPlaying) {
+            item.classList.add('playing-now');
+            const playBtn = item.querySelector('.time-discography-item-play');
+            if (playBtn) {
+                playBtn.innerHTML = `
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                    </svg>
+                `;
+            }
+        } else {
+            item.classList.remove('playing-now');
+            const playBtn = item.querySelector('.time-discography-item-play');
+            if (playBtn) {
+                playBtn.innerHTML = `
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                `;
+            }
+        }
+    });
+
+    document.querySelectorAll('.actual-song-item').forEach(item => {
+        const trackUrl = item.getAttribute('data-preview-url');
+        if (trackUrl && trackUrl === currentSrc && isPlaying) {
+            item.classList.add('playing-now');
+            const playIcon = item.querySelector('.actual-song-play');
+            if (playIcon) {
+                playIcon.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                    </svg>
+                `;
+            }
+        } else {
+            item.classList.remove('playing-now');
+            const playIcon = item.querySelector('.actual-song-play');
+            if (playIcon) {
+                playIcon.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                `;
+            }
+        }
+    });
+
+    const currentArtist = document.getElementById('player-artist-name')?.textContent || '';
+    document.querySelectorAll('.artist-item').forEach(el => {
+        const nameEl = el.querySelector('.artist-name');
+        if (nameEl && nameEl.textContent === currentArtist && isPlaying) {
+            el.classList.add('playing-now');
+            const playBtn = el.querySelector('.mini-play-btn');
+            if (playBtn) {
+                playBtn.classList.add('active');
+                playBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+                currentArtistBtn = playBtn;
+            }
+        } else {
+            el.classList.remove('playing-now');
+            const playBtn = el.querySelector('.mini-play-btn');
+            if (playBtn) {
+                playBtn.classList.remove('active');
+                playBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>';
+            }
+        }
+    });
+}
 
 // ============================================================
 // TIME MACHINE DATA (OLAP DIMENSIONAL STRUCTURE)
@@ -2528,12 +3223,14 @@ async function playSongFromDiscography(track, itunesQuery) {
             isPlaying = true; 
             updatePlayBtn(); 
             startProgressTracker(); 
+            if (typeof syncPlayingStates === 'function') syncPlayingStates();
         }).catch(()=>{});
-        document.getElementById('source-label').textContent = '✓ Preview real — iTunes';
+        document.getElementById('source-label').textContent = currentLanguage === 'en' ? '✓ Real Preview — iTunes' : '✓ Preview real — iTunes';
         document.getElementById('source-label').style.color = '#10b981';
     } else {
-        document.getElementById('source-label').textContent = 'Sin preview disponible';
+        document.getElementById('source-label').textContent = currentLanguage === 'en' ? 'No preview available' : 'Sin preview disponible';
         document.getElementById('source-label').style.color = 'var(--muted)';
+        if (typeof syncPlayingStates === 'function') syncPlayingStates();
     }
 }
 
@@ -2675,13 +3372,18 @@ function queryDatabase(val) {
     // 1. Search Macro Genres
     macroGenres.forEach(m => {
         const g = GENRES[m.id];
-        if (g && g.label.toLowerCase().includes(valLower)) {
-            results.push({
-                type: 'macro',
-                label: g.label,
-                id: m.id,
-                displayText: g.label
-            });
+        if (g) {
+            const matchesSp = g.label.toLowerCase().includes(valLower);
+            const matchesEn = g.labelEn && g.labelEn.toLowerCase().includes(valLower);
+            if (matchesSp || matchesEn) {
+                const display = currentLanguage === 'en' && g.labelEn ? g.labelEn : g.label;
+                results.push({
+                    type: 'macro',
+                    label: display,
+                    id: m.id,
+                    displayText: display
+                });
+            }
         }
     });
 
@@ -2689,14 +3391,20 @@ function queryDatabase(val) {
     macroGenres.forEach(m => {
         m.children.forEach(cid => {
             const g = GENRES[cid];
-            if (g && g.label.toLowerCase().includes(valLower)) {
-                if (!results.some(r => r.id === cid && r.type === 'sub')) {
-                    results.push({
-                        type: 'sub',
-                        label: g.label,
-                        id: cid,
-                        displayText: `${g.label} (${GENRES[m.id].label})`
-                    });
+            if (g) {
+                const matchesSp = g.label.toLowerCase().includes(valLower);
+                const matchesEn = g.labelEn && g.labelEn.toLowerCase().includes(valLower);
+                if (matchesSp || matchesEn) {
+                    if (!results.some(r => r.id === cid && r.type === 'sub')) {
+                        const display = currentLanguage === 'en' && g.labelEn ? g.labelEn : g.label;
+                        const parentDisplay = currentLanguage === 'en' && GENRES[m.id].labelEn ? GENRES[m.id].labelEn : GENRES[m.id].label;
+                        results.push({
+                            type: 'sub',
+                            label: display,
+                            id: cid,
+                            displayText: `${display} (${parentDisplay})`
+                        });
+                    }
                 }
             }
         });
@@ -2707,12 +3415,14 @@ function queryDatabase(val) {
         GENRE_ARTISTS[gid].forEach(a => {
             if (a.name.toLowerCase().includes(valLower)) {
                 if (!results.some(r => r.label.toLowerCase() === a.name.toLowerCase() && r.type === 'artist')) {
+                    const genreLabel = GENRES[gid] ? (currentLanguage === 'en' && GENRES[gid].labelEn ? GENRES[gid].labelEn : GENRES[gid].label) : "";
+                    const typeText = currentLanguage === 'en' ? 'Artist' : 'Artista';
                     results.push({
                         type: 'artist',
                         label: a.name,
                         id: a.id,
                         genreId: gid,
-                        displayText: `${a.name} — Artista (${GENRES[gid] ? GENRES[gid].label : ""})`
+                        displayText: `${a.name} — ${typeText} (${genreLabel})`
                     });
                 }
             }
@@ -2727,12 +3437,22 @@ function queryDatabase(val) {
                     if (item.artist.toLowerCase().includes(valLower)) {
                         const artistId = item.artist.toLowerCase().replace(/[^a-z0-9]/g, '_');
                         if (!results.some(r => r.label.toLowerCase() === item.artist.toLowerCase() && r.type === 'artist')) {
+                            let resolvedGenre = item.genre;
+                            if (currentLanguage === 'en') {
+                                for (const key in GENRES) {
+                                    if (GENRES[key].label === item.genre && GENRES[key].labelEn) {
+                                        resolvedGenre = GENRES[key].labelEn;
+                                        break;
+                                    }
+                                }
+                            }
+                            const typeText = currentLanguage === 'en' ? 'Artist' : 'Artista';
                             results.push({
                                 type: 'artist',
                                 label: item.artist,
                                 id: artistId,
-                                genreLabel: item.genre,
-                                displayText: `${item.artist} — Artista (${item.genre})`
+                                genreLabel: resolvedGenre,
+                                displayText: `${item.artist} — ${typeText} (${resolvedGenre})`
                             });
                         }
                     }
@@ -2803,7 +3523,7 @@ document.getElementById('global-search').addEventListener('input', e => {
     
     const results = queryDatabase(val);
     if (results.length === 0) {
-        suggestionsBox.innerHTML = '<div class="suggestion-item" style="cursor:default;color:var(--muted)">Sin resultados</div>';
+        suggestionsBox.innerHTML = `<div class="suggestion-item" style="cursor:default;color:var(--muted)">${currentLanguage === 'en' ? 'No results' : 'Sin resultados'}</div>`;
         suggestionsBox.classList.add('active');
         return;
     }
@@ -2814,9 +3534,9 @@ document.getElementById('global-search').addEventListener('input', e => {
         div.className = 'suggestion-item';
         
         let typeBadge = '';
-        if (res.type === 'macro') typeBadge = 'Macro';
-        else if (res.type === 'sub') typeBadge = 'Género';
-        else typeBadge = 'Artista';
+        if (res.type === 'macro') typeBadge = currentLanguage === 'en' ? 'Macro' : 'Macro';
+        else if (res.type === 'sub') typeBadge = currentLanguage === 'en' ? 'Genre' : 'Género';
+        else typeBadge = currentLanguage === 'en' ? 'Artist' : 'Artista';
         
         div.innerHTML = `
             <span class="suggestion-name">${res.displayText || res.label}</span>
@@ -2853,7 +3573,7 @@ document.getElementById('global-search').addEventListener('keydown', e => {
     if (e.key === 'Enter') {
         const suggestionsBox = document.getElementById('search-suggestions');
         const firstItem = suggestionsBox.querySelector('.suggestion-item');
-        if (firstItem && !firstItem.textContent.includes('Sin resultados')) {
+        if (firstItem && !firstItem.textContent.includes('Sin resultados') && !firstItem.textContent.includes('No results')) {
             firstItem.click();
         }
     }
@@ -2862,8 +3582,15 @@ document.getElementById('global-search').addEventListener('keydown', e => {
 // ============================================================
 // INIT
 // ============================================================
+for (const key in GENRES_EN_EXTRA) {
+    if (GENRES[key]) {
+        GENRES[key].labelEn = GENRES_EN_EXTRA[key].labelEn;
+        GENRES[key].bioEn = GENRES_EN_EXTRA[key].bioEn;
+    }
+}
 initGraph('macro');
 initTimeMachine();
+fetchActualSongs('es');
 </script>
 </body>
 </html>

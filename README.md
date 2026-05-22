@@ -58,6 +58,9 @@ La aplicación permite explorar la **arquitectura del universo musical moderno**
   - Paleta armónica de 21+ colores
 
 ### 🎧 Características Interactivas
+- **Tendencias en Tiempo Real "Lo Más Nuevo" (v13.4)**: Sección interactiva en el panel derecho que se alimenta del Feed RSS en tiempo real de iTunes/Apple Music. Permite listar las 10 canciones del momento y filtrarlas instantáneamente por país (España, EE.UU., Reino Unido, Argentina, México, Colombia) con un indicador de carga asíncrono y reproducción fluida integrada.
+- **Traducción Bilingüe en Vivo (v13.4)**: Sistema de localización instantánea (Español / Inglés) sin recargar la página mediante el botón `#btn-lang-toggle` en la barra superior. Traduce dinámicamente toda la interfaz estática, el buscador predictivo y los **60+ géneros y biografías del grafo interactivo D3** (con hot reload de datos del grafo).
+- **Sincronización de Reproducción Inteligente (v13.4)**: Sincronización bidireccional y en tiempo real del estado de reproducción activa (botón play/pause esmerilado y clases `playing-now`) en todas las tarjetas de la interfaz (reproductor principal, buscador, discografías de la Máquina del Tiempo y tendencias "Lo Más Nuevo").
 - **Búsqueda Universal Predictiva (v13.3)**: Motor de búsqueda predictivo multi-nivel que autocompleta géneros, subgéneros y artistas mediante un elegante menú flotante con Glassmorphism. Soporta enlaces profundos nativos y registro dinámico de artistas en caliente en el grafo D3 (p. ej. buscando "The Doors").
 - **Audio Preview**: Escuchar previsualizaciones de iTunes
 - **Información Detallada**: Bio de géneros, tags, conexiones
@@ -269,7 +272,18 @@ Para agregar nuevos géneros, editar:
 - **Auto-expand**: No implementado
 - **Estado**: Versión estable con limitaciones
 
-### v4.5 (Sonic_nodes_V4.html - ACTUAL) ⭐
+### v13.4 (Sonic_nodes_V13_3.html / Sonic_nodes_V13.html - ACTUAL) ⭐
+- **Géneros**: 21 macro-géneros + 70+ subgéneros + 60+ subgéneros localizados.
+- **Nodos**: 240+ nodos en grafo interactivo, más base de datos dimensional OLAP.
+- **Features Nuevas**:
+  - ✅ **Buscador Predictivo Universal**: Búsqueda difusa multi-nivel y registro dinámico de artistas en caliente.
+  - ✅ **La Máquina del Tiempo**: Modal Glassmorphism a pantalla completa (90% viewport) con consulta OLAP en cascada.
+  - ✅ **Tendencias "Lo Más Nuevo"**: Lista interactiva de 10 canciones del feed de iTunes con selector de país.
+  - ✅ **Traducción Bilingüe en Vivo (ES / EN)**: Localización en tiempo real sin recarga de página para interfaz, buscador y ForceGraph.
+  - ✅ **Sincronización Total de Reproductor**: Estado play/pause persistente y sincronizado bidireccionalmente.
+- **Estado**: Producción premium lista para producción.
+
+### v4.5 (Sonic_nodes_V4.html - Anterior)
 - **Géneros**: 21 macro-géneros (expandido 4x)
 - **Nodos**: 90+ totales (expansión jerárquica)
 - **Features Nuevas**:
@@ -281,18 +295,18 @@ Para agregar nuevos géneros, editar:
 - **Líneas (Light Mode)**: 
   - Ring links: `rgba(0,0,0,0.22)` (mejora: +5.5x visibilidad)
   - Internal links: `rgba(0,0,0,0.28)` (mejora: +2.8x visibilidad)
-- **Estado**: Producción con todas las mejoras implementadas
+- **Estado**: Versión estable anterior con limitaciones
 
 #### 📈 Evolución de Métricas
 
-| Métrica | v1.0 | v2.0 | v4.0 | v4.5 |
-|---------|------|------|------|------|
-| Macro-Géneros | 5 | 8 | 5 | 21 |
-| Nodos Totales | ~20 | ~40 | 25 | 90+ |
-| Profundidades | 1 | 1 | 2 | 3 |
-| Auto-expand | ✗ | ✗ | ✗ | ✓ |
-| Light Mode | ✗ | ✓ | ✓ | ✓ (mejorado) |
-| APIs Externas | 0 | 1 | 2 | 2 |
+| Métrica | v1.0 | v2.0 | v4.0 | v4.5 | v13.4 |
+|---------|------|------|------|------|-------|
+| Macro-Géneros | 5 | 8 | 5 | 21 | 21 |
+| Nodos Totales | ~20 | ~40 | 25 | 90+ | 240+ |
+| Profundidades | 1 | 1 | 2 | 3 | 3 |
+| Auto-expand | ✗ | ✗ | ✗ | ✓ | ✓ |
+| Light Mode | ✗ | ✓ | ✓ | ✓ (mejorado) | ✓ (Premium) |
+| APIs Externas | 0 | 1 | 2 | 2 | 3 (iTunes, Spotify, RSS) |
 
 ---
 

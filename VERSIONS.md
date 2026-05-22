@@ -2,7 +2,27 @@
 
 ## Releases
 
-### v13.3 (Mayo 2026) - ACTUAL ⭐
+### v13.4 (Mayo 2026) - ACTUAL ⭐
+**Título**: "Real-Time Trends & Live Bilingual Translation"
+
+**Cambios Principales**:
+- ✅ **Sección "Lo Más Nuevo" (Actual)**: Se inyectó una sección dinámica e interactiva en el panel lateral derecho que consume el Feed RSS en tiempo real de iTunes/Apple Music para listar las 10 canciones más populares.
+- ✅ **Filtro de Tendencias por País**: Selector interactivo de países (España, Estados Unidos, Reino Unido, Argentina, México, Colombia) con actualizaciones asíncronas en tiempo real (hot reload) e indicador visual de carga (spinner).
+- ✅ **Sincronización Total de Reproducción (Play Sync)**: Los clips de audio preview de la lista "Actual" se integran directamente con el reproductor principal (esquina inferior izquierda) y con los temas clave de la discografía del modal de la "Máquina del Tiempo". Al hacer clics sucesivos se conmuta el estado play/pause de forma bidireccional y sincrónica.
+- ✅ **Traducción Bilingüe Instantánea (ES / EN)**: Botón `#btn-lang-toggle` con ícono de globo terráqueo en la barra superior. Traduce instantáneamente y sin recarga de página:
+  - Textos estáticos de la barra lateral, simbología, buscador, descripciones y selectores.
+  - Títulos y discografías de la Máquina del Tiempo.
+  - Los **60+ géneros musicales y biografías completas** renderizados en el grafo D3 ForceGraph (inyectando propiedades `labelEn` y `bioEn` dinámicamente y regenerando el grafo).
+  - Mapeo y formateo lingüístico adaptativo en las sugerencias del buscador predictivo.
+- ✅ **Badge de Versión Actualizado**: Distintivo visual actualizado a `v13.4` en la barra superior de la aplicación.
+
+**Archivos**:
+- `Sonic_nodes_V13_3.html` (versión principal y completa de producción v13.4)
+- `Sonic_nodes_V13.html` (versión principal y completa de producción v13.4)
+
+---
+
+### v13.3 (Mayo 2026) - Anterior
 **Título**: "The Universal Search & Deep-Link Era"
 
 **Cambios Principales**:
