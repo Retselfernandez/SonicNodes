@@ -639,6 +639,321 @@
             max-width: 320px;
             line-height: 1.5;
         }
+
+        /* ===== ARTIST PROFILE & DISCOGRAPHY VIEW (v13.1) ===== */
+        .time-artist-detail-view {
+            position: absolute;
+            inset: 0;
+            background: var(--panel-bg);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(40px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .time-artist-detail-view.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(0);
+        }
+        
+        .time-artist-detail-header {
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255,255,255,0.005);
+        }
+        
+        .time-artist-detail-back-btn {
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .time-artist-detail-back-btn:hover {
+            background: var(--surface2);
+            color: var(--accent);
+        }
+        
+        .time-artist-detail-hero {
+            padding: 24px 30px;
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            background: linear-gradient(180deg, rgba(124,58,237,0.06) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .time-artist-detail-hero-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 14px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+            background: var(--surface2);
+        }
+        
+        .time-artist-detail-hero-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .time-artist-detail-hero-info h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.03em;
+        }
+        
+        .time-artist-detail-hero-info .genre-pill {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(124,58,237,0.1);
+            color: var(--accent);
+            border: 1px solid rgba(124,58,237,0.2);
+            align-self: flex-start;
+            font-weight: 600;
+        }
+        
+        .time-artist-detail-hero-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .time-artist-detail-hero-actions button {
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-focus-graph {
+            background: var(--accent);
+            border: 1px solid transparent;
+            color: white;
+        }
+        
+        .btn-focus-graph:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+        }
+        
+        .time-artist-detail-body {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            overflow: hidden;
+        }
+        
+        .time-artist-detail-sidebar {
+            padding: 24px;
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: rgba(255,255,255,0.002);
+        }
+        
+        .time-artist-detail-sidebar h4 {
+            margin: 0 0 10px 0;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+        }
+        
+        /* Sidebar Player Card */
+        .time-detail-player-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        .time-detail-player-card-art {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+            background: var(--surface);
+        }
+        
+        .time-detail-player-card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .time-detail-player-card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .time-detail-player-card-artist {
+            font-size: 12px;
+            color: var(--muted);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* Sidebar equalizer */
+        .eq-animation {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 16px;
+            margin-left: auto;
+        }
+        
+        .eq-bar {
+            width: 3px;
+            background: var(--accent);
+            border-radius: 1px;
+            animation: bounce 0.8s ease infinite alternate;
+        }
+        
+        .eq-bar:nth-child(1) { height: 30%; animation-delay: 0.1s; }
+        .eq-bar:nth-child(2) { height: 60%; animation-delay: 0.3s; }
+        .eq-bar:nth-child(3) { height: 40%; animation-delay: 0.2s; }
+        .eq-bar:nth-child(4) { height: 80%; animation-delay: 0.5s; }
+        
+        @keyframes bounce {
+            0% { transform: scaleY(0.3); }
+            100% { transform: scaleY(1); }
+        }
+        
+        .time-artist-detail-tracks {
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        
+        .time-discography-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .time-discography-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .time-discography-item:hover {
+            background: var(--surface);
+            border-color: var(--border2);
+            transform: translateY(-1px);
+        }
+        
+        .time-discography-item.playing-now {
+            border-color: var(--accent);
+            background: rgba(124, 58, 237, 0.05);
+        }
+        
+        .time-discography-item-art {
+            width: 42px;
+            height: 42px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+            background: var(--surface);
+        }
+        
+        .time-discography-item-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .time-discography-item-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .time-discography-item-album {
+            font-size: 11px;
+            color: var(--muted);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .time-discography-item-play {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0.6;
+        }
+        
+        .time-discography-item:hover .time-discography-item-play {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        
+        .time-discography-item.playing-now .time-discography-item-play {
+            background: rgba(124, 58, 237, 0.2);
+            color: var(--accent);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -656,7 +971,7 @@
         </svg>
     </div>
     <span class="logo-text">SonicNodes</span>
-    <span class="logo-ver">v13.0</span>
+    <span class="logo-ver">v13.1</span>
 
     <div class="search-wrap">
         <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -850,6 +1165,74 @@
                 </div>
             </div>
         </section>
+
+        <!-- Artist Detail & Discography Slide-in View -->
+        <div class="time-artist-detail-view" id="time-artist-detail-view">
+            <!-- Header with Back Button -->
+            <div class="time-artist-detail-header">
+                <button class="time-artist-detail-back-btn" onclick="closeArtistDiscography()">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Volver a la Máquina del Tiempo
+                </button>
+            </div>
+
+            <!-- Hero Banner -->
+            <div class="time-artist-detail-hero">
+                <img id="artist-detail-hero-img" class="time-artist-detail-hero-img" src="" alt="">
+                <div class="time-artist-detail-hero-info">
+                    <span class="genre-pill" id="artist-detail-genre">Género</span>
+                    <h1 id="artist-detail-name">Nombre Artista</h1>
+                </div>
+                <div class="time-artist-detail-hero-actions">
+                    <button class="btn-focus-graph" id="artist-detail-focus-btn">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                        Ver en el Grafo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Detail Body -->
+            <div class="time-artist-detail-body">
+                <!-- Left Sidebar: Player Panel -->
+                <aside class="time-artist-detail-sidebar">
+                    <div>
+                        <h4>Reproduciendo Ahora</h4>
+                        <div class="time-detail-player-card">
+                            <img id="time-detail-player-art" class="time-detail-player-card-art" src="" alt="Album Art">
+                            <div style="display:flex;align-items:center;">
+                                <div class="time-detail-player-card-info" style="flex:1; min-width:0;">
+                                    <div id="time-detail-player-title" class="time-detail-player-card-title">Canción</div>
+                                    <div id="time-detail-player-artist" class="time-detail-player-card-artist">Artista</div>
+                                </div>
+                                <div class="eq-animation" id="time-detail-eq" style="display:none;">
+                                    <span class="eq-bar"></span>
+                                    <span class="eq-bar"></span>
+                                    <span class="eq-bar"></span>
+                                    <span class="eq-bar"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Right Content: Discography List -->
+                <section class="time-artist-detail-tracks">
+                    <h3 style="margin:0 0 4px 0;font-size:18px;font-weight:700;color:var(--text);letter-spacing:-0.02em;">Discografía & Temas Clave</h3>
+                    <p style="font-size:12px;color:var(--muted);margin:0 0 10px 0;">Selecciona cualquier tema para escuchar una previsualización de iTunes.</p>
+                    
+                    <div style="flex:1; overflow-y:auto; padding-right:4px;">
+                        <div class="time-discography-list" id="time-discography-list">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -1841,6 +2224,171 @@ function closeTimeMachine() {
     modal.classList.remove('active');
 }
 
+// ============================================================
+// ARTIST DISCOGRAPHY VIEW LOGICAL CONTROLLER (v13.1)
+// ============================================================
+async function openArtistDiscography(artistName, genreLabel) {
+    const detailView = document.getElementById('time-artist-detail-view');
+    const heroImg = document.getElementById('artist-detail-hero-img');
+    const nameEl = document.getElementById('artist-detail-name');
+    const genreEl = document.getElementById('artist-detail-genre');
+    const focusBtn = document.getElementById('artist-detail-focus-btn');
+    
+    // Set basic info immediately
+    nameEl.textContent = artistName;
+    genreEl.textContent = genreLabel || 'Éxito Histórico';
+    heroImg.src = ''; // reset
+    
+    // Wire focus graph button
+    focusBtn.onclick = () => {
+        const searchInput = document.getElementById('global-search');
+        searchInput.value = artistName;
+        searchInput.dispatchEvent(new Event('input'));
+        closeTimeMachine();
+        closeArtistDiscography();
+    };
+
+    // Show detail panel
+    detailView.classList.add('active');
+
+    // Fetch and play first track automatically
+    const playerArt = document.getElementById('time-detail-player-art');
+    const playerTitle = document.getElementById('time-detail-player-title');
+    const playerArtist = document.getElementById('time-detail-player-artist');
+    const eq = document.getElementById('time-detail-eq');
+
+    playerTitle.textContent = 'Buscando preview...';
+    playerArtist.textContent = artistName;
+    playerArt.src = '';
+    eq.style.display = 'none';
+
+    // Fetch top track from iTunes
+    const topTrack = await fetchItunes(artistName);
+    if (topTrack) {
+        heroImg.src = topTrack.artworkUrl;
+        playerArt.src = topTrack.artworkUrl;
+        playerTitle.textContent = topTrack.trackName;
+        playerArtist.textContent = topTrack.artistName;
+        
+        // Play song
+        playSongFromDiscography(topTrack, artistName);
+        eq.style.display = 'flex';
+    } else {
+        playerTitle.textContent = 'Sin preview disponible';
+        playerArtist.textContent = artistName;
+        eq.style.display = 'none';
+    }
+
+    // Load full discography (up to 25 items)
+    const discographyList = document.getElementById('time-discography-list');
+    discographyList.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:20px;text-align:center;">Cargando discografía real...</div>';
+
+    try {
+        const url = `https://itunes.apple.com/search?term=${encodeURIComponent(artistName)}&entity=song&limit=25`;
+        const r = await fetch(url);
+        const data = await r.json();
+        const results = data.results || [];
+        
+        discographyList.innerHTML = '';
+        
+        if (results.length === 0) {
+            discographyList.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:20px;text-align:center;">No se encontraron canciones en iTunes.</div>';
+            return;
+        }
+
+        results.forEach(track => {
+            const item = document.createElement('div');
+            item.className = 'time-discography-item';
+            
+            // Set playing class if currently playing
+            if (audioEl.src === track.previewUrl && isPlaying) {
+                item.classList.add('playing-now');
+            }
+
+            const artwork = (track.artworkUrl100 || '').replace('100x100bb', '200x200bb');
+            
+            item.innerHTML = `
+                <img class="time-discography-item-art" src="${artwork}" alt="Cover">
+                <div class="time-discography-item-info">
+                    <div class="time-discography-item-title" title="${track.trackName}">${track.trackName}</div>
+                    <div class="time-discography-item-album" title="${track.collectionName || 'Sencillo'}">${track.collectionName || 'Sencillo'}</div>
+                </div>
+                <button class="time-discography-item-play" title="Reproducir preview">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+            `;
+
+            item.onclick = () => {
+                const formattedTrack = {
+                    previewUrl: track.previewUrl,
+                    artworkUrl: artwork,
+                    trackName: track.trackName,
+                    artistName: track.artistName,
+                    collectionName: track.collectionName,
+                    trackViewUrl: track.trackViewUrl
+                };
+                
+                // Toggle play/pause if same
+                if (audioEl.src === track.previewUrl) {
+                    if (isPlaying) {
+                        audioEl.pause();
+                        isPlaying = false;
+                        item.classList.remove('playing-now');
+                        eq.style.display = 'none';
+                        updatePlayBtn();
+                    } else {
+                        audioEl.play().then(() => {
+                            isPlaying = true;
+                            item.classList.add('playing-now');
+                            eq.style.display = 'flex';
+                            updatePlayBtn();
+                        }).catch(()=>{});
+                    }
+                    return;
+                }
+
+                // Deactivate all playing items
+                document.querySelectorAll('.time-discography-item').forEach(el => el.classList.remove('playing-now'));
+                item.classList.add('playing-now');
+
+                playerArt.src = artwork;
+                playerTitle.textContent = track.trackName;
+                playerArtist.textContent = track.artistName;
+                eq.style.display = 'flex';
+
+                playSongFromDiscography(formattedTrack, artistName);
+            };
+
+            discographyList.appendChild(item);
+        });
+    } catch(err) {
+        discographyList.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:20px;text-align:center;">Error al cargar la discografía de iTunes.</div>';
+    }
+}
+
+function closeArtistDiscography() {
+    document.getElementById('time-artist-detail-view').classList.remove('active');
+    stopAudio();
+}
+
+async function playSongFromDiscography(track, itunesQuery) {
+    stopAudio();
+    setPlayerUI(track, itunesQuery);
+    if (track.previewUrl) {
+        audioEl.src = track.previewUrl;
+        audioEl.play().then(() => { 
+            isPlaying = true; 
+            updatePlayBtn(); 
+            startProgressTracker(); 
+        }).catch(()=>{});
+        document.getElementById('source-label').textContent = '✓ Preview real — iTunes';
+        document.getElementById('source-label').style.color = '#10b981';
+    } else {
+        document.getElementById('source-label').textContent = 'Sin preview disponible';
+        document.getElementById('source-label').style.color = 'var(--muted)';
+    }
+}
+
 function updateGeoCascade() {
     const continentSelect = document.getElementById('time-select-continent');
     const countrySelect = document.getElementById('time-select-country');
@@ -1943,10 +2491,7 @@ function renderTimeMachineResults() {
         `;
         
         card.onclick = () => {
-            const searchInput = document.getElementById('global-search');
-            searchInput.value = item.artist;
-            searchInput.dispatchEvent(new Event('input'));
-            closeTimeMachine();
+            openArtistDiscography(item.artist, item.genre);
         };
         
         grid.appendChild(card);

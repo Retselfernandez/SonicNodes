@@ -2,7 +2,22 @@
 
 ## Releases
 
-### v13.0 (Mayo 2026) - ACTUAL ⭐
+### v13.1 (Mayo 2026) - ACTUAL ⭐
+**Título**: "The Discography & Autoplay Era"
+
+**Cambios Principales**:
+- ✅ **Reproducción Automática de Éxitos**: Al hacer clic en cualquier tarjeta de artista de la Máquina del Tiempo, la aplicación busca y reproduce inmediatamente una previsualización de iTunes en segundo plano, enlazada al reproductor de la barra inferior.
+- ✅ **Pantalla de Discografía en Tiempo Real**: Al pulsar un artista, el modal de la Máquina del Tiempo realiza una transición hacia una espectacular pantalla de detalle del artista, cargando dinámicamente hasta 25 éxitos y álbumes en tiempo real desde la API de iTunes.
+- ✅ **Ecualizador Animado Glassmorphic**: Diseño esmerilado que incluye una mini tarjeta del reproductor activo con carátula del álbum y un ecualizador interactivo animado por CSS.
+- ✅ **Interacción Cruzada Dinámica ("Ver en el Grafo")**: El botón en la pantalla de detalle de discografía cierra el modal y redirige la cámara de ForceGraph hacia el artista seleccionado con un efecto de zoom y centrado suave.
+- ✅ **Navegación Fluida (Volver)**: El botón "Volver a la Máquina del Tiempo" restablece de forma suave el panel del buscador geográfico multidimensional sin interrumpir la reproducción del tema musical actual.
+
+**Archivos**:
+- `Sonic_nodes_V13.html` (versión principal y completa de producción)
+
+---
+
+### v13.0 (Mayo 2026) - Anterior
 **Título**: "The Time Machine Era"
 
 **Cambios Principales**:
@@ -135,20 +150,20 @@
 
 ## 📊 Comparativa de Evolución
 
-| Aspecto | v1.0 | v2.0 | v4.0 | v4.5 | v13.0 |
-|---------|------|------|------|------|-------|
-| **Macro-Géneros** | 5 | 8 | 5 | 21 | 21 |
-| **Total Nodos** | ~20 | ~40 | 25 | 90+ | 90+ |
-| **Profundidades** | 1 | 1 | 2 | 3 | 3 |
-| **Búsqueda** | ✗ | ✓ | ✓ | ✓ | ✓ |
-| **iTunes API** | ✗ | ✓ | ✓ | ✓ | ✓ |
-| **Spotify API** | ✗ | ✗ | ✓ | ✓ | ✓ |
-| **Temas** | ✗ | Básico | Avanzado | Avanzado + | Premium Glassmorphism |
-| **Métricas** | ✗ | ✗ | ✓ | ✓ | Máquina del Tiempo Fullscreen |
-| **Auto-expand** | ✗ | ✗ | ✗ | ✓ | ✓ |
-| **Bridges** | ✗ | ✗ | Limitados | Completos | Completos |
-| **Light Mode** | ✗ | ✓ (tenue) | ✓ (tenue) | ✓ (mejorado) | ✓ (espectacular con blur) |
-| **Líneas Código** | ~800 | ~1200 | ~2000 | ~2400 | ~2900 |
+| Aspecto | v1.0 | v2.0 | v4.0 | v4.5 | v13.0 | v13.1 |
+|---------|------|------|------|------|-------|-------|
+| **Macro-Géneros** | 5 | 8 | 5 | 21 | 21 | 21 |
+| **Total Nodos** | ~20 | ~40 | 25 | 90+ | 90+ | 90+ |
+| **Profundidades** | 1 | 1 | 2 | 3 | 3 | 3 |
+| **Búsqueda** | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| **iTunes API** | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ (Búsqueda + Discografía) |
+| **Spotify API** | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ |
+| **Temas** | ✗ | Básico | Avanzado | Avanzado + | Premium Glassmorphism | Premium Glassmorphism |
+| **Métricas** | ✗ | ✗ | ✓ | ✓ | Máquina del Tiempo Fullscreen | M. Tiempo + Discografía en vivo |
+| **Auto-expand** | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ |
+| **Bridges** | ✗ | ✗ | Limitados | Completos | Completos | Completos |
+| **Light Mode** | ✗ | ✓ (tenue) | ✓ (tenue) | ✓ (mejorado) | ✓ (espectacular con blur) | ✓ (espectacular con blur) |
+| **Líneas Código** | ~800 | ~1200 | ~2000 | ~2400 | ~2900 | ~3400 |
 
 ---
 

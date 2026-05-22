@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SonicNodes V5 — Universo Isomorfo de la Música</title>
+    <title>SonicNodes — Navega el ADN de la Música</title>
     <script src="https://unpkg.com/force-graph@1.43.5/dist/force-graph.min.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -26,7 +26,11 @@
             --amber: #f59e0b;
             --panel-bg: rgba(8,8,14,0.82);
             --graph-bg: #08080e;
+            --node-label: #94a3b8;
+            --core-label: #ffffff;
             --scrollbar: rgba(255,255,255,0.1);
+            --artist-card-bg: rgba(255,255,255,0.04);
+            --artist-card-hover: rgba(255,255,255,0.08);
         }
         :root[data-theme="light"] {
             --bg: #f0f2f8;
@@ -45,10 +49,15 @@
             --amber: #d97706;
             --panel-bg: rgba(240,242,248,0.92);
             --graph-bg: #e8eaf4;
+            --node-label: #334155;
+            --core-label: #0f172a;
             --scrollbar: rgba(0,0,0,0.15);
+            --artist-card-bg: rgba(0,0,0,0.04);
+            --artist-card-hover: rgba(0,0,0,0.08);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
             font-family: 'Space Grotesk', sans-serif;
             background: var(--bg);
@@ -63,25 +72,30 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 4px; }
 
-        .panel { background: var(--panel-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--border); }
+        /* ===== GLASS PANEL ===== */
+        .panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border);
+        }
 
+        /* ===== TOPBAR ===== */
         #topbar {
             position: absolute; top: 0; left: 0; right: 0; height: 52px;
             z-index: 30;
             display: flex; align-items: center; padding: 0 16px; gap: 12px;
+            border-top: none; border-left: none; border-right: none;
             border-bottom: 1px solid var(--border);
         }
 
-        .logo-mark { width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; }
+        .logo-mark {
+            width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            display: flex; align-items: center; justify-content: center;
+        }
         .logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.03em; }
         .logo-ver { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); margin-left: 4px; }
-
-        #menu-btn {
-            width: 34px; height: 34px; border-radius: 9px; background: var(--surface2); border: 1px solid var(--border);
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: background 0.2s; color: var(--text2);
-        }
-        #menu-btn:hover { background: var(--surface); }
 
         .search-wrap { position: relative; flex: 1; max-width: 380px; }
         .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
@@ -93,38 +107,24 @@
             outline: none; transition: border-color 0.2s;
         }
         #global-search:focus { border-color: var(--accent); }
+        #global-search::placeholder { color: var(--muted); }
 
+        .tag-pill {
+            font-family: 'DM Mono', monospace; font-size: 9px;
+            padding: 3px 8px; border-radius: 5px; border: 1px solid;
+            white-space: nowrap;
+        }
+
+        /* Theme toggle */
         #theme-toggle {
             width: 34px; height: 34px; border-radius: 9px;
             background: var(--surface2); border: 1px solid var(--border);
             cursor: pointer; display: flex; align-items: center; justify-content: center;
             transition: background 0.2s; color: var(--text2);
         }
-        #theme-toggle:hover { background: var(--surface); }
+        #theme-toggle:hover { background: var(--surface); border-color: var(--border2); }
 
-        /* Hamburger Menu */
-        #hamburger-menu {
-            position: fixed; left: 0; top: 0; width: 280px; height: 100vh;
-            background: var(--panel-bg); border-right: 1px solid var(--border);
-            z-index: 50; display: flex; flex-direction: column; overflow: hidden;
-            transform: translateX(-100%); transition: transform 0.3s;
-        }
-        #hamburger-menu.open { transform: translateX(0); }
-        #menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-        #menu-overlay.open { opacity: 1; pointer-events: auto; }
-
-        .menu-header { padding: 20px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-        .menu-header-title { font-weight: 600; font-size: 15px; }
-        #menu-close { width: 28px; height: 28px; border-radius: 6px; background: var(--surface2); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text2); transition: background 0.2s; }
-        #menu-close:hover { background: var(--surface); }
-
-        .menu-section { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 20px; }
-        .menu-label { font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--muted); letter-spacing: 0.08em; margin-bottom: 8px; }
-        .menu-item { padding: 8px 12px; border-radius: 8px; background: transparent; border: 1px solid transparent; cursor: pointer; font-size: 13px; text-align: left; color: var(--text2); transition: all 0.2s; }
-        .menu-item:hover { background: var(--surface2); border-color: var(--border); color: var(--text); }
-        .menu-item.active { background: rgba(124,58,237,0.15); border-color: var(--accent); color: var(--accent); }
-
-        /* LEFT PANEL */
+        /* ===== LEFT PANEL ===== */
         #left-panel {
             position: absolute; left: 12px; top: 60px; bottom: 12px;
             width: 300px; z-index: 20; border-radius: 16px;
@@ -134,10 +134,14 @@
         .artwork-wrap {
             width: 100%; height: 150px; overflow: hidden; position: relative;
             background: linear-gradient(135deg, var(--surface2), var(--surface));
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
         }
         .artwork-wrap img { width: 100%; height: 100%; object-fit: cover; }
-        .artwork-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 50%, var(--panel-bg)); }
+        .artwork-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to bottom, transparent 50%, var(--panel-bg));
+        }
 
         .inspector-body {
             padding: 12px 14px; flex: 1; overflow-y: auto;
@@ -157,19 +161,109 @@
             display: inline-block; margin-bottom: 6px;
         }
 
-        #player-section {
-            padding: 12px 14px; background: var(--bg2);
-            border-top: 1px solid var(--border); flex-shrink: 0;
+        /* ===== ARTIST LIST in Inspector ===== */
+        #artist-section { display: none; margin-top: 12px; }
+        .artist-item {
+            display: flex; align-items: center; gap: 9px;
+            padding: 8px 10px; border-radius: 9px;
+            cursor: pointer; transition: background 0.15s;
+            border: 1px solid transparent;
+            margin-bottom: 3px;
         }
+        .artist-item:hover { background: var(--artist-card-hover); border-color: var(--border); }
+        .artist-item.playing-now { background: var(--artist-card-hover); border-color: var(--accent); }
+        .artist-thumb {
+            width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
+            background: var(--surface2); overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .artist-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .artist-name { font-size: 12px; font-weight: 600; }
+        .artist-meta { font-size: 10px; color: var(--text2); }
+        .mini-play-btn {
+            width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+            background: var(--accent); border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.15s; margin-left: auto; color: white;
+        }
+        .mini-play-btn:hover { transform: scale(1.1); }
+        .mini-play-btn.active { background: #dc2626; }
 
-        /* RIGHT PANEL */
+        /* Expand button */
+        #expand-artists-btn {
+            display: none; width: 100%; margin-top: 10px;
+            padding: 8px 12px; border-radius: 9px;
+            background: var(--surface2); border: 1px solid var(--border);
+            color: var(--text2); font-size: 11px; font-family: 'Space Grotesk', sans-serif;
+            cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        #expand-artists-btn:hover { background: var(--accent); border-color: var(--accent); color: white; }
+        #expand-artists-btn.hidden { display: none !important; }
+
+        /* ===== PLAYER ===== */
+        #player-section {
+            padding: 12px 14px;
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .player-row { display: flex; align-items: center; gap: 9px; margin-bottom: 9px; }
+        .player-art {
+            width: 42px; height: 42px; border-radius: 8px; flex-shrink: 0;
+            background: var(--surface2); overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .player-art img { width: 100%; height: 100%; object-fit: cover; }
+        .player-meta { flex: 1; min-width: 0; }
+        .player-track { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .player-artist { font-size: 10px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .play-btn {
+            width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+            background: linear-gradient(135deg, var(--accent), #5b21b6);
+            border: none; color: white; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .play-btn:hover { transform: scale(1.08); box-shadow: 0 0 18px var(--accent-glow); }
+        .play-btn.playing { background: linear-gradient(135deg, #dc2626, #9f1239); }
+
+        .spotify-btn {
+            width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+            background: #1db954; display: flex; align-items: center; justify-content: center;
+            text-decoration: none; transition: transform 0.15s;
+        }
+        .spotify-btn:hover { transform: scale(1.1); }
+
+        /* iTunes logo button */
+        .itunes-btn {
+            width: 28px; height: 28px; border-radius: 7px; flex-shrink: 0;
+            background: linear-gradient(135deg, #FC3C44, #FF2D55);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; transition: transform 0.15s;
+        }
+        .itunes-btn:hover { transform: scale(1.1); }
+
+        .progress-track {
+            height: 3px; background: var(--border); border-radius: 2px;
+            overflow: hidden; cursor: pointer; margin: 0 0 4px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            border-radius: 2px; transition: width 0.1s linear;
+        }
+        .time-row { display: flex; justify-content: space-between; align-items: center; }
+        .time-label { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); }
+        .source-label { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--muted); }
+
+        /* ===== RIGHT PANEL ===== */
         #right-panel {
             position: absolute; right: 12px; top: 60px; bottom: 12px;
             width: 272px; z-index: 20; border-radius: 16px;
-            display: flex; flex-direction: column; padding: 14px; gap: 10px;
-        }
-        #right-panel.metrics-mode {
-            padding: 14px;
+            display: flex; flex-direction: column; padding: 14px;
+            gap: 10px;
         }
 
         .panel-title { font-size: 13px; font-weight: 600; }
@@ -183,13 +277,39 @@
             cursor: pointer; outline: none; width: 100%;
         }
         select:focus { border-color: var(--accent); }
+        option { background: var(--bg2); }
 
-        /* Hide/show modes */
-        .mode-section { display: none; }
-        .mode-section.active { display: flex; flex-direction: column; gap: 10px; }
+        .top-item {
+            display: flex; align-items: center; gap: 8px;
+            padding: 7px 9px; border-radius: 8px;
+            cursor: pointer; transition: background 0.15s;
+            border: 1px solid transparent;
+        }
+        .top-item:hover { background: var(--artist-card-hover); border-color: var(--border); }
+        .top-rank { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); width: 16px; text-align: center; }
 
-        #graph-container { position: absolute; inset: 0; z-index: 1; }
+        /* depth selector */
+        .depth-row { display: flex; gap: 4px; }
+        .depth-btn {
+            flex: 1; font-size: 10px; font-family: 'DM Mono', monospace;
+            padding: 6px 4px; border-radius: 7px;
+            border: 1px solid var(--border); background: transparent;
+            color: var(--muted); cursor: pointer; transition: all 0.15s;
+        }
+        .depth-btn.active { background: rgba(124,58,237,0.2); border-color: var(--accent); color: var(--text); }
 
+        /* legend */
+        .legend-row { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text2); }
+
+        /* spinner */
+        .spinner { width: 12px; height: 12px; border: 2px solid var(--border); border-top-color: var(--accent2); border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+        .spinner.on { display: inline-block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* separator */
+        .sep { border: none; border-top: 1px solid var(--border); }
+
+        /* node tooltip */
         #node-tooltip {
             position: fixed; z-index: 200; pointer-events: none; display: none;
             background: var(--bg2); border: 1px solid var(--border2);
@@ -197,26 +317,31 @@
             box-shadow: 0 8px 24px rgba(0,0,0,0.3);
         }
 
+        /* neon dot */
         .neon-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse-nd 2s ease-in-out infinite; }
         @keyframes pulse-nd { 0%,100%{opacity:1;box-shadow:0 0 6px var(--green);} 50%{opacity:.5;box-shadow:0 0 14px var(--green);} }
 
-        .tag-pill {
+        /* Transition for theme changes */
+        .panel, #topbar, body, #left-panel, #right-panel { transition: background 0.25s, border-color 0.25s, color 0.25s; }
+
+        /* tag chips */
+        .chip {
             font-family: 'DM Mono', monospace; font-size: 9px;
-            padding: 3px 8px; border-radius: 5px; border: 1px solid;
-            white-space: nowrap;
+            padding: 2px 7px; border-radius: 4px;
+            background: var(--surface2); border: 1px solid var(--border);
+            color: var(--muted); display: inline-block;
         }
+
+        /* node expand flash */
+        @keyframes node-pop { 0%{transform:scale(0.6);opacity:0;} 60%{transform:scale(1.15);} 100%{transform:scale(1);opacity:1;} }
     </style>
 </head>
 <body>
 
 <div id="node-tooltip"></div>
 
-<!-- TOPBAR -->
+<!-- ===== TOPBAR ===== -->
 <header id="topbar" class="panel">
-    <button id="menu-btn" title="Menú">
-        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-    </button>
-
     <div class="logo-mark">
         <svg width="18" height="18" viewBox="0 0 100 100" fill="none">
             <path d="M25,75 C25,40 50,25 50,50 C50,75 75,60 75,25" stroke="white" stroke-width="10" stroke-linecap="round"/>
@@ -226,7 +351,7 @@
         </svg>
     </div>
     <span class="logo-text">SonicNodes</span>
-    <span class="logo-ver">v5.0</span>
+    <span class="logo-ver">v4.5</span>
 
     <div class="search-wrap">
         <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -236,127 +361,157 @@
     <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
         <div class="neon-dot"></div>
         <span style="font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);" id="node-counter">0 nodos</span>
-        <button id="theme-toggle" title="Cambiar tema">
+
+        <span class="tag-pill" style="background:rgba(252,60,68,0.12);color:#FC3C44;border-color:rgba(252,60,68,0.25);">iTunes API</span>
+        <span class="tag-pill" style="background:rgba(29,185,84,0.1);color:#1db954;border-color:rgba(29,185,84,0.2);">Spotify</span>
+
+        <!-- Theme toggle -->
+        <button id="theme-toggle" title="Cambiar tema" onclick="toggleTheme()">
             <svg id="theme-icon-dark" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
             <svg id="theme-icon-light" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none;"><circle cx="12" cy="12" r="5" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         </button>
     </div>
 </header>
 
-<!-- HAMBURGER MENU -->
-<div id="menu-overlay"></div>
-<nav id="hamburger-menu" class="panel">
-    <div class="menu-header">
-        <span class="menu-header-title">Menú</span>
-        <button id="menu-close">✕</button>
-    </div>
-    <div class="menu-section">
-        <div>
-            <div class="menu-label">Vista</div>
-            <button class="menu-item active" data-mode="graph">🎵 Mapa de Géneros</button>
-            <button class="menu-item" data-mode="metrics">📊 Métricas Históricas</button>
-        </div>
-        <div>
-            <div class="menu-label">Géneros (Mapa)</div>
-            <button class="menu-item" data-genre="rock">🎸 Rock</button>
-            <button class="menu-item" data-genre="electronica">⚡ Electrónica</button>
-            <button class="menu-item" data-genre="hiphop">🎤 Hip-Hop & R&B</button>
-            <button class="menu-item" data-genre="reggaeton">🔥 Reggaeton</button>
-            <button class="menu-item" data-genre="kpop">🌟 K-Pop</button>
-            <button class="menu-item" data-genre="jazz">🎷 Jazz</button>
-            <button class="menu-item" data-genre="latina">💃 Latina</button>
-        </div>
-    </div>
-</nav>
-
-<!-- LEFT PANEL -->
+<!-- ===== LEFT PANEL ===== -->
 <aside id="left-panel" class="panel">
+    <!-- Artwork -->
     <div class="artwork-wrap" id="inspector-artwork">
         <svg width="44" height="44" fill="none" stroke="rgba(124,58,237,0.3)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
         <div class="artwork-overlay"></div>
     </div>
+
+    <!-- Inspector body -->
     <div class="inspector-body">
-        <span class="type-badge" id="inspector-badge" style="background:rgba(124,58,237,0.15);color:#a78bfa;border-color:rgba(124,58,237,0.3);">Macro-Género</span>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span class="type-badge" id="inspector-badge" style="background:rgba(124,58,237,0.15);color:#a78bfa;border-color:rgba(124,58,237,0.3);">Macro-Género</span>
+            <div class="spinner" id="api-spinner"></div>
+        </div>
         <h2 id="inspector-title" style="font-size:20px;font-weight:700;letter-spacing:-0.03em;line-height:1.2;margin-bottom:3px;">Explorar</h2>
         <p id="inspector-subtitle" style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:10px;">Haz clic en un nodo para comenzar</p>
+
         <div class="label-sm">Descripción</div>
-        <p id="inspector-bio" style="font-size:11.5px;line-height:1.65;color:var(--text2);">Navega el universo musical por constelaciones isomorfas con géneros expandidos.</p>
-    </div>
-    <div id="player-section">
-        <div style="display:flex;align-items:center;gap:9px;margin-bottom:9px;">
-            <div style="width:42px;height:42px;border-radius:8px;background:var(--surface2);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:18px;">🎵</div>
-            <div style="flex:1;min-width:0;">
-                <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Selecciona un nodo</div>
-                <div style="font-size:10px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">—</div>
+        <p id="inspector-bio" style="font-size:11.5px;line-height:1.65;color:var(--text2);">
+            Navega el universo musical por constelaciones isomorfas. Haz clic en cualquier nodo para explorar su historia y escuchar audio real vía iTunes.
+        </p>
+
+        <div id="inspector-tags" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;"></div>
+
+        <!-- ARTIST SECTION — aparece al clickar subgénero -->
+        <div id="artist-section">
+            <hr class="sep" style="margin:12px 0 10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <span class="label-sm" style="margin-bottom:0;">Artistas del género</span>
+                <span id="artist-loading" class="spinner"></span>
             </div>
+            <div id="artist-list"></div>
+            <button id="expand-artists-btn" onclick="expandArtistsOnGraph()" title="Agregar artistas como nodos al grafo">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Expandir en el grafo
+            </button>
         </div>
+    </div>
+
+    <!-- Player -->
+    <div id="player-section">
+        <div class="player-row">
+            <div class="player-art" id="player-art">
+                <svg width="18" height="18" fill="none" stroke="var(--muted)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+            </div>
+            <div class="player-meta">
+                <div class="player-track" id="player-track">Sin selección</div>
+                <div class="player-artist" id="player-artist-name">—</div>
+            </div>
+            <!-- iTunes logo oficial SVG -->
+            <a href="#" id="itunes-open-link" target="_blank" class="itunes-btn" title="Ver en iTunes / Apple Music" style="opacity:0.4;">
+                <!-- Nota musical Apple Music style -->
+                <svg width="15" height="15" viewBox="0 0 100 100" fill="white">
+                    <path d="M65,15 L65,55 C65,62 58,65 52,62 C46,59 46,51 52,48 C56,46 62,47 65,50 L65,28 L40,35 L40,68 C40,75 33,78 27,75 C21,72 21,64 27,61 C31,59 37,60 40,63 L40,15 Z"/>
+                </svg>
+            </a>
+            <!-- Spotify link -->
+            <a href="#" id="spotify-open-link" target="_blank" class="spotify-btn" title="Buscar en Spotify" style="opacity:0.4;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.24 1.021zm1.44-3.3c-.301.42-.841.54-1.262.24-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.6.18-1.2.72-1.38 4.26-1.26 11.28-1.02 15.72 1.62.54.301.719.979.419 1.501-.3.42-.979.659-1.559.359z"/></svg>
+            </a>
+        </div>
+
+        <div class="progress-track" id="progress-track">
+            <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+        <div class="time-row">
+            <div style="display:flex;align-items:center;gap:8px;">
+                <button class="play-btn" id="play-btn" onclick="togglePlay()">
+                    <svg id="play-icon" width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <span id="time-display" class="time-label">0:00 / 0:00</span>
+            </div>
+            <span id="source-label" class="source-label">iTunes Preview</span>
+        </div>
+        <audio id="audio-player" style="display:none;"></audio>
     </div>
 </aside>
 
-<!-- RIGHT PANEL -->
+<!-- ===== RIGHT PANEL ===== -->
 <aside id="right-panel" class="panel">
-    <!-- Modo Grafo -->
-    <div class="mode-section active" data-mode="graph">
-        <div>
-            <div class="panel-title">Métricas</div>
-            <div class="panel-sub">Datos por región</div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-            <select id="filter-region">
+    <div>
+        <div class="panel-title">Métricas Históricas</div>
+        <div class="panel-sub">Datos por región y época</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;gap:5px;">
+            <select id="filter-region" style="flex:1;">
                 <option value="global">🌐 Global</option>
                 <option value="latam">🌎 LATAM</option>
                 <option value="spain">🇪🇸 España</option>
+                <option value="galicia">🏴 Galicia</option>
                 <option value="us">🇺🇸 USA</option>
             </select>
-            <select id="filter-year">
+            <select id="filter-year" style="flex:1;">
                 <option value="now">Ahora</option>
                 <option value="2020">2020</option>
                 <option value="2015">2015</option>
-            </select>
-            <select id="filter-type">
-                <option value="artists">Top 10 Artistas</option>
-                <option value="genres">Top 10 Géneros</option>
+                <option value="2010">2010</option>
+                <option value="2005">2005</option>
+                <option value="2000">2000</option>
+                <option value="1995">1995</option>
             </select>
         </div>
-        <div style="flex:1;overflow-y:auto;">
-            <ul id="top-list" style="list-style:none;display:flex;flex-direction:column;gap:3px;"></ul>
-        </div>
-        <div style="border-top:1px solid var(--border);padding-top:10px;">
-            <div class="label-sm" style="margin-bottom:7px;">Profundidad</div>
-            <div style="display:flex;gap:4px;">
-                <button class="depth-btn active" onclick="setDepth('macro',this)" style="flex:1;font-size:10px;font-family:'DM Mono',monospace;padding:6px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all 0.15s;">Macro</button>
-                <button class="depth-btn" onclick="setDepth('sub',this)" style="flex:1;font-size:10px;font-family:'DM Mono',monospace;padding:6px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all 0.15s;">Sub</button>
-                <button class="depth-btn" onclick="setDepth('artist',this)" style="flex:1;font-size:10px;font-family:'DM Mono',monospace;padding:6px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all 0.15s;">Artista</button>
-            </div>
+        <select id="filter-type">
+            <option value="artists">Top 10 Artistas</option>
+            <option value="genres">Top 10 Géneros</option>
+        </select>
+    </div>
+
+    <div style="flex:1;overflow-y:auto;">
+        <ul id="top-list" style="list-style:none;display:flex;flex-direction:column;gap:2px;"></ul>
+    </div>
+
+    <hr class="sep">
+
+    <div>
+        <div class="label-sm" style="margin-bottom:7px;">Profundidad del Grafo</div>
+        <div class="depth-row">
+            <button class="depth-btn active" onclick="setDepth('macro',this)">Macro</button>
+            <button class="depth-btn" onclick="setDepth('sub',this)">Sub</button>
+            <button class="depth-btn" onclick="setDepth('artist',this)">Artista</button>
         </div>
     </div>
 
-    <!-- Modo Métricas -->
-    <div class="mode-section" data-mode="metrics">
-        <div>
-            <div class="panel-title">Métricas Históricas</div>
-            <div class="panel-sub">Datos por región y época</div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-            <select id="metrics-region" style="flex:1;">
-                <option value="global">🌐 Global</option>
-                <option value="latam">🌎 LATAM</option>
-                <option value="spain">🇪🇸 España</option>
-            </select>
-            <select id="metrics-year" style="flex:1;">
-                <option value="now">Actualidad</option>
-                <option value="2010">Año 2010</option>
-                <option value="2000">Año 2000</option>
-            </select>
-        </div>
-        <div style="flex:1;overflow-y:auto;">
-            <div id="metrics-display" style="font-size:12px;color:var(--text2);line-height:1.6;"></div>
+    <div>
+        <div class="label-sm" style="margin-bottom:7px;">Simbología</div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+            <div class="legend-row"><span style="width:11px;height:11px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>Macro-Género</div>
+            <div class="legend-row"><span style="width:9px;height:9px;border-radius:50%;background:transparent;border:2px solid var(--accent);flex-shrink:0;"></span>Subgénero</div>
+            <div class="legend-row"><span style="width:7px;height:7px;border-radius:50%;background:transparent;border:1.5px solid var(--muted);flex-shrink:0;"></span>Artista</div>
+            <div class="legend-row"><div style="width:14px;border-top:2px dashed var(--amber);"></div>Puente transversal</div>
+            <div class="legend-row"><div style="width:14px;border-top:2px solid rgba(252,60,68,0.6);"></div>Expandido iTunes</div>
         </div>
     </div>
 </aside>
 
 <!-- GRAPH -->
-<div id="graph-container"></div>
+<div id="graph-container" style="position:absolute;inset:0;z-index:1;"></div>
 
 <script>
 // ============================================================
@@ -374,108 +529,154 @@ function toggleTheme() {
 }
 
 // ============================================================
-// MENU HANDLING
-// ============================================================
-const menuBtn = document.getElementById('menu-btn');
-const menuClose = document.getElementById('menu-close');
-const menu = document.getElementById('hamburger-menu');
-const overlay = document.getElementById('menu-overlay');
-
-menuBtn.addEventListener('click', () => {
-    menu.classList.add('open');
-    overlay.classList.add('open');
-});
-
-menuClose.addEventListener('click', () => {
-    menu.classList.remove('open');
-    overlay.classList.remove('open');
-});
-
-overlay.addEventListener('click', () => {
-    menu.classList.remove('open');
-    overlay.classList.remove('open');
-});
-
-// Mode switching
-document.querySelectorAll('.menu-item[data-mode]').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const mode = btn.getAttribute('data-mode');
-        switchMode(mode);
-        document.querySelectorAll('.menu-item[data-mode]').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        menu.classList.remove('open');
-        overlay.classList.remove('open');
-    });
-});
-
-function switchMode(mode) {
-    document.querySelectorAll('.mode-section').forEach(s => s.classList.remove('active'));
-    document.querySelector(`.mode-section[data-mode="${mode}"]`).classList.add('active');
-
-    if (mode === 'metrics') {
-        if (currentGraph) try { currentGraph._destructor?.(); } catch(e) {}
-    } else {
-        if (!currentGraph) initGraph('macro');
-    }
-}
-
-// Genre highlighting
-document.querySelectorAll('.menu-item[data-genre]').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const genre = btn.getAttribute('data-genre');
-        if (currentGraph && selectedNode) {
-            const data = currentGraph.graphData();
-            const genreNode = data.nodes.find(n => n.id === genre);
-            if (genreNode) {
-                currentGraph.centerAt(genreNode.x, genreNode.y, 700);
-                currentGraph.zoom(2.5, 700);
-                updateInspector(genreNode);
-            }
-        }
-        menu.classList.remove('open');
-        overlay.classList.remove('open');
-    });
-});
-
-// ============================================================
-// GENRE DATA (Expandido con K-pop, Reggaeton, Hip-Hop)
+// GENRE DATA
 // ============================================================
 const GENRES = {
-    rock: { label:'Rock', color:'#ef4444', bio:'Género nacido en los 50s mezclando rhythm & blues, country y gospel.', tags:['guitarra','blues','1950s'], itunesQuery:'rock classic' },
-    electronica: { label:'Electrónica', color:'#06b6d4', bio:'Música creada electrónicamente. Del experimento académico de los 50s a los clubs del siglo XXI.', tags:['sintetizador','digital'], itunesQuery:'daft punk electronic' },
-    hiphop: { label:'Hip Hop', color:'#f59e0b', bio:'El Bronx, Nueva York, 1973. Rap, DJing, breakdance como pilares culturales.', tags:['Bronx','sampling','rimas'], itunesQuery:'grandmaster flash hip hop' },
-    reggaeton: { label:'Reggaeton', color:'#ec4899', bio:'Puerto Rico, 90s. Dembow + reggae + hip hop latino. Daddy Yankee lo globalizó.', tags:['dembow','Puerto Rico'], itunesQuery:'daddy yankee gasolina' },
-    kpop: { label:'K-Pop', color:'#f97316', bio:'Género musical surcoreano que combina pop, hip-hop, R&B y danza. Fenómeno global.', tags:['Corea','K-Pop','global'], itunesQuery:'bts dynamite' },
-    jazz: { label:'Jazz', color:'#8b5cf6', bio:'Nueva Orleans, siglo XIX. Blues + ragtime. La improvisación como alma.', tags:['improvisación','New Orleans'], itunesQuery:'miles davis jazz' },
-    latina: { label:'Latina', color:'#10b981', bio:'Siglos de música del Caribe, Sudamérica. Ritmos africanos, melodías europeas.', tags:['ritmo','percusión'], itunesQuery:'latin music' },
+    rock:          { label:'Rock',            color:'#ef4444', bio:'Género nacido en los 50s mezclando rhythm & blues, country y gospel. El género más influyente del siglo XX.', tags:['guitarra','blues','1950s'], itunesQuery:'rock classic hits', spotifySearch:'rock' },
+    electronica:   { label:'Electrónica',     color:'#06b6d4', bio:'Toda la música creada electrónicamente. Del experimento académico de los 50s a los clubs del siglo XXI.', tags:['sintetizador','digital','sampling'], itunesQuery:'daft punk electronic music', spotifySearch:'electronic' },
+    hiphop:        { label:'Hip Hop',         color:'#f59e0b', bio:'El Bronx, Nueva York, 1973. Rap, DJing, breakdance y graffiti como cuatro pilares culturales.', tags:['Bronx','sampling','rimas','1973'], itunesQuery:'grandmaster flash hip hop', spotifySearch:'hip hop' },
+    reggaeton:     { label:'Reggaeton',       color:'#f59e0b', bio:'Puerto Rico, 90s. Dembow + reggae + hip hop latino. Daddy Yankee lo globalizó con Gasolina.', tags:['dembow','Puerto Rico','perreo'], itunesQuery:'daddy yankee gasolina reggaeton', spotifySearch:'reggaeton' },
+    afrobeats_gen: { label:'Afrobeats',       color:'#f59e0b', bio:'Nigeria y Ghana, 2010s. Highlife + hip hop + dancehall africano. Burna Boy, Wizkid, Davido.', tags:['Nigeria','Ghana','dance'], itunesQuery:'burna boy outside afrobeats', spotifySearch:'afrobeats' },
+    latina:        { label:'Latina',          color:'#10b981', bio:'Siglos de música del Caribe, Sudamérica y Centroamérica. Ritmos africanos, melodías europeas e indígenas.', tags:['ritmo','percusión','clave'], itunesQuery:'latin music classics', spotifySearch:'latin' },
+    jazz:          { label:'Jazz',            color:'#8b5cf6', bio:'Nueva Orleans, siglo XIX. Blues + ragtime + música europea. La improvisación como alma.', tags:['improvisación','New Orleans','swing'], itunesQuery:'miles davis kind of blue jazz', spotifySearch:'jazz' },
+    rock_alt_gen:  { label:'Rock Alternativo', color:'#ef4444', bio:'Rock experimental y urbano. Del indie al post-punk, nuevas formas de expresión musical.', tags:['experimental','urbano','innovación'], itunesQuery:'radiohead alternative rock', spotifySearch:'alternative rock' },
+    metal_gen:     { label:'Metal',           color:'#ef4444', bio:'Guitarras distorsionadas pesadas, velocidad y virtuosismo. Desde el heavy al black metal.', tags:['distorsión','heavy','virtuosismo'], itunesQuery:'metallica master puppets', spotifySearch:'metal' },
+    ambient_gen:   { label:'Ambient & Synth', color:'#06b6d4', bio:'Atmósferas electrónicas. Brian Eno, sintetizadores análogos, texturas inmersivas.', tags:['atmósfera','sintetizador','textura'], itunesQuery:'brian eno ambient music', spotifySearch:'ambient' },
+    drum_bass_gen: { label:'Drum & Bass',     color:'#06b6d4', bio:'UK 90s, velocidad y bajos. Jungle, DnB, grime y dubstep como evolución.', tags:['UK','breakbeat','velocidad'], itunesQuery:'goldie drum bass timeless', spotifySearch:'drum and bass' },
+    funk_soul_gen: { label:'Funk & Soul',     color:'#8b5cf6', bio:'Groove y alma. James Brown, Ray Charles, el corazón rítmico de la música negra.', tags:['groove','soul','R&B'], itunesQuery:'james brown sex machine funk', spotifySearch:'funk' },
+    bossa_latino:  { label:'Bossa & Ritmos',  color:'#10b981', bio:'Brasil y Latinoamérica. Samba, bossa nova, saudade y movimiento.', tags:['Brasil','samba','ritmo'], itunesQuery:'stan getz joao gilberto bossa nova', spotifySearch:'bossa nova' },
+    flamenco_span: { label:'Flamenco Ibérico', color:'#10b981', bio:'Andalucía y España. Cante jondo, guitarra flamenca, duende gitano.', tags:['Andalucía','duende','guitarra'], itunesQuery:'paco de lucia entre dos aguas', spotifySearch:'flamenco' },
+    reggae_gen:    { label:'Reggae & Roots',  color:'#10b981', bio:'Jamaica. Bob Marley, rastafari, reggae, dancehall y ska.', tags:['Jamaica','Rastafari','reggae'], itunesQuery:'bob marley no woman no cry', spotifySearch:'reggae' },
+    jazz_avant:    { label:'Jazz Experimental', color:'#8b5cf6', bio:'Jazz de vanguardia. Free jazz, bebop moderno, experimentación.', tags:['experimental','vanguardia','improvisación'], itunesQuery:'ornette coleman free jazz', spotifySearch:'jazz' },
+    electronic_exp:{ label:'Electrónica Tech', color:'#06b6d4', bio:'House, techno, trance. Pistas de baile, sintetizadores, ritmo hipnótico.', tags:['dancefloor','sintetizador','beat'], itunesQuery:'daft punk one more time', spotifySearch:'house' },
+    indie_alt:     { label:'Indie & Alt Pop',  color:'#ef4444', bio:'Indie rock, art rock, post-punk. Lo alternativo hecho mainstream.', tags:['indie','alternativo','urbano'], itunesQuery:'the strokes last nite', spotifySearch:'indie rock' },
+    blues_roots:   { label:'Blues & Raíces',   color:'#8b5cf6', bio:'Blues tradicional, delta blues, chicago blues. La raíz de todo.', tags:['root','blues','tradición'], itunesQuery:'b b king the thrill is gone', spotifySearch:'blues' },
+    country_folk:  { label:'Country & Folk',  color:'#10b981', bio:'USA rural y música del pueblo. Banjo, narrativa, tradición oral.', tags:['USA','tradición','narrativa'], itunesQuery:'johnny cash ring of fire', spotifySearch:'country' },
+    world_fusion:  { label:'World & Fusion',  color:'#06b6d4', bio:'Músicas del mundo, fusiones globales. Ethno-jazz, world fusion, crossover.', tags:['global','fusion','world'], itunesQuery:'fela kuti afrobeat', spotifySearch:'world music' },
+    
+    rock_clasico:  { label:'Rock Clásico',    color:'#ef4444', bio:'La era dorada 1960-1980: Led Zeppelin, Rolling Stones, Hendrix, The Who. Riffs que definieron una era.', tags:['1970s','riff','blues rock'], itunesQuery:'led zeppelin classic rock', spotifySearch:'classic rock' },
+    rock_alt:      { label:'Rock Alternativo',color:'#ef4444', bio:'Surgido en los 80s como reacción al mainstream. Del grunge al indie, de Sonic Youth a Radiohead.', tags:['indie','grunge','underground'], itunesQuery:'radiohead alternative rock', spotifySearch:'alternative rock' },
+    punk:          { label:'Punk',            color:'#ef4444', bio:'Movimiento cultural y musical de los 70s. DIY, velocidad, actitud. Sex Pistols, Ramones, The Clash.', tags:['DIY','velocidad','1977'], itunesQuery:'ramones punk rock blitzkrieg', spotifySearch:'punk' },
+    metal:         { label:'Metal',           color:'#ef4444', bio:'Guitarras distorsionadas pesadas, velocidad y virtuosismo. Black Sabbath lo inventó, Metallica lo masificó.', tags:['distorsión','heavy','riffs'], itunesQuery:'metallica master puppets', spotifySearch:'metal' },
+    grunge:        { label:'Grunge',          color:'#ef4444', bio:'Seattle, finales 80s. Mezcla metal y punk con letras introspectivas. Nirvana lo llevó al mundo.', tags:['Seattle','angst','distortion'], itunesQuery:'nirvana smells teen spirit', spotifySearch:'grunge' },
+    indie_rock:    { label:'Indie Rock',      color:'#ef4444', bio:'Rock producido independientemente. Énfasis en autenticidad y experimentación. The Strokes, Arctic Monkeys.', tags:['independiente','lo-fi','experimental'], itunesQuery:'the strokes last nite indie', spotifySearch:'indie rock' },
+    house:         { label:'House',           color:'#06b6d4', bio:'Chicago, principios 80s. Deconstrucción del disco con Roland 909 y bajos profundos. Frankie Knuckles.', tags:['Chicago','4/4','909','dance'], itunesQuery:'frankie knuckles house music', spotifySearch:'house' },
+    techno:        { label:'Techno',          color:'#06b6d4', bio:'Detroit, futurismo industrial y funk afrocéntrico. Juan Atkins, Derrick May, Kevin Saunderson.', tags:['Detroit','futurismo','industrial'], itunesQuery:'derrick may techno detroit', spotifySearch:'techno' },
+    drum_bass:     { label:'Drum & Bass',     color:'#06b6d4', bio:'UK 90s, 160-180 BPM y bajos elaborados. Nacido de la escena rave y el jungle londinense.', tags:['UK','160BPM','rave','breakbeat'], itunesQuery:'goldie drum bass timeless', spotifySearch:'drum and bass' },
+    ambient:       { label:'Ambient',         color:'#06b6d4', bio:'Brian Eno (1978): música creada para ser escuchada o ignorada. Atmósferas más que melodías.', tags:['Brian Eno','atmósfera','textura'], itunesQuery:'brian eno ambient music', spotifySearch:'ambient' },
+    synthwave:     { label:'Synthwave',       color:'#06b6d4', bio:'Nostalgia sonora de los 80s recreada con sintetizadores análogos. Kavinsky, Perturbator, Carpenter Brut.', tags:['80s','retrowave','synth','nostalgia'], itunesQuery:'kavinsky nightcall synthwave', spotifySearch:'synthwave' },
+    dubstep:       { label:'Dubstep',         color:'#06b6d4', bio:'Sur de Londres, 90s tardíos. Dub jamaicano + 2-step garage. Bajo sincopado y oscilante. Skream, Benga.', tags:['wobble bass','UK','140BPM'], itunesQuery:'skream dubstep', spotifySearch:'dubstep' },
+    rap_east:      { label:'East Coast Rap',  color:'#f59e0b', bio:'Nueva York. Líricas complejas, jazz samples. Notorious B.I.G., Nas, Jay-Z, Wu-Tang Clan.', tags:['New York','lyricism','jazz'], itunesQuery:'notorious big juicy east coast', spotifySearch:'east coast hip hop' },
+    trap:          { label:'Trap',            color:'#f59e0b', bio:'Atlanta, 2000s. Hi-hats veloces, 808s y letras sobre la calle. Gucci Mane, T.I., Young Jeezy.', tags:['Atlanta','808s','hi-hats'], itunesQuery:'future trap music', spotifySearch:'trap' },
+    lofi:          { label:'Lo-Fi Hip Hop',   color:'#f59e0b', bio:'Beats lentos, jazz samples, estética analógica. La banda sonora del estudio moderno.', tags:['chill','estudio','jazz samples'], itunesQuery:'nujabes lofi hip hop', spotifySearch:'lo-fi' },
+    salsa:         { label:'Salsa',           color:'#10b981', bio:'Son cubano + jazz en Nueva York, 60s. Fania Records fue su catedral. Celia Cruz, Héctor Lavoe.', tags:['Fania','conga','tumbao','NY'], itunesQuery:'celia cruz azucar salsa', spotifySearch:'salsa' },
+    cumbia:        { label:'Cumbia',          color:'#10b981', bio:'Costa caribeña colombiana. Ritmos africanos + melodías indígenas + acordeón europeo.', tags:['Colombia','acordeón','gaita'], itunesQuery:'carlos vives cumbia colombiana', spotifySearch:'cumbia' },
+    bossa_nova:    { label:'Bossa Nova',      color:'#10b981', bio:'Río de Janeiro, 1958. Samba renovado. João Gilberto, Tom Jobim, Vinícius de Moraes. Saudade.', tags:['Brasil','saudade','samba'], itunesQuery:'stan getz joao gilberto bossa nova', spotifySearch:'bossa nova' },
+    flamenco:      { label:'Flamenco',        color:'#10b981', bio:'Andalucía. Gitano + árabe + judío + castellano. Patrimonio UNESCO. Paco de Lucía, Camarón.', tags:['Andalucía','duende','cante jondo'], itunesQuery:'paco de lucia entre dos aguas', spotifySearch:'flamenco' },
+    reggae:        { label:'Reggae',          color:'#10b981', bio:'Jamaica, 60s. Ska + rocksteady. Bob Marley lo hizo global. Patrimonio UNESCO 2018.', tags:['Jamaica','Rastafari','offbeat'], itunesQuery:'bob marley no woman no cry', spotifySearch:'reggae' },
+    bebop:         { label:'Bebop',           color:'#8b5cf6', bio:'Revolución 40s. Para escuchar, no bailar. Charlie Parker y Dizzy Gillespie lo crearon.', tags:['Charlie Parker','virtuosismo','40s'], itunesQuery:'charlie parker ornithology bebop', spotifySearch:'bebop' },
+    jazz_fusion:   { label:'Jazz Fusión',     color:'#8b5cf6', bio:'"Bitches Brew" (1970) de Miles Davis abrió la puerta. Jazz + rock eléctrico + funk. Weather Report.', tags:['Miles Davis','eléctrico','1970s'], itunesQuery:'weather report birdland fusion', spotifySearch:'jazz fusion' },
+    soul:          { label:'Soul',            color:'#8b5cf6', bio:'R&B + gospel. Detroit Motown, Memphis Stax. Ray Charles y Aretha Franklin son sus voces máximas.', tags:['Motown','gospel','Ray Charles'], itunesQuery:'aretha franklin respect soul', spotifySearch:'soul' },
+    funk:          { label:'Funk',            color:'#8b5cf6', bio:'James Brown y Sly Stone. El groove como ley. Influencia fundamental del hip hop y la electrónica.', tags:['James Brown','groove','rhythm'], itunesQuery:'james brown sex machine funk', spotifySearch:'funk' },
+    r_and_b:       { label:'R&B',            color:'#8b5cf6', bio:'Rhythm & Blues. Fusión de soul, funk y pop. Usher, Alicia Keys, The Weeknd.', tags:['soul','groove','vocal'], itunesQuery:'usher nice slow jam r and b', spotifySearch:'r and b' },
+    alternative:   { label:'Alternative',    color:'#ef4444', bio:'Sonido diferente al mainstream. Desde new wave hasta shoegaze y post-rock.', tags:['experimental','indie','underground'], itunesQuery:'radiohead alternative rock', spotifySearch:'alternative' },
+    electronic_exp:{ label:'Electrónica Exp.', color:'#06b6d4', bio:'Experimentación electrónica pura. Kraftwerk, Autechre, Aphex Twin.', tags:['experimental','sintetizador','digital'], itunesQuery:'kraftwerk autobahn', spotifySearch:'electronic' },
+    uk_bass:       { label:'UK Bass Music',   color:'#06b6d4', bio:'Escena de bajo del Reino Unido. 2-step, grime, jungle, dubstep.', tags:['UK','bass','breakbeat'], itunesQuery:'grime music uk', spotifySearch:'grime' },
+    samba:         { label:'Samba',          color:'#10b981', bio:'Brasil. Ritmo africano con raíces en la diáspora. Carnaval y alegría.', tags:['Brasil','ritmo','percusión'], itunesQuery:'beth carvalho samba brasil', spotifySearch:'samba' },
+    rumba_espanola:{ label:'Rumba Española',  color:'#10b981', bio:'Adaptación española de la rumba cubana con flamenco. Cante y baile de Andalucía.', tags:['Andalucía','Gipsy Kings','guitarra'], itunesQuery:'gipsy kings rumba', spotifySearch:'rumba española' },
+    cante_jondo:   { label:'Cante Jondo',    color:'#10b981', bio:'Canto hondo del flamenco. Letras sobre pena, amor y dolor gitano.', tags:['Andalucía','duende','emocional'], itunesQuery:'camarón cante jondo', spotifySearch:'cante jondo' },
+    roots_reggae:  { label:'Roots Reggae',   color:'#10b981', bio:'Reggae con mensaje espiritual y social. Rastafari y conciencia.', tags:['Rastafari','spirituality','Bob Marley'], itunesQuery:'peter tosh roots reggae', spotifySearch:'roots reggae' },
+    dancehall:     { label:'Dancehall',      color:'#10b981', bio:'Jamaica moderno. Riddims rápidos y movimiento en el baile. Sean Paul, Busy Signal.', tags:['Jamaica','dancehall','energía'], itunesQuery:'sean paul dancehall', spotifySearch:'dancehall' },
+    free_jazz:     { label:'Free Jazz',      color:'#8b5cf6', bio:'Improvisación sin estructura. Ornette Coleman y Sun Ra rompieron límites.', tags:['improvisación','experimental','vanguardia'], itunesQuery:'ornette coleman free jazz', spotifySearch:'free jazz' },
+    cool_jazz:     { label:'Cool Jazz',      color:'#8b5cf6', bio:'Jazz liso y sofisticado. Miles Davis Birth of Cool. West Coast Jazz.', tags:['Miles Davis','soft','smooth'], itunesQuery:'miles davis birth of cool', spotifySearch:'cool jazz' },
+    trance:        { label:'Trance',         color:'#06b6d4', bio:'Música electrónica hipnótica con builds y breakdowns. Paul Oakenfold, Tiësto.', tags:['hipnótico','progresivo','beat'], itunesQuery:'paul oakenfold trance', spotifySearch:'trance' },
+    art_rock:      { label:'Art Rock',       color:'#ef4444', bio:'Rock experimental y progresivo. Yes, Genesis, King Crimson. Complejidad musical.', tags:['progresivo','conceptual','virtuosismo'], itunesQuery:'yes close to the edge art rock', spotifySearch:'art rock' },
+    post_punk:     { label:'Post-Punk',      color:'#ef4444', bio:'Punk evolucionado. Joy Division, Bauhaus, Wire. Sofisticación y oscuridad.', tags:['post-punk','darkwave','experimental'], itunesQuery:'joy division love will tear us apart', spotifySearch:'post punk' },
+    delta_blues:   { label:'Delta Blues',    color:'#8b5cf6', bio:'Blues de Mississippi. Raíces de toda la música blues. Muddy Waters, Son House.', tags:['Mississippi','acoustic','raíces'], itunesQuery:'muddy waters blues deluxe', spotifySearch:'delta blues' },
+    chicago_blues: { label:'Chicago Blues',  color:'#8b5cf6', bio:'Blues eléctrico urbano. Amplificación y potencia. Willie Dixon, John Lee Hooker.', tags:['Chicago','eléctrico','harmonica'], itunesQuery:'john lee hooker boom boom', spotifySearch:'chicago blues' },
+    blues:         { label:'Blues',          color:'#8b5cf6', bio:'Género padre del rock y la música moderna. Emoción, bending de notas, 12 bar blues.', tags:['root','pentatónico','alma'], itunesQuery:'b b king the thrill is gone', spotifySearch:'blues' },
+    country:       { label:'Country',        color:'#10b981', bio:'USA rural. Historias de la vida, twang y banjo. Hank Williams, Johnny Cash.', tags:['USA','acoustic','narrativa'], itunesQuery:'johnny cash ring of fire', spotifySearch:'country' },
+    folk:          { label:'Folk',           color:'#10b981', bio:'Música del pueblo. Tradición oral, instrumentos acústicos. Dylan, Guthrie.', tags:['tradición','acústico','narrativa'], itunesQuery:'bob dylan blowin in the wind', spotifySearch:'folk' },
+    singer_songwriter:{ label:'Singer-Songwriter', color:'#10b981', bio:'Artista-compositor. Narrativa personal y profunda. Leonard Cohen, Joni Mitchell.', tags:['lírico','personal','acústico'], itunesQuery:'leonard cohen hallelujah', spotifySearch:'singer songwriter' },
+    world_music:   { label:'World Music',    color:'#06b6d4', bio:'Música de tradiciones no occidentales. Afrobeat, raí, raga, gamelan.', tags:['tradición','percusión','global'], itunesQuery:'fela kuti afrobeat', spotifySearch:'world music' },
+    fusion:        { label:'Fusión Musical', color:'#06b6d4', bio:'Mezcla de géneros. Jazz + rock, funk + electronic, world + pop.', tags:['crossover','experimental','híbrido'], itunesQuery:'carlos santana smooth criminal fusion', spotifySearch:'fusion' },
+    ethno_jazz:    { label:'Ethno-Jazz',    color:'#8b5cf6', bio:'Jazz con elementos de música tradicional mundial. Thad Jones, Randy Weston.', tags:['world','improvisación','cross-cultural'], itunesQuery:'randy weston ethno jazz', spotifySearch:'ethno jazz' },
+    psychedelic:   { label:'Psychedelic Rock', color:'#ef4444', bio:'Rock psicodélico 60s. Pink Floyd, The Doors. Sonar líquido, sintetizadores analógicos, letras surrealistas.', tags:['60s','synth','psych'], itunesQuery:'pink floyd wish you were here', spotifySearch:'psychedelic rock' },
+    stoner_rock:   { label:'Stoner Rock',   color:'#ef4444', bio:'Riffs pesados y lentos. Kyuss, Sleep, Queens of the Stone Age. Groove hipnótico.', tags:['heavy','groove','riff'], itunesQuery:'queens of the stone age go with the flow', spotifySearch:'stoner rock' },
+    hard_rock:     { label:'Hard Rock',     color:'#ef4444', bio:'Rock duro. AC/DC, Aerosmith, KISS. Riffs simples pero devastadores.', tags:['riff','heavy','groove'], itunesQuery:'acdc back in black', spotifySearch:'hard rock' },
+    glam_rock:     { label:'Glam Rock',     color:'#ef4444', bio:'Rock de los 70s con visual extravagante. David Bowie, T. Rex, Queen.', tags:['70s','visual','experimental'], itunesQuery:'david bowie ziggy stardust', spotifySearch:'glam rock' },
+    prog_metal:    { label:'Progressive Metal', color:'#ef4444', bio:'Metal progresivo. Dream Theater, Tool, Meshuggah. Complejidad y experimentación.', tags:['progresivo','virtuosismo','complejo'], itunesQuery:'dream theater pull me under', spotifySearch:'progressive metal' },
+    liquid_drum:   { label:'Liquid Drum & Bass', color:'#06b6d4', bio:'Drum & bass suave. Calibre, High Contrast, London Elektricity. Melodía en velocidad.', tags:['UK','165BPM','melodía'], itunesQuery:'high contrast if we ever', spotifySearch:'liquid drum and bass' },
+    vaporwave:     { label:'Vaporwave',     color:'#06b6d4', bio:'Estética digital nostálgica. Malls abandonados, estatuas, internet early 2000s.', tags:['nostálgico','digital','experimental'], itunesQuery:'macintosh plus floral shoppe', spotifySearch:'vaporwave' },
+    witch_house:   { label:'Witch House',   color:'#06b6d4', bio:'Experimental electrónico oscuro. Ritmos witch house, síntesis siniestra.', tags:['experimental','oscuro','sintetizador'], itunesQuery:'salem king night', spotifySearch:'witch house' },
+    grime:         { label:'Grime',         color:'#06b6d4', bio:'Londres 2000s. Garage + hip hop urbano. Wiley, Dizzee Rascal, Skepta.', tags:['UK','urban','energy'], itunesQuery:'wiley tunnel back', spotifySearch:'grime' },
+    west_coast:    { label:'West Coast Hip Hop', color:'#f59e0b', bio:'Los Ángeles. G-funk, laid-back. NWA, Tupac, Snoop Dogg, Dr. Dre.', tags:['LA','G-funk','lowriders'], itunesQuery:'snoop dogg gin and juice', spotifySearch:'west coast hip hop' },
+    conscious_hip: { label:'Conscious Hip Hop', color:'#f59e0b', bio:'Hip hop reflexivo. Lyrics sociales y políticas. Talib Kweli, Common, Mos Def.', tags:['lyricism','social','conscious'], itunesQuery:'common come close', spotifySearch:'conscious hip hop' },
+    emo_rap:       { label:'Emo Rap',       color:'#f59e0b', bio:'Hip hop emocional. XXXTentacion, Juice WRLD, Lil Peep. Vulnerabilidad y melodía.', tags:['emocional','melodía','generación'], itunesQuery:'juice wrld lucid dreams', spotifySearch:'emo rap' },
+    pop_urbano:    { label:'Pop Urbano',    color:'#f59e0b', bio:'Pop + urbano. Bad Bunny, Rosalía, Rauw Alejandro. Mezcla global.', tags:['urbano','pop','latin'], itunesQuery:'bad bunny blinding lights', spotifySearch:'urban pop' },
+    indie_pop:     { label:'Indie Pop',     color:'#ef4444', bio:'Pop independiente. Mac DeMarco, Clairo, The Japanese House. Lo-fi y emocional.', tags:['lo-fi','independiente','emocional'], itunesQuery:'mac demarco chamber of reflection', spotifySearch:'indie pop' },
+    dark_wave:     { label:'Darkwave',      color:'#ef4444', bio:'Post-punk oscuro. Neue Deutsche Härte, Cold Wave. Melancolía y sofisticación.', tags:['post-punk','oscuro','europeo'], itunesQuery:'depeche mode enjoy the silence', spotifySearch:'darkwave' },
+    gothic_rock:   { label:'Gothic Rock',   color:'#ef4444', bio:'Rock gótico. The Cure, Siouxsie, Fields of the Nephilim. Atmósfera oscura.', tags:['gótico','oscuro','atmósfera'], itunesQuery:'the cure boys dont cry', spotifySearch:'gothic rock' },
+    nu_metal:      { label:'Nu Metal',      color:'#ef4444', bio:'90s-2000s. Limp Bizkit, Deftones, Linkin Park. Raps + metal pesado.', tags:['90s','raps','industrial'], itunesQuery:'linkin park in the end', spotifySearch:'nu metal' },
+    metal_sinfon:  { label:'Symphonic Metal', color:'#ef4444', bio:'Metal sinfónico. Epica, Therion, Nightwish. Orquestas + metal.', tags:['sinfónico','operático','épico'], itunesQuery:'epica consign to oblivion', spotifySearch:'symphonic metal' },
+    doom_metal:    { label:'Doom Metal',    color:'#ef4444', bio:'Metal apocalíptico lento. Sleep, Electric Wizard, Candlemass.', tags:['lento','pesado','épico'], itunesQuery:'sleep dopesmoker', spotifySearch:'doom metal' },
+    djent:         { label:'Djent',         color:'#ef4444', bio:'Metal matemático. Meshuggah, Periphery, Animals as Leaders. Rítmica compleja.', tags:['progresivo','matemático','complejo'], itunesQuery:'meshuggah bleed', spotifySearch:'djent' },
+    noise_rock:    { label:'Noise Rock',    color:'#ef4444', bio:'Rock experimental abrasivo. Sonic Youth, Merzbow, Godspeed You! Black Emperor.', tags:['experimental','abrasivo','vanguardia'], itunesQuery:'sonic youth teenage riot', spotifySearch:'noise rock' },
+    funk_moderno:  { label:'Funk Moderno',  color:'#8b5cf6', bio:'Funk contemporáneo. Anderson .Paak, Bruno Mars, Thundercat.', tags:['contemporáneo','groove','virtuosismo'], itunesQuery:'anderson paak come down', spotifySearch:'modern funk' },
+    disco:         { label:'Disco',         color:'#8b5cf6', bio:'1970s dancefloor. Bee Gees, Donna Summer, Gloria Gaynor. 4/4 beat eternamente.', tags:['70s','dancefloor','groovy'], itunesQuery:'bee gees stayin alive', spotifySearch:'disco' },
+    new_wave:      { label:'New Wave',      color:'#ef4444', bio:'80s minimalista. Blondie, Talking Heads, New Order. Sintetizadores y nervio.', tags:['80s','sintético','minimalista'], itunesQuery:'blondie heart of glass', spotifySearch:'new wave' },
+    shoegaze:      { label:'Shoegaze',      color:'#ef4444', bio:'1990s UK. My Bloody Valentine, Slowdive. Efectos guitarra, voces envueltas.', tags:['90s','textural','ecos'], itunesQuery:'my bloody valentine sometimes', spotifySearch:'shoegaze' },
+    slowcore:      { label:'Slowcore',      color:'#ef4444', bio:'Indie-rock lento y emocional. Galaxie 500, Low, Tortoise. Minimalismo melódico.', tags:['lento','emocional','minimalista'], itunesQuery:'galaxie 500 strange', spotifySearch:'slowcore' },
+    folk_punk:     { label:'Folk Punk',     color:'#10b981', bio:'Folk + punk DIY. Andrew Jackson Jihad, Ramshackle Glory.', tags:['DIY','folk','punk'], itunesQuery:'andrew jackson jihad people II', spotifySearch:'folk punk' },
+    dark_folk:     { label:'Dark Folk',     color:'#10b981', bio:'Folk oscuro nórdico. Wardruna, Heilung, Of the Wand.', tags:['nórdico','oscuro','étnico'], itunesQuery:'wardruna nord dark folk', spotifySearch:'dark folk' },
+    techno_industrial:{ label:'Techno Industrial', color:'#06b6d4', bio:'Techno + industrial. Throbbing Gristle, Test Dept, Coil.', tags:['industrial','abrasivo','experimental'], itunesQuery:'throbbing gristle industrial', spotifySearch:'industrial techno' },
+    breakcore:     { label:'Breakcore',     color:'#06b6d4', bio:'Ritmos fragmentados veloces. Venetian Snares, Kid606. Caos estructurado.', tags:['velocidad','experimental','caos'], itunesQuery:'venetian snares', spotifySearch:'breakcore' },
+    chillwave:     { label:'Chillwave',     color:'#06b6d4', bio:'Electronic relajante nostálgico. Neon Indian, Washed Out, Best Coast.', tags:['relajante','nostálgico','synth'], itunesQuery:'washed out feel it all around', spotifySearch:'chillwave' },
+    future_bass:   { label:'Future Bass',   color:'#06b6d4', bio:'Electronic experimental. SOPHIE, PC Music, HyperPop. Digital y líquido.', tags:['futurista','experimental','digital'], itunesQuery:'sophie immaterial', spotifySearch:'future bass' },
+    darkrap:       { label:'Dark Rap',      color:'#f59e0b', bio:'Hip hop oscuro. Earl Sweatshirt, Navy Blue, MF DOOM.', tags:['oscuro','introspectivo','underground'], itunesQuery:'mf doom all caps', spotifySearch:'dark rap' },
+    latinrap:      { label:'Latin Trap Rap', color:'#f59e0b', bio:'Trap latino moderno. Almighty, Yng Lvcas, C.R.O.', tags:['latino','trap','moderno'], itunesQuery:'latin trap music', spotifySearch:'latin trap' },
 };
 
+
+// Artistas curados por subgénero para expansión en grafo
 const GENRE_ARTISTS = {
-    rock: [
-        {id:'led_zeppelin',name:'Led Zeppelin',q:'led zeppelin'},
-        {id:'beatles',name:'The Beatles',q:'beatles'},
-        {id:'pink_floyd',name:'Pink Floyd',q:'pink floyd'},
-    ],
-    jazz: [
-        {id:'miles_davis',name:'Miles Davis',q:'miles davis'},
-        {id:'john_coltrane',name:'John Coltrane',q:'john coltrane'},
-    ],
-    reggaeton: [
-        {id:'bad_bunny',name:'Bad Bunny',q:'bad bunny'},
-        {id:'karol_g',name:'Karol G',q:'karol g'},
-        {id:'daddy_yankee',name:'Daddy Yankee',q:'daddy yankee'},
-    ],
-    kpop: [
-        {id:'bts',name:'BTS',q:'bts'},
-        {id:'blackpink',name:'BLACKPINK',q:'blackpink'},
-        {id:'iu',name:'IU',q:'iu kpop'},
-    ],
-    hiphop: [
-        {id:'eminem',name:'Eminem',q:'eminem'},
-        {id:'nas',name:'Nas',q:'nas'},
-        {id:'jay_z',name:'Jay-Z',q:'jay z'},
-    ],
+    rock_clasico:  [{id:'led_zeppelin',name:'Led Zeppelin',q:'led zeppelin whole lotta love'},{id:'rolling_stones',name:'Rolling Stones',q:'rolling stones paint it black'},{id:'jimi_hendrix',name:'Jimi Hendrix',q:'jimi hendrix purple haze'},{id:'the_who',name:'The Who',q:'the who baba oriley'},{id:'deep_purple',name:'Deep Purple',q:'deep purple smoke on water'}],
+    rock_alt:      [{id:'radiohead',name:'Radiohead',q:'radiohead creep'},{id:'nirvana_alt',name:'Nirvana',q:'nirvana come as you are'},{id:'rcp',name:'Red Hot Chili Peppers',q:'red hot chili peppers californication'},{id:'foo_fighters',name:'Foo Fighters',q:'foo fighters best of you'},{id:'oasis',name:'Oasis',q:'oasis wonderwall'}],
+    punk:          [{id:'ramones',name:'Ramones',q:'ramones blitzkrieg bop'},{id:'sex_pistols',name:'Sex Pistols',q:'sex pistols anarchy uk'},{id:'the_clash',name:'The Clash',q:'the clash london calling'},{id:'dead_kennedys',name:'Dead Kennedys',q:'dead kennedys california uber alles'},{id:'bad_religion',name:'Bad Religion',q:'bad religion punk rock song'}],
+    metal:         [{id:'metallica',name:'Metallica',q:'metallica enter sandman'},{id:'iron_maiden',name:'Iron Maiden',q:'iron maiden run to the hills'},{id:'sabbath',name:'Black Sabbath',q:'black sabbath paranoid'},{id:'slayer',name:'Slayer',q:'slayer raining blood'},{id:'megadeth',name:'Megadeth',q:'megadeth symphony destruction'}],
+    grunge:        [{id:'nirvana_g',name:'Nirvana',q:'nirvana smells like teen spirit'},{id:'pearl_jam',name:'Pearl Jam',q:'pearl jam alive'},{id:'soundgarden',name:'Soundgarden',q:'soundgarden black hole sun'},{id:'alice_chains',name:'Alice in Chains',q:'alice chains would'},{id:'mudhoney',name:'Mudhoney',q:'mudhoney touch me sick'}],
+    indie_rock:    [{id:'strokes',name:'The Strokes',q:'the strokes last nite'},{id:'arctic',name:'Arctic Monkeys',q:'arctic monkeys do i wanna know'},{id:'interpol',name:'Interpol',q:'interpol obstacle indie'},{id:'vampire_w',name:'Vampire Weekend',q:'vampire weekend oxford comma'},{id:'lcd',name:'LCD Soundsystem',q:'lcd soundsystem all my friends'}],
+    house:         [{id:'frankie',name:'Frankie Knuckles',q:'frankie knuckles your love house'},{id:'larry_heard',name:'Larry Heard',q:'larry heard can you feel it'},{id:'dj_premier_h',name:'Masters at Work',q:'masters at work to be in love'},{id:'roger_sanchez',name:'Roger Sanchez',q:'roger sanchez another chance'},{id:'bob_sinclar',name:'Bob Sinclar',q:'bob sinclar love generation'}],
+    techno:        [{id:'derrick_may',name:'Derrick May',q:'derrick may strings of life'},{id:'juan_atkins',name:'Juan Atkins',q:'juan atkins techno city'},{id:'plastikman',name:'Plastikman',q:'plastikman spastik'},{id:'surgeon',name:'Surgeon',q:'surgeon magneze techno'},{id:'adam_beyer',name:'Adam Beyer',q:'adam beyer remember techno'}],
+    drum_bass:     [{id:'goldie',name:'Goldie',q:'goldie inner city life'},{id:'ltj_bukem',name:'LTJ Bukem',q:'ltj bukem music dnb'},{id:'roni_size',name:'Roni Size',q:'roni size brown paper bag'},{id:'aphex_twin_d',name:'DJ Aphex',q:'aphex twin come to daddy'},{id:'pendulum',name:'Pendulum',q:'pendulum hold your colour'}],
+    ambient:       [{id:'brian_eno',name:'Brian Eno',q:'brian eno music for airports'},{id:'aphex_twin_a',name:'Aphex Twin',q:'aphex twin selected ambient'},{id:'moby',name:'Moby',q:'moby why does my heart feel so bad'},{id:'boards_canada',name:'Boards of Canada',q:'boards of canada roygbiv'},{id:'harold_budd',name:'Harold Budd',q:'harold budd ambient music'}],
+    synthwave:     [{id:'kavinsky',name:'Kavinsky',q:'kavinsky nightcall'},{id:'perturbator',name:'Perturbator',q:'perturbator synthwave'},{id:'gunship',name:'Gunship',q:'gunship dark all day'},{id:'dynatron',name:'Dynatron',q:'dynatron synthwave'},{id:'lazerhawk',name:'Lazerhawk',q:'lazerhawk overdrive synthwave'}],
+    dubstep:       [{id:'skream',name:'Skream',q:'skream midnight request line'},{id:'benga',name:'Benga',q:'benga26 bassline'},{id:'digital_mystikz',name:'Digital Mystikz',q:'digital mystikz haunted'},{id:'rusko',name:'Rusko',q:'rusko woo boost dubstep'},{id:'flux_pavilion',name:'Flux Pavilion',q:'flux pavilion i cant stop'}],
+    rap_east:      [{id:'biggie',name:'Notorious B.I.G.',q:'notorious big juicy'},{id:'nas',name:'Nas',q:'nas illmatic NY state of mind'},{id:'jay_z',name:'Jay-Z',q:'jay z empire state of mind'},{id:'wu_tang',name:'Wu-Tang Clan',q:'wu tang clan creme brulee'},{id:'rakim',name:'Rakim',q:'rakim paid in full'}],
+    trap:          [{id:'future',name:'Future',q:'future mask off'},{id:'young_thug',name:'Young Thug',q:'young thug lifestyle'},{id:'travis_scott',name:'Travis Scott',q:'travis scott goosebumps'},{id:'lil_baby',name:'Lil Baby',q:'lil baby yes indeed'},{id:'offset',name:'Migos',q:'migos bad and boujee'}],
+    lofi:          [{id:'nujabes',name:'Nujabes',q:'nujabes feather lofi'},{id:'jdilla',name:'J Dilla',q:'j dilla donuts'},{id:'idealism',name:'Idealism',q:'idealism lofi chill'},{id:'lgl',name:'Lofi Girl',q:'lofi girl chill beats'},{id:'philanthrope',name:'Philanthrope',q:'philanthrope lofi hip hop'}],
+    reggaeton:     [{id:'daddy_y',name:'Daddy Yankee',q:'daddy yankee gasolina'},{id:'bad_bunny_r',name:'Bad Bunny',q:'bad bunny mia reggaeton'},{id:'j_balvin',name:'J Balvin',q:'j balvin mi gente'},{id:'karol_g',name:'Karol G',q:'karol g tusa'},{id:'ozuna',name:'Ozuna',q:'ozuna taki taki'}],
+    afrobeats:     [{id:'burna_boy',name:'Burna Boy',q:'burna boy ye afrobeats'},{id:'wizkid',name:'Wizkid',q:'wizkid essence'},{id:'davido',name:'Davido',q:'davido fall afrobeats'},{id:'tiwa_savage',name:'Tiwa Savage',q:'tiwa savage all over'},{id:'ckay',name:'CKay',q:'ckay love nwantiti'}],
+    salsa:         [{id:'celia_cruz',name:'Celia Cruz',q:'celia cruz azucar'},{id:'hector_lavoe',name:'Héctor Lavoe',q:'hector lavoe el cantante'},{id:'marc_anthony',name:'Marc Anthony',q:'marc anthony vivir mi vida'},{id:'willie_colon',name:'Willie Colón',q:'willie colon salsa'},{id:'ruben_blades',name:'Rubén Blades',q:'ruben blades pedro navaja'}],
+    cumbia:        [{id:'carlos_vives',name:'Carlos Vives',q:'carlos vives la bicicleta'},{id:'son_cubano',name:'Sonora Santanera',q:'sonora santanera cumbia'},{id:'aniceto_m',name:'Aniceto Molina',q:'aniceto molina cumbia sabrosa'},{id:'galy_g',name:'Galy Galiano',q:'galy galiano cumbia'},{id:'grupo_niche',name:'Grupo Niche',q:'grupo niche colombia tierra querida'}],
+    bossa_nova:    [{id:'joao_gilberto',name:'João Gilberto',q:'joao gilberto garota de ipanema'},{id:'tom_jobim',name:'Tom Jobim',q:'tom jobim corcovado'},{id:'stan_getz',name:'Stan Getz',q:'stan getz bossa nova'},{id:'astrud_g',name:'Astrud Gilberto',q:'astrud gilberto garota ipanema'},{id:'sergio_mendes',name:'Sérgio Mendes',q:'sergio mendes mas que nada'}],
+    flamenco:      [{id:'paco_lucia',name:'Paco de Lucía',q:'paco de lucia entre dos aguas'},{id:'camaron',name:'Camarón de la Isla',q:'camaron de la isla como el agua'},{id:'tomatito',name:'Tomatito',q:'tomatito flamenco'},{id:'estrella_morente',name:'Estrella Morente',q:'estrella morente flamenco'},{id:'rosalia_f',name:'Rosalía',q:'rosalia malamente flamenco'}],
+    reggae:        [{id:'bob_marley',name:'Bob Marley',q:'bob marley no woman no cry'},{id:'peter_tosh',name:'Peter Tosh',q:'peter tosh legalize it'},{id:'burning_spear',name:'Burning Spear',q:'burning spear marcus garvey'},{id:'toots',name:'Toots & Maytals',q:'toots maytals pressure drop'},{id:'damian_m',name:'Damian Marley',q:'damian marley road to zion'}],
+    bebop:         [{id:'charlie_parker',name:'Charlie Parker',q:'charlie parker ornithology'},{id:'dizzy_g',name:'Dizzy Gillespie',q:'dizzy gillespie manteca'},{id:'thelonious',name:'Thelonious Monk',q:'thelonious monk round midnight'},{id:'bud_powell',name:'Bud Powell',q:'bud powell hallucinations bebop'},{id:'clifford_brown',name:'Clifford Brown',q:'clifford brown joy spring'}],
+    jazz_fusion:   [{id:'miles_d',name:'Miles Davis',q:'miles davis bitches brew'},{id:'weather_r',name:'Weather Report',q:'weather report birdland'},{id:'mahavishnu',name:'Mahavishnu Orch.',q:'mahavishnu orchestra birds of fire'},{id:'herbie_h',name:'Herbie Hancock',q:'herbie hancock chameleon'},{id:'return_f',name:'Return to Forever',q:'return to forever romantic warrior'}],
+    soul:          [{id:'aretha_f',name:'Aretha Franklin',q:'aretha franklin respect'},{id:'ray_charles',name:'Ray Charles',q:'ray charles hit the road jack'},{id:'otis_r',name:'Otis Redding',q:'otis redding sittin dock of bay'},{id:'marvin_gaye',name:'Marvin Gaye',q:'marvin gaye sexual healing'},{id:'sam_cooke',name:'Sam Cooke',q:'sam cooke a change gonna come'}],
+    funk:          [{id:'james_brown',name:'James Brown',q:'james brown sex machine'},{id:'sly_stone',name:'Sly & Family Stone',q:'sly stone thank you falettinme'},{id:'parliament',name:'Parliament-Funkadelic',q:'parliament funkadelic give up funk'},{id:'prince_f',name:'Prince',q:'prince kiss funk'},{id:'earth_wind',name:'Earth Wind & Fire',q:'earth wind fire september'}],
+    jazz:          [{id:'miles_davis',name:'Miles Davis',q:'miles davis so what'},{id:'john_coltrane',name:'John Coltrane',q:'john coltrane a love supreme'},{id:'ella_fitz',name:'Ella Fitzgerald',q:'ella fitzgerald summertime'},{id:'duke_ell',name:'Duke Ellington',q:'duke ellington take the a train'},{id:'louis_arm',name:'Louis Armstrong',q:'louis armstrong what a wonderful world'}],
+    hiphop:        [{id:'tupac',name:'Tupac Shakur',q:'tupac dear mama'},{id:'eminem',name:'Eminem',q:'eminem lose yourself'},{id:'kanye',name:'Kanye West',q:'kanye west gold digger'},{id:'kendrick',name:'Kendrick Lamar',q:'kendrick lamar alright'},{id:'drake_r',name:'Drake',q:'drake hotline bling'}],
+    latina:        [{id:'shakira',name:'Shakira',q:'shakira whenever wherever'},{id:'marc_a2',name:'Marc Anthony',q:'marc anthony vivir mi vida'},{id:'ricky_m',name:'Ricky Martin',q:'ricky martin livin la vida loca'},{id:'celia2',name:'Celia Cruz',q:'celia cruz la vida es un carnaval'},{id:'juanes',name:'Juanes',q:'juanes la camisa negra'}],
+    electronica:   [{id:'daft_punk',name:'Daft Punk',q:'daft punk one more time'},{id:'kraftwerk',name:'Kraftwerk',q:'kraftwerk autobahn electronic'},{id:'chemical_b',name:'Chemical Brothers',q:'chemical brothers hey boy girl'},{id:'prodigy',name:'The Prodigy',q:'prodigy firestarter'},{id:'underworld',name:'Underworld',q:'underworld born slippy'}],
+    psychedelic:   [{id:'pink_floyd',name:'Pink Floyd',q:'pink floyd wish you were here'},{id:'the_doors',name:'The Doors',q:'the doors light my fire'},{id:'hendrix_p',name:'Jimi Hendrix',q:'jimi hendrix foxy lady'},{id:'jefferson',name:'Jefferson Airplane',q:'jefferson airplane white rabbit'},{id:'grateful_d',name:'Grateful Dead',q:'grateful dead casey jones'}],
+    stoner_rock:   [{id:'queens_stone',name:'Queens of the Stone Age',q:'queens of the stone age go with the flow'},{id:'kyuss',name:'Kyuss',q:'kyuss space cadet stoner'},{id:'sleep',name:'Sleep',q:'sleep dopesmoker'},{id:'electric_w',name:'Electric Wizard',q:'electric wizard doom stoner'},{id:'earthless',name:'Earthless',q:'earthless from above stoner'}],
+    gothic_rock:   [{id:'the_cure',name:'The Cure',q:'the cure boys dont cry'},{id:'siouxsie',name:'Siouxsie & the Banshees',q:'siouxsie spellbound'},{id:'sisters_m',name:'Sisters of Mercy',q:'sisters of mercy more'},{id:'bauhaus',name:'Bauhaus',q:'bauhaus bela lugosis dead'},{id:'fields_n',name:'Fields of the Nephilim',q:'fields of the nephilim blue water'}],
+    grime:         [{id:'wiley_g',name:'Wiley',q:'wiley tunnel back grime'},{id:'dizzee_r',name:'Dizzee Rascal',q:'dizzee rascal bonkers'},{id:'skepta',name:'Skepta',q:'skepta shutdown grime'},{id:'stormzy',name:'Stormzy',q:'stormzy big for your boots'},{id:'jme',name:'JME',q:'jme grime gamer'}],
+    nu_metal:      [{id:'linkin_p',name:'Linkin Park',q:'linkin park in the end'},{id:'limp_b',name:'Limp Bizkit',q:'limp bizkit nookie'},{id:'deftones',name:'Deftones',q:'deftones change'},{id:'korn_n',name:'Korn',q:'korn got the life'},{id:'papa_roach',name:'Papa Roach',q:'papa roach last resort'}],
 };
+
 
 // ============================================================
 // GRAPH STATE
@@ -483,63 +684,101 @@ const GENRE_ARTISTS = {
 let currentGraph = null;
 let currentDepth = 'macro';
 let selectedNode = null;
-let expandedNodes = new Set();
+let expandedNodes = new Set(); // IDs de artistas ya expandidos en el grafo
+let graphNodes = [];
+let graphLinks = [];
 
 function buildGraphData(depth) {
     const nodes = [];
     const links = [];
     const macroGenres = [
-        { id:'rock', children:['rock'] },
-        { id:'electronica', children:['electronica'] },
-        { id:'hiphop', children:['hiphop'] },
-        { id:'reggaeton', children:['reggaeton'] },
-        { id:'kpop', children:['kpop'] },
-        { id:'jazz', children:['jazz'] },
-        { id:'latina', children:['latina'] },
+        { id:'rock',           children:['rock_clasico','rock_alt','punk','metal','grunge','indie_rock','psychedelic','stoner_rock','hard_rock','glam_rock'] },
+        { id:'electronica',    children:['house','techno','drum_bass','ambient','synthwave','dubstep','liquid_drum','vaporwave','witch_house','breakcore','chillwave','future_bass'] },
+        { id:'hiphop',         children:['rap_east','trap','lofi','west_coast','conscious_hip','emo_rap','darkrap','latinrap'] },
+        { id:'reggaeton',      children:['reggaeton','trap','pop_urbano'] },
+        { id:'afrobeats_gen',  children:['afrobeats'] },
+        { id:'latina',         children:['salsa','cumbia','bossa_nova','flamenco','reggae'] },
+        { id:'jazz',           children:['jazz','bebop','jazz_fusion','soul','funk','funk_moderno'] },
+        { id:'rock_alt_gen',   children:['rock_alt','indie_rock','alternative','gothic_rock','shoegaze','slowcore'] },
+        { id:'metal_gen',      children:['metal','grunge','punk','prog_metal','nu_metal','metal_sinfon','doom_metal','djent','noise_rock'] },
+        { id:'ambient_gen',    children:['ambient','synthwave','electronic_exp','vaporwave','chillwave'] },
+        { id:'drum_bass_gen',  children:['drum_bass','dubstep','uk_bass','liquid_drum','grime'] },
+        { id:'funk_soul_gen',  children:['funk','soul','r_and_b','funk_moderno','disco'] },
+        { id:'bossa_latino',   children:['bossa_nova','samba','salsa'] },
+        { id:'flamenco_span',  children:['flamenco','rumba_espanola','cante_jondo','dark_folk'] },
+        { id:'reggae_gen',     children:['reggae','dancehall','roots_reggae'] },
+        { id:'jazz_avant',     children:['bebop','free_jazz','cool_jazz'] },
+        { id:'electronic_exp', children:['house','techno','trance','techno_industrial','grime'] },
+        { id:'indie_alt',      children:['indie_rock','art_rock','post_punk','indie_pop','dark_wave','new_wave'] },
+        { id:'blues_roots',    children:['blues','delta_blues','chicago_blues'] },
+        { id:'country_folk',   children:['country','folk','singer_songwriter','folk_punk'] },
+        { id:'world_fusion',   children:['world_music','fusion','ethno_jazz','dark_folk'] },
+        { id:'dark_gothic',    children:['gothic_rock','dark_wave','noise_rock'] },
+    ];
+    const bridges = [
+        {s:'jazz_fusion',t:'rock_alt',   l:'Jazz-Rock Fusion'},
+        {s:'funk',       t:'trap',       l:'Funk en el Hip Hop'},
+        {s:'reggaeton',  t:'trap',       l:'Crossover Latino'},
+        {s:'bossa_nova', t:'jazz_fusion', l:'Bossa Jazz'},
+        {s:'flamenco',   t:'indie_rock', l:'Flamenco Moderno'},
+        {s:'dubstep',    t:'drum_bass',  l:'UK Bass Heritage'},
+        {s:'soul',       t:'funk',       l:'Soul-Funk Groove'},
+        {s:'reggae',     t:'lofi',       l:'Reggae Vibes'},
     ];
 
     macroGenres.forEach(m => {
         const g = GENRES[m.id];
-        nodes.push({ id:m.id, label:g.label, type:'core', color:g.color, bio:g.bio, tags:g.tags, itunesQuery:g.itunesQuery, searchTarget:g.label.toLowerCase() });
+        nodes.push({ id:m.id, label:g.label, type:'core', color:g.color, bio:g.bio, tags:g.tags, itunesQuery:g.itunesQuery, spotifySearch:g.spotifySearch, searchTarget:g.label.toLowerCase() });
     });
 
     if (depth === 'sub' || depth === 'artist') {
-        macroGenres.forEach((m, mi) => {
-            m.children.forEach((cid, ci) => {
+        macroGenres.forEach(m => {
+            m.children.forEach((cid, i) => {
                 const g = GENRES[cid];
                 if (!g) return;
-                nodes.push({ id:cid, label:g.label, type:'primary', color:g.color, bio:g.bio, tags:g.tags, itunesQuery:g.itunesQuery, searchTarget:g.label.toLowerCase(), hasArtists: !!(GENRE_ARTISTS[cid]) });
+                nodes.push({ id:cid, label:g.label, type:'primary', color:g.color, bio:g.bio, tags:g.tags, itunesQuery:g.itunesQuery, spotifySearch:g.spotifySearch, searchTarget:g.label.toLowerCase(), hasArtists: !!(GENRE_ARTISTS[cid]) });
                 links.push({source:m.id, target:cid, type:'internal'});
+                if (i > 0) links.push({source:m.children[i-1], target:cid, type:'ring'});
             });
-            if (mi > 0) links.push({source:macroGenres[mi-1].id, target:m.id, type:'ring'});
         });
     }
 
     if (depth === 'artist') {
-        Object.keys(GENRE_ARTISTS).forEach(genreId => {
-            (GENRE_ARTISTS[genreId] || []).forEach(a => {
-                nodes.push({ id:a.id, label:a.name, type:'satellite', color:GENRES[genreId].color, bio:'', tags:[], itunesQuery:a.q, searchTarget:a.name.toLowerCase(), parentGenre:genreId });
-                links.push({source:genreId, target:a.id, type:'internal'});
+        macroGenres.forEach(m => {
+            m.children.forEach(cid => {
+                (GENRE_ARTISTS[cid] || []).forEach(a => {
+                    nodes.push({ id:a.id, label:a.name, type:'satellite', color:GENRES[cid].color, bio:'', tags:[], itunesQuery:a.q, searchTarget:a.name.toLowerCase(), parentGenre:cid });
+                    links.push({source:cid, target:a.id, type:'internal'});
+                });
             });
         });
     }
+
+    bridges.forEach(b => {
+        const se = nodes.find(n => n.id === b.s);
+        const te = nodes.find(n => n.id === b.t);
+        if (se && te) links.push({source:b.s, target:b.t, type:'bridge', label:b.l});
+    });
 
     return { nodes, links };
 }
 
 function initGraph(depth) {
     currentDepth = depth;
+    expandedNodes.clear();
     const { nodes, links } = buildGraphData(depth);
-    renderGraph(nodes, links);
+    graphNodes = [...nodes];
+    graphLinks = [...links];
+    renderGraph(graphNodes, graphLinks);
 }
 
 function renderGraph(nodes, links) {
     document.getElementById('node-counter').textContent = `${nodes.length} nodos`;
-    const isDarkMode = isDark;
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
     const container = document.getElementById('graph-container');
 
     if (currentGraph) {
-        try { currentGraph._destructor?.(); } catch(e) {}
+        try { currentGraph._destructor && currentGraph._destructor(); } catch(e) {}
         container.innerHTML = '';
     }
 
@@ -547,145 +786,520 @@ function renderGraph(nodes, links) {
         .graphData({ nodes: [...nodes], links: [...links] })
         .backgroundColor(isDarkMode ? '#08080e' : '#e8eaf4')
         .nodeRelSize(5)
-        .linkColor(l => l.type === 'ring' ? (isDarkMode ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.22)') : (isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.28)'))
-        .linkWidth(l => l.type === 'ring' ? 0.4 : 1.5)
+        .linkColor(l => {
+            if (l.type === 'bridge') return 'rgba(245,158,11,0.65)';
+            if (l.type === 'ring') return isDarkMode ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.22)';
+            if (l.type === 'itunes') return 'rgba(252,60,68,0.5)';
+            return isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.28)';
+        })
+        .linkWidth(l => l.type==='bridge'?2.5: l.type==='ring'?0.4: l.type==='itunes'?2:1.5)
+        .linkLineDash(l => l.type==='bridge'?[6,4]:[])
+        .linkDirectionalParticles(l => l.type==='bridge'?4:l.type==='itunes'?3:0)
+        .linkDirectionalParticleSpeed(0.007)
+        .linkDirectionalParticleWidth(3)
+        .linkDirectionalParticleColor(l => l.type==='itunes'?'#FC3C44':'#f59e0b')
         .nodeCanvasObject((node, ctx, gs) => {
-            const isCore = node.type === 'core', isPrimary = node.type === 'primary';
-            const r = isCore ? 12 : isPrimary ? 7 : 5;
+            const isCore = node.type==='core', isPrimary = node.type==='primary', isArtist = node.type==='satellite' || node.type==='artist_node';
+            const r = isCore?12: isPrimary?7: isArtist?5:4;
+            const isSelected = selectedNode && selectedNode.id === node.id;
+            const isExpanded = expandedNodes.has(node.id);
 
-            ctx.beginPath();
-            ctx.arc(node.x, node.y, r, 0, 2 * Math.PI);
-            if (isCore) {
-                ctx.fillStyle = node.color;
-                ctx.fill();
-            } else {
-                ctx.fillStyle = isDarkMode ? '#08080e' : '#f0f2f8';
-                ctx.fill();
-                ctx.strokeStyle = node.color;
-                ctx.lineWidth = isPrimary ? 2 : 1.5;
-                ctx.stroke();
+            if (isSelected) {
+                ctx.beginPath(); ctx.arc(node.x,node.y,r+7,0,2*Math.PI);
+                ctx.fillStyle = node.color+'28'; ctx.fill();
+            }
+            if (isExpanded && isPrimary) {
+                ctx.beginPath(); ctx.arc(node.x,node.y,r+4,0,2*Math.PI);
+                ctx.fillStyle = 'rgba(252,60,68,0.15)'; ctx.fill();
             }
 
-            const fontSize = isCore ? Math.max(13/gs, 2.5) : Math.max(9/gs, 2);
-            ctx.font = `${isCore ? '600' : '400'} ${fontSize}px 'Space Grotesk',sans-serif`;
-            ctx.fillStyle = isCore ? (isDarkMode ? '#fff' : '#0f172a') : (isDarkMode ? '#94a3b8' : '#475569');
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'top';
-            ctx.fillText(node.label, node.x, node.y + r + 2.5);
+            ctx.beginPath(); ctx.arc(node.x,node.y,r,0,2*Math.PI);
+            if (isCore) {
+                ctx.fillStyle = node.color; ctx.fill();
+                ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth=1.5; ctx.stroke();
+            } else {
+                const lightBg = document.documentElement.getAttribute('data-theme')==='light';
+                ctx.fillStyle = lightBg ? '#f0f2f8' : '#08080e'; ctx.fill();
+                ctx.strokeStyle = node.color;
+                ctx.lineWidth = isPrimary?2: isArtist?1.5:1.2; ctx.stroke();
+            }
+
+            const fontSize = isCore?Math.max(13/gs,2.5): isPrimary?Math.max(9/gs,2): Math.max(7/gs,1.8);
+            ctx.font = `${isCore?'600':'400'} ${fontSize}px 'Space Grotesk',sans-serif`;
+            const light = document.documentElement.getAttribute('data-theme')==='light';
+            ctx.fillStyle = isCore?(light?'#0f172a':'#fff'): (light?'#475569':'#94a3b8');
+            ctx.textAlign='center'; ctx.textBaseline='top';
+            ctx.fillText(node.label, node.x, node.y+r+2.5);
         })
         .onNodeClick(node => {
             selectedNode = node;
-            currentGraph.centerAt(node.x, node.y, 700);
-            currentGraph.zoom(3.5, 700);
+            currentGraph.centerAt(node.x,node.y,700);
+            currentGraph.zoom(3.5,700);
             updateInspector(node);
+            
+            // Auto-expand subgenres when clicking on a macro genre (core node)
+            if (node.type === 'core' && currentDepth === 'macro') {
+                setTimeout(() => {
+                    const subBtn = document.querySelector('.depth-btn:nth-child(2)');
+                    if (subBtn) {
+                        setDepth('sub', subBtn);
+                        // Re-select and re-center after expansion
+                        setTimeout(() => {
+                            selectedNode = node;
+                            if (currentGraph) {
+                                const newData = currentGraph.graphData();
+                                const updatedNode = newData.nodes.find(n => n.id === node.id);
+                                if (updatedNode) {
+                                    currentGraph.centerAt(updatedNode.x, updatedNode.y, 700);
+                                    updateInspector(updatedNode);
+                                }
+                            }
+                        }, 600);
+                    }
+                }, 200);
+            }
+        })
+        .onNodeHover(node => {
+            const tt = document.getElementById('node-tooltip');
+            if (node) {
+                tt.style.display='block';
+                const typeLabel = node.type==='core'?'Macro-Género': node.type==='primary'?'Subgénero':node.type==='artist_node'?'Artista (iTunes)':'Artista';
+                tt.innerHTML = `<strong style="font-size:12px;color:var(--text);">${node.label}</strong><br><span style="font-size:10px;color:var(--muted);">${typeLabel}</span>`;
+            } else { tt.style.display='none'; }
         });
 
-    currentGraph.d3Force('link').distance(l => l.type === 'ring' ? 90 : 90).strength(l => l.type === 'ring' ? 0.25 : 0.8);
+    document.addEventListener('mousemove', e => {
+        const tt = document.getElementById('node-tooltip');
+        if (tt.style.display!=='none') { tt.style.left=(e.clientX+14)+'px'; tt.style.top=(e.clientY-8)+'px'; }
+    });
+
+    currentGraph.d3Force('link').distance(l => l.type==='bridge'?360: l.type==='ring'?90: l.type==='itunes'?70: (l.source?.type==='core'||l.target?.type==='core')?90:55).strength(l => l.type==='bridge'?0.06: l.type==='ring'?0.25: l.type==='itunes'?0.8:0.8);
     currentGraph.d3Force('charge').strength(-550);
-    currentGraph.d3Force('collide', d3.forceCollide(n => n.type === 'core' ? 42 : 24));
-    setTimeout(() => currentGraph.zoomToFit(900, 80), 1000);
+    currentGraph.d3Force('collide', d3.forceCollide(n => n.type==='core'?42: n.type==='primary'?24: 16));
+    setTimeout(()=>currentGraph.zoomToFit(900,80),1000);
+}
+
+// ============================================================
+// EXPAND ARTISTS ON GRAPH
+// ============================================================
+let currentExpandNode = null;
+
+function expandArtistsOnGraph() {
+    if (!currentExpandNode) return;
+    const genreId = currentExpandNode.id;
+    const artists = GENRE_ARTISTS[genreId];
+    if (!artists || expandedNodes.has(genreId)) return;
+
+    expandedNodes.add(genreId);
+    document.getElementById('expand-artists-btn').textContent = '✓ Expandido en el grafo';
+    document.getElementById('expand-artists-btn').style.background = 'rgba(16,185,129,0.15)';
+    document.getElementById('expand-artists-btn').style.borderColor = '#10b981';
+    document.getElementById('expand-artists-btn').style.color = '#10b981';
+    document.getElementById('expand-artists-btn').onclick = null;
+
+    // Add artist nodes + links to live graph
+    const newNodes = [];
+    const newLinks = [];
+    artists.forEach(a => {
+        if (graphNodes.find(n => n.id === a.id)) return;
+        const newNode = {
+            id: a.id, label: a.name, type:'artist_node',
+            color: currentExpandNode.color,
+            bio: '', tags: [], itunesQuery: a.q,
+            searchTarget: a.name.toLowerCase(),
+            parentGenre: genreId,
+            x: currentExpandNode.x + (Math.random()-0.5)*80,
+            y: currentExpandNode.y + (Math.random()-0.5)*80,
+        };
+        newNodes.push(newNode);
+        newLinks.push({source:genreId, target:a.id, type:'itunes'});
+    });
+
+    graphNodes.push(...newNodes);
+    graphLinks.push(...newLinks);
+
+    const existingData = currentGraph.graphData();
+    currentGraph.graphData({
+        nodes: [...existingData.nodes, ...newNodes],
+        links: [...existingData.links, ...newLinks]
+    });
+
+    document.getElementById('node-counter').textContent = `${currentGraph.graphData().nodes.length} nodos`;
+
+    // Click on first artist
+    if (newNodes.length > 0) {
+        setTimeout(() => {
+            updateInspector(newNodes[0]);
+            currentGraph.centerAt(currentExpandNode.x, currentExpandNode.y, 700);
+        }, 600);
+    }
+}
+
+// ============================================================
+// ITUNES API
+// ============================================================
+let itunesCache = {};
+
+async function fetchItunes(query) {
+    if (itunesCache[query]) return itunesCache[query];
+    try {
+        const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=15&country=ES`;
+        const r = await fetch(url);
+        const data = await r.json();
+        const results = (data.results||[]);
+        const withPreview = results.filter(x => x.previewUrl);
+        const best = withPreview[0] || results[0];
+        if (!best) return null;
+        const result = {
+            previewUrl: best.previewUrl||null,
+            artworkUrl: (best.artworkUrl100||'').replace('100x100bb','400x400bb'),
+            trackName: best.trackName||best.collectionName||'',
+            artistName: best.artistName||'',
+            collectionName: best.collectionName||'',
+            trackViewUrl: best.trackViewUrl||null,
+        };
+        itunesCache[query] = result;
+        return result;
+    } catch(e) { return null; }
+}
+
+// ============================================================
+// FETCH ARTISTS FOR INSPECTOR LIST (with iTunes artwork)
+// ============================================================
+async function loadArtistList(genreId) {
+    const artists = GENRE_ARTISTS[genreId];
+    if (!artists) { document.getElementById('artist-section').style.display='none'; return; }
+
+    document.getElementById('artist-section').style.display='block';
+    document.getElementById('expand-artists-btn').style.display='flex';
+    document.getElementById('expand-artists-btn').textContent = expandedNodes.has(genreId) ? '✓ Expandido en el grafo' : '＋ Expandir en el grafo';
+    document.getElementById('expand-artists-btn').onclick = expandedNodes.has(genreId) ? null : expandArtistsOnGraph;
+
+    const listEl = document.getElementById('artist-list');
+    listEl.innerHTML = '';
+    document.getElementById('artist-loading').classList.add('on');
+
+    // Render placeholders
+    artists.forEach(a => {
+        const div = document.createElement('div');
+        div.className = 'artist-item';
+        div.id = `ai_${a.id}`;
+        div.innerHTML = `
+            <div class="artist-thumb" id="at_${a.id}">
+                <svg width="16" height="16" fill="none" stroke="var(--muted)" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke-width="1.5"/><path stroke-linecap="round" stroke-width="1.5" d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            </div>
+            <div style="flex:1;min-width:0;">
+                <div class="artist-name">${a.name}</div>
+                <div class="artist-meta" id="am_${a.id}">Cargando…</div>
+            </div>
+            <button class="mini-play-btn" id="mpb_${a.id}" onclick="playArtist('${a.id}','${a.q}',this)" title="Preview">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+        `;
+        div.onclick = (e) => {
+            if (e.target.closest('button')) return;
+            playArtist(a.id, a.q, document.getElementById(`mpb_${a.id}`));
+        };
+        listEl.appendChild(div);
+    });
+
+    document.getElementById('artist-loading').classList.remove('on');
+
+    // Load iTunes data per artist (non-blocking)
+    artists.forEach(async a => {
+        const data = await fetchItunes(a.q);
+        if (!data) { const m = document.getElementById(`am_${a.id}`); if(m) m.textContent='—'; return; }
+        const thumb = document.getElementById(`at_${a.id}`);
+        if (thumb && data.artworkUrl) thumb.innerHTML = `<img src="${data.artworkUrl}" alt="${a.name}">`;
+        const meta = document.getElementById(`am_${a.id}`);
+        if (meta) meta.textContent = data.collectionName ? `${data.collectionName.substring(0,28)}…` : '—';
+    });
+}
+
+let currentArtistBtn = null;
+
+async function playArtist(artistId, query, btn) {
+    // Toggle same
+    if (currentArtistBtn && currentArtistBtn === btn && isPlaying) {
+        togglePlay(); return;
+    }
+
+    // Deactivate previous
+    if (currentArtistBtn) currentArtistBtn.classList.remove('active');
+    document.querySelectorAll('.artist-item').forEach(el => el.classList.remove('playing-now'));
+
+    currentArtistBtn = btn;
+    btn.classList.add('active');
+    btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+    document.getElementById(`ai_${artistId}`)?.classList.add('playing-now');
+
+    const data = await fetchItunes(query);
+    if (!data) { btn.classList.remove('active'); btn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>'; return; }
+
+    stopAudio();
+    setPlayerUI(data, query);
+
+    if (data.previewUrl) {
+        audioEl.src = data.previewUrl;
+        audioEl.play().then(() => { isPlaying=true; updatePlayBtn(); startProgressTracker(); }).catch(()=>{});
+        document.getElementById('source-label').textContent = '✓ Preview real — iTunes';
+        document.getElementById('source-label').style.color = '#10b981';
+    } else {
+        document.getElementById('source-label').textContent = 'Sin preview disponible';
+        document.getElementById('source-label').style.color = 'var(--muted)';
+        btn.classList.remove('active');
+        btn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>';
+    }
+}
+
+function setPlayerUI(data, itunesQuery) {
+    document.getElementById('player-track').textContent = data.trackName || '—';
+    document.getElementById('player-artist-name').textContent = data.artistName || '—';
+    const art = document.getElementById('player-art');
+    art.innerHTML = data.artworkUrl ? `<img src="${data.artworkUrl}" alt="">` : `<svg width="18" height="18" fill="none" stroke="var(--muted)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>`;
+    if (data.trackViewUrl) {
+        document.getElementById('itunes-open-link').href = data.trackViewUrl;
+        document.getElementById('itunes-open-link').style.opacity = '1';
+    }
+    document.getElementById('spotify-open-link').href = `https://open.spotify.com/search/${encodeURIComponent(itunesQuery)}`;
+    document.getElementById('spotify-open-link').style.opacity = '1';
 }
 
 // ============================================================
 // INSPECTOR
 // ============================================================
-function updateInspector(node) {
-    const typeMap = { core: 'Macro-Género', primary: 'Subgénero', satellite: 'Artista' };
+async function updateInspector(node) {
+    currentExpandNode = (node.type === 'primary') ? node : null;
+
+    const typeMap = {core:'Macro-Género', primary:'Subgénero', satellite:'Artista', artist_node:'Artista'};
     const badge = document.getElementById('inspector-badge');
-    badge.textContent = typeMap[node.type] || 'Nodo';
-    badge.style.background = node.color + '22';
+    badge.textContent = typeMap[node.type]||'Nodo';
+    badge.style.background = node.color+'22';
     badge.style.color = node.color;
-    badge.style.borderColor = node.color + '44';
+    badge.style.borderColor = node.color+'44';
 
     document.getElementById('inspector-title').textContent = node.label;
-    document.getElementById('inspector-subtitle').textContent = node.itunesQuery ? 'iTunes disponible' : 'Información disponible';
-    document.getElementById('inspector-bio').textContent = node.bio || 'Nodo musical en el universo isomorfo.';
+    document.getElementById('inspector-subtitle').textContent = 'Cargando datos…';
+    document.getElementById('inspector-bio').textContent = node.bio || 'Información adicional no disponible.';
+
+    const tagsEl = document.getElementById('inspector-tags');
+    tagsEl.innerHTML = '';
+    (node.tags||[]).forEach(t => {
+        const s = document.createElement('span');
+        s.className='chip'; s.textContent=t; tagsEl.appendChild(s);
+    });
+
+    // Hide artist section by default
+    document.getElementById('artist-section').style.display = 'none';
+    document.getElementById('expand-artists-btn').style.display = 'none';
+
+    // Set artwork placeholder
+    const aw = document.getElementById('inspector-artwork');
+    aw.innerHTML = `<div style="width:100%;height:100%;background:linear-gradient(135deg,${node.color}25,${node.color}10);display:flex;align-items:center;justify-content:center;"><svg width="40" height="40" fill="none" stroke="${node.color}50" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg></div><div class="artwork-overlay"></div>`;
+
+    document.getElementById('api-spinner').classList.add('on');
+
+    // If subgénero → load artist list
+    if (node.type === 'primary') {
+        loadArtistList(node.id);
+    } else if (node.type === 'artist_node' || node.type === 'satellite') {
+        // Direct artist: fetch and play
+        const data = await fetchItunes(node.itunesQuery);
+        document.getElementById('api-spinner').classList.remove('on');
+        if (data) {
+            if (data.artworkUrl) aw.innerHTML = `<img src="${data.artworkUrl}" style="width:100%;height:100%;object-fit:cover;"><div class="artwork-overlay"></div>`;
+            document.getElementById('inspector-subtitle').textContent = data.artistName + (data.collectionName ? ` — ${data.collectionName}` : '');
+            stopAudio();
+            setPlayerUI(data, node.itunesQuery);
+            if (data.previewUrl) {
+                audioEl.src = data.previewUrl;
+                audioEl.play().then(()=>{ isPlaying=true; updatePlayBtn(); startProgressTracker(); }).catch(()=>{});
+                document.getElementById('source-label').textContent = '✓ Preview real — iTunes';
+                document.getElementById('source-label').style.color = '#10b981';
+            }
+        }
+        return;
+    }
+
+    // Fetch iTunes for genre node
+    const data = await fetchItunes(node.itunesQuery);
+    document.getElementById('api-spinner').classList.remove('on');
+    if (data) {
+        if (data.artworkUrl) aw.innerHTML = `<img src="${data.artworkUrl}" style="width:100%;height:100%;object-fit:cover;"><div class="artwork-overlay"></div>`;
+        document.getElementById('inspector-subtitle').textContent = data.trackName ? `${data.trackName} — ${data.artistName}` : node.label;
+        if (!document.getElementById('artist-section').style.display || document.getElementById('artist-section').style.display==='none') {
+            stopAudio();
+            setPlayerUI(data, node.itunesQuery);
+            if (data.previewUrl) {
+                audioEl.src = data.previewUrl;
+                audioEl.play().then(()=>{ isPlaying=true; updatePlayBtn(); startProgressTracker(); }).catch(()=>{});
+                document.getElementById('source-label').textContent = '✓ Preview real — iTunes';
+                document.getElementById('source-label').style.color = '#10b981';
+            } else {
+                document.getElementById('source-label').textContent = 'Sin preview disponible';
+                document.getElementById('source-label').style.color = 'var(--muted)';
+            }
+        }
+    } else {
+        document.getElementById('inspector-subtitle').textContent = 'Sin datos de iTunes';
+        document.getElementById('api-spinner').classList.remove('on');
+    }
 }
+
+// ============================================================
+// AUDIO PLAYER
+// ============================================================
+const audioEl = document.getElementById('audio-player');
+let isPlaying = false;
+let progressInterval = null;
+
+function stopAudio() {
+    clearInterval(progressInterval);
+    audioEl.pause(); audioEl.currentTime=0;
+    isPlaying=false; updatePlayBtn();
+    document.getElementById('progress-fill').style.width='0%';
+    document.getElementById('time-display').textContent='0:00 / 0:00';
+    if (currentArtistBtn) { currentArtistBtn.classList.remove('active'); currentArtistBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>'; }
+    document.querySelectorAll('.artist-item').forEach(el=>el.classList.remove('playing-now'));
+    currentArtistBtn=null;
+}
+
+function startProgressTracker() {
+    clearInterval(progressInterval);
+    progressInterval = setInterval(()=>{
+        if (!audioEl.duration) return;
+        const pct = (audioEl.currentTime/audioEl.duration)*100;
+        document.getElementById('progress-fill').style.width=pct+'%';
+        const cur=Math.floor(audioEl.currentTime), dur=Math.floor(audioEl.duration);
+        const fmt = s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+        document.getElementById('time-display').textContent=`${fmt(cur)} / ${fmt(dur)}`;
+        if (audioEl.ended) { isPlaying=false; updatePlayBtn(); clearInterval(progressInterval); if(currentArtistBtn){currentArtistBtn.classList.remove('active');currentArtistBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>';} }
+    },150);
+}
+
+function updatePlayBtn() {
+    const btn=document.getElementById('play-btn'); const icon=document.getElementById('play-icon');
+    if (isPlaying) { btn.classList.add('playing'); icon.innerHTML='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; }
+    else { btn.classList.remove('playing'); icon.innerHTML='<path d="M8 5v14l11-7z"/>'; }
+}
+
+function togglePlay() {
+    if (!audioEl.src) return;
+    if (isPlaying) { audioEl.pause(); isPlaying=false; clearInterval(progressInterval); }
+    else { audioEl.play().then(()=>{ isPlaying=true; startProgressTracker(); }).catch(()=>{}); }
+    updatePlayBtn();
+}
+
+document.getElementById('progress-track').addEventListener('click', e=>{
+    const rect=e.target.getBoundingClientRect();
+    if (audioEl.duration) audioEl.currentTime=(e.clientX-rect.left)/rect.width*audioEl.duration;
+});
 
 // ============================================================
 // TOP LIST
 // ============================================================
 const historicalData = {
-    artists: {
-        now: {
-            global: [['Bad Bunny', '🇵🇷'], ['Taylor Swift', '🇺🇸'], ['The Weeknd', '🇨🇦'], ['Drake', '🇨🇦'], ['Karol G', '🇨🇴'], ['BTS', '🇰🇷'], ['BLACKPINK', '🇰🇷'], ['Eminem', '🇺🇸'], ['SZA', '🇺🇸'], ['Morgan Wallen', '🇺🇸']],
-            latam: [['Bad Bunny', '🇵🇷'], ['Karol G', '🇨🇴'], ['Peso Pluma', '🇲🇽'], ['Feid', '🇨🇴'], ['BTS', '🇰🇷'], ['J Balvin', '🇨🇴'], ['Rauw Alejandro', '🇵🇷'], ['Shakira', '🇨🇴'], ['Bizarrap', '🇦🇷'], ['Daddy Yankee', '🇵🇷']],
-            spain: [['Bad Bunny', '🇵🇷'], ['Quevedo', '🇪🇸'], ['Rosalía', '🇪🇸'], ['Bizarrap', '🇦🇷'], ['BLACKPINK', '🇰🇷'], ['C. Tangana', '🇪🇸'], ['BTS', '🇰🇷'], ['Morad', '🇲🇦'], ['Duki', '🇦🇷'], ['Aitana', '🇪🇸']],
+    artists:{
+        now:{
+            global:[['Bad Bunny','🇵🇷'],['Taylor Swift','🇺🇸'],['The Weeknd','🇨🇦'],['Drake','🇨🇦'],['Karol G','🇨🇴'],['Peso Pluma','🇲🇽'],['SZA','🇺🇸'],['Morgan Wallen','🇺🇸'],['Feid','🇨🇴'],['Dua Lipa','🇬🇧']],
+            latam:[['Bad Bunny','🇵🇷'],['Karol G','🇨🇴'],['Peso Pluma','🇲🇽'],['Feid','🇨🇴'],['J Balvin','🇨🇴'],['Rauw Alejandro','🇵🇷'],['Shakira','🇨🇴'],['Grupo Frontera','🇲🇽'],['Bizarrap','🇦🇷'],['Daddy Yankee','🇵🇷']],
+            spain:[['Bad Bunny','🇵🇷'],['Quevedo','🇪🇸'],['Rosalía','🇪🇸'],['Bizarrap','🇦🇷'],['C. Tangana','🇪🇸'],['Morad','🇲🇦'],['Duki','🇦🇷'],['Aitana','🇪🇸'],['Rauw Alejandro','🇵🇷'],['Feid','🇨🇴']],
+            galicia:[['Tanxugueiras','🏴'],['Quevedo','🇪🇸'],['Rosalía','🇪🇸'],['Bad Bunny','🇵🇷'],['Iván Ferreiro','🏴'],['Baiuca','🏴'],['C. Tangana','🇪🇸'],['Xoel López','🏴'],['Novedades Carminha','🏴'],['Feid','🇨🇴']],
+            us:[['Taylor Swift','🇺🇸'],['Drake','🇨🇦'],['The Weeknd','🇨🇦'],['Beyoncé','🇺🇸'],['SZA','🇺🇸'],['Morgan Wallen','🇺🇸'],['Bad Bunny','🇵🇷'],['21 Savage','🇬🇧'],['Olivia Rodrigo','🇺🇸'],['Kendrick Lamar','🇺🇸']]
         },
-        '2010': {
-            global: [['Lady Gaga', '🇺🇸'], ['Eminem', '🇺🇸'], ['Rihanna', '🇧🇧'], ['Katy Perry', '🇺🇸'], ['Justin Bieber', '🇨🇦'], ['Bruno Mars', '🇺🇸'], ['Beyoncé', '🇺🇸'], ['David Guetta', '🇫🇷'], ['B.o.B', '🇺🇸'], ['Taio Cruz', '🇬🇧']],
-            latam: [['Shakira', '🇨🇴'], ['Daddy Yankee', '🇵🇷'], ['Wisin & Yandel', '🇵🇷'], ['Don Omar', '🇵🇷'], ['Marc Anthony', '🇺🇸'], ['Pitbull', '🇺🇸'], ['J Alvarez', '🇵🇷'], ['Plan B', '🇵🇷'], ['Enrique Iglesias', '🇪🇸'], ['Ricky Martin', '🇵🇷']],
-            spain: [['Shakira', '🇨🇴'], ['David Bisbal', '🇪🇸'], ['Alejandro Sanz', '🇪🇸'], ['Estopa', '🇪🇸'], ['Melendi', '🇪🇸'], ['El Canto del Loco', '🇪🇸'], ['Rihanna', '🇧🇧'], ['Carlos Baute', '🇻🇪'], ['Dani Martín', '🇪🇸'], ['Pereza', '🇪🇸']],
+        '2010':{
+            global:[['Lady Gaga','🇺🇸'],['Eminem','🇺🇸'],['Rihanna','🇧🇧'],['Katy Perry','🇺🇸'],['Justin Bieber','🇨🇦'],['Bruno Mars','🇺🇸'],['Beyoncé','🇺🇸'],['David Guetta','🇫🇷'],['B.o.B','🇺🇸'],['Taio Cruz','🇬🇧']],
+            latam:[['Shakira','🇨🇴'],['Daddy Yankee','🇵🇷'],['Wisin & Yandel','🇵🇷'],['Don Omar','🇵🇷'],['Marc Anthony','🇺🇸'],['Pitbull','🇺🇸'],['J Alvarez','🇵🇷'],['Plan B','🇵🇷'],['Enrique Iglesias','🇪🇸'],['Ricky Martin','🇵🇷']],
+            spain:[['Shakira','🇨🇴'],['David Bisbal','🇪🇸'],['Alejandro Sanz','🇪🇸'],['Estopa','🇪🇸'],['Melendi','🇪🇸'],['El Canto del Loco','🇪🇸'],['Rihanna','🇧🇧'],['Carlos Baute','🇻🇪'],['Dani Martín','🇪🇸'],['Pereza','🇪🇸']],
+            galicia:[['Iván Ferreiro','🏴'],['Xoel López','🏴'],['Los Piratas','🏴'],['Siniestro Total','🏴'],['Shakira','🇨🇴'],['Estopa','🇪🇸'],['Alejandro Sanz','🇪🇸'],['David Bisbal','🇪🇸'],['Rihanna','🇧🇧'],['Fito & Fitipaldis','🇪🇸']],
+            us:[['Lady Gaga','🇺🇸'],['Eminem','🇺🇸'],['Rihanna','🇧🇧'],['Katy Perry','🇺🇸'],['Justin Bieber','🇨🇦'],['Usher','🇺🇸'],['Bruno Mars','🇺🇸'],['B.o.B','🇺🇸'],['Beyoncé','🇺🇸'],['Ke$ha','🇺🇸']]
         },
-        '2000': {
-            global: [['Eminem', '🇺🇸'], ['Britney Spears', '🇺🇸'], ['Madonna', '🇺🇸'], ["N'Sync", '🇺🇸'], ['Santana', '🇲🇽'], ['Ricky Martin', '🇵🇷'], ['Shakira', '🇨🇴'], ["Destiny's Child", '🇺🇸'], ['U2', '🇮🇪'], ['Coldplay', '🇬🇧']],
-            latam: [['Ricky Martin', '🇵🇷'], ['Shakira', '🇨🇴'], ['Marc Anthony', '🇺🇸'], ['Chayanne', '🇵🇷'], ['Alejandro Sanz', '🇪🇸'], ['Celia Cruz', '🇨🇺'], ['Maná', '🇲🇽'], ['Gilberto Santa Rosa', '🇵🇷'], ['Paulina Rubio', '🇲🇽'], ['Luis Miguel', '🇲🇽']],
-            spain: [['Alejandro Sanz', '🇪🇸'], ['La Oreja de Van Gogh', '🇪🇸'], ['Estopa', '🇪🇸'], ['Joaquín Sabina', '🇪🇸'], ['Ricky Martin', '🇵🇷'], ['Shakira', '🇨🇴'], ['Mónica Naranjo', '🇪🇸'], ['Britney Spears', '🇺🇸'], ['Raúl', '🇪🇸'], ['Tom Jones', '🇬🇧']],
+        '2000':{
+            global:[['Eminem','🇺🇸'],['Britney Spears','🇺🇸'],['Madonna','🇺🇸'],["N'Sync",'🇺🇸'],['Santana','🇲🇽'],['Ricky Martin','🇵🇷'],['Shakira','🇨🇴'],["Destiny's Child",'🇺🇸'],['U2','🇮🇪'],['Coldplay','🇬🇧']],
+            latam:[['Ricky Martin','🇵🇷'],['Shakira','🇨🇴'],['Marc Anthony','🇺🇸'],['Chayanne','🇵🇷'],['Alejandro Sanz','🇪🇸'],['Celia Cruz','🇨🇺'],['Maná','🇲🇽'],['Gilberto Santa Rosa','🇵🇷'],['Paulina Rubio','🇲🇽'],['Luis Miguel','🇲🇽']],
+            spain:[['Alejandro Sanz','🇪🇸'],['La Oreja de Van Gogh','🇪🇸'],['Estopa','🇪🇸'],['Joaquín Sabina','🇪🇸'],['Ricky Martin','🇵🇷'],['Shakira','🇨🇴'],['Mónica Naranjo','🇪🇸'],['Britney Spears','🇺🇸'],['Raúl','🇪🇸'],['Tom Jones','🇬🇧']],
+            galicia:[['Siniestro Total','🏴'],['Os Resentidos','🏴'],['La Oreja de Van Gogh','🇪🇸'],['Estopa','🇪🇸'],['Alejandro Sanz','🇪🇸'],['Celtas Cortos','🇪🇸'],['Shakira','🇨🇴'],['Joaquín Sabina','🇪🇸'],['Mónica Naranjo','🇪🇸'],['Ricky Martin','🇵🇷']],
+            us:[['Eminem','🇺🇸'],['Britney Spears','🇺🇸'],["N'Sync",'🇺🇸'],['Backstreet Boys','🇺🇸'],["Destiny's Child",'🇺🇸'],['Jay-Z','🇺🇸'],['DMX','🇺🇸'],['Madonna','🇺🇸'],['Santana','🇲🇽'],['Nelly','🇺🇸']]
+        },
+        '1995':{
+            global:[['Michael Jackson','🇺🇸'],['Boyz II Men','🇺🇸'],['TLC','🇺🇸'],['Mariah Carey','🇺🇸'],['Alanis Morissette','🇨🇦'],['Coolio','🇺🇸'],['Tupac','🇺🇸'],['Notorious B.I.G.','🇺🇸'],['Oasis','🇬🇧'],['Take That','🇬🇧']],
+            latam:[['Luis Miguel','🇲🇽'],['Ricky Martin','🇵🇷'],['Celia Cruz','🇨🇺'],['Juan Luis Guerra','🇩🇴'],['Carlos Vives','🇨🇴'],['Marc Anthony','🇺🇸'],['Gilberto Santa Rosa','🇵🇷'],['Alejandro Fernández','🇲🇽'],['Rubén Blades','🇵🇦'],['José Luis Perales','🇪🇸']],
+            spain:[['Alejandro Sanz','🇪🇸'],['Luis Miguel','🇲🇽'],['Jarabe de Palo','🇪🇸'],['Mónica Naranjo','🇪🇸'],['El Último de la Fila','🇪🇸'],['Ricky Martin','🇵🇷'],['Joan Manuel Serrat','🇪🇸'],['Los Secretos','🇪🇸'],['Michael Jackson','🇺🇸'],['Miguel Ríos','🇪🇸']],
+            galicia:[['Siniestro Total','🏴'],['Os Resentidos','🏴'],['Celtas Cortos','🇪🇸'],['Luis Miguel','🇲🇽'],['Alejandro Sanz','🇪🇸'],['Jarabe de Palo','🇪🇸'],['El Último de la Fila','🇪🇸'],['Michael Jackson','🇺🇸'],['Mónica Naranjo','🇪🇸'],['Clannad','🇮🇪']],
+            us:[['Michael Jackson','🇺🇸'],['Boyz II Men','🇺🇸'],['TLC','🇺🇸'],['Mariah Carey','🇺🇸'],['Coolio','🇺🇸'],['Tupac','🇺🇸'],['Notorious B.I.G.','🇺🇸'],['Alanis Morissette','🇨🇦'],['Montell Jordan','🇺🇸'],["Hootie & The Blowfish",'🇺🇸']]
+        },
+        '2005':{
+            global:[['Eminem','🇺🇸'],['50 Cent','🇺🇸'],['Mariah Carey','🇺🇸'],['Kanye West','🇺🇸'],['Coldplay','🇬🇧'],['Green Day','🇺🇸'],['Gorillaz','🇬🇧'],['Black Eyed Peas','🇺🇸'],['Alicia Keys','🇺🇸'],['Beyoncé','🇺🇸']],
+            latam:[['Shakira','🇨🇴'],['Juanes','🇨🇴'],['Daddy Yankee','🇵🇷'],['Marc Anthony','🇺🇸'],['Don Omar','🇵🇷'],['Wisin & Yandel','🇵🇷'],['RBD','🇲🇽'],['Paulina Rubio','🇲🇽'],['Romeo Santos','🇺🇸'],['Alejandro Sanz','🇪🇸']],
+            spain:[['Alejandro Sanz','🇪🇸'],['Shakira','🇨🇴'],['La Oreja de Van Gogh','🇪🇸'],['Estopa','🇪🇸'],['David Bisbal','🇪🇸'],['Melendi','🇪🇸'],['Fito & Fitipaldis','🇪🇸'],['El Canto del Loco','🇪🇸'],['Juanes','🇨🇴'],['Paulina Rubio','🇲🇽']],
+            galicia:[['Iván Ferreiro','🏴'],['Siniestro Total','🏴'],['Los Piratas','🏴'],['Xoel López','🏴'],['La Oreja de Van Gogh','🇪🇸'],['Alejandro Sanz','🇪🇸'],['Shakira','🇨🇴'],['Estopa','🇪🇸'],['Juanes','🇨🇴'],['El Canto del Loco','🇪🇸']],
+            us:[['Eminem','🇺🇸'],['50 Cent','🇺🇸'],['Mariah Carey','🇺🇸'],['Kanye West','🇺🇸'],['Coldplay','🇬🇧'],['Green Day','🇺🇸'],['Black Eyed Peas','🇺🇸'],['Alicia Keys','🇺🇸'],['Beyoncé','🇺🇸'],['Linkin Park','🇺🇸']]
+        },
+        '2015':{
+            global:[['Ed Sheeran','🇬🇧'],['Taylor Swift','🇺🇸'],['Drake','🇨🇦'],['The Weeknd','🇨🇦'],['Adele','🇬🇧'],['Kendrick Lamar','🇺🇸'],['Sam Smith','🇬🇧'],['Major Lazer','🇺🇸'],['Fetty Wap','🇺🇸'],['Wiz Khalifa','🇺🇸']],
+            latam:[['Enrique Iglesias','🇪🇸'],['Ricky Martin','🇵🇷'],['J Balvin','🇨🇴'],['Maluma','🇨🇴'],['Marc Anthony','🇺🇸'],['Shakira','🇨🇴'],['Daddy Yankee','🇵🇷'],['Carlos Vives','🇨🇴'],['Nicky Jam','🇵🇷'],['Ozuna','🇵🇷']],
+            spain:[['Alejandro Sanz','🇪🇸'],['Taburete','🇪🇸'],['Fito & Fitipaldis','🇪🇸'],['Dani Martín','🇪🇸'],['Shakira','🇨🇴'],['Enrique Iglesias','🇪🇸'],['Adele','🇬🇧'],['Melendi','🇪🇸'],['C. Tangana','🇪🇸'],['David Bisbal','🇪🇸']],
+            galicia:[['Iván Ferreiro','🏴'],['Fito & Fitipaldis','🇪🇸'],['Xoel López','🏴'],['Los Piratas','🏴'],['La Oreja de Van Gogh','🇪🇸'],['Alejandro Sanz','🇪🇸'],['Shakira','🇨🇴'],['El Kanka','🇪🇸'],['Dani Martín','🇪🇸'],['Enrique Iglesias','🇪🇸']],
+            us:[['Taylor Swift','🇺🇸'],['Drake','🇨🇦'],['Ed Sheeran','🇬🇧'],['The Weeknd','🇨🇦'],['Adele','🇬🇧'],['Kendrick Lamar','🇺🇸'],['Fetty Wap','🇺🇸'],['Wiz Khalifa','🇺🇸'],['Chris Brown','🇺🇸'],['Maroon 5','🇺🇸']]
+        },
+        '2020':{
+            global:[['Bad Bunny','🇵🇷'],['Drake','🇨🇦'],['J Balvin','🇨🇴'],['Juice WRLD','🇺🇸'],['Billie Eilish','🇺🇸'],['Roddy Ricch','🇺🇸'],['Pop Smoke','🇺🇸'],['DaBaby','🇺🇸'],['The Weeknd','🇨🇦'],['Harry Styles','🇬🇧']],
+            latam:[['Bad Bunny','🇵🇷'],['J Balvin','🇨🇴'],['Maluma','🇨🇴'],['Ozuna','🇵🇷'],['Karol G','🇨🇴'],['Anuel AA','🇵🇷'],['Sech','🇵🇦'],['Jhay Cortez','🇵🇷'],['Rauw Alejandro','🇵🇷'],['Nicky Jam','🇵🇷']],
+            spain:[['Rosalía','🇪🇸'],['Bad Bunny','🇵🇷'],['C. Tangana','🇪🇸'],['Alejandro Sanz','🇪🇸'],['Maluma','🇨🇴'],['Ozuna','🇵🇷'],['Daddy Yankee','🇵🇷'],['Anuel AA','🇵🇷'],['Dua Lipa','🇬🇧'],['J Balvin','🇨🇴']],
+            galicia:[['Tanxugueiras','🏴'],['Rosalía','🇪🇸'],['Iván Ferreiro','🏴'],['Bad Bunny','🇵🇷'],['Baiuca','🏴'],['C. Tangana','🇪🇸'],['Maluma','🇨🇴'],['Xoel López','🏴'],['El Kanka','🇪🇸'],['Fito & Fitipaldis','🇪🇸']],
+            us:[['Drake','🇨🇦'],['The Weeknd','🇨🇦'],['Post Malone','🇺🇸'],['Billie Eilish','🇺🇸'],['Juice WRLD','🇺🇸'],['Roddy Ricch','🇺🇸'],['Pop Smoke','🇺🇸'],['DaBaby','🇺🇸'],['Lil Baby','🇺🇸'],['Cardi B','🇺🇸']]
         },
     },
-    genres: {
-        now: { global: ['Pop', 'Hip Hop', 'Reggaeton', 'K-Pop', 'EDM', 'Rock', 'R&B', 'Indie', 'Afrobeats', 'Jazz'], latam: ['Reggaeton', 'Trap', 'Pop Latino', 'Bachata', 'Salsa', 'Rock', 'Cumbia', 'Hip Hop', 'Merengue', 'K-Pop'], spain: ['Reggaeton', 'Pop', 'Trap', 'Indie Pop', 'EDM', 'Rock', 'Jazz', 'Salsa', 'Hip Hop', 'K-Pop'] },
-        '2010': { global: ['Pop', 'Hip Hop', 'R&B', 'Rock', 'EDM', 'Indie Rock', 'Dubstep', 'Country', 'Reggaeton', 'Jazz'], latam: ['Pop Latino', 'Reggaeton', 'Salsa', 'Bachata', 'Rock', 'Balada', 'Cumbia', 'Hip Hop', 'Merengue', 'Jazz'], spain: ['Pop Latino', 'Rock', 'Flamenco', 'Dance', 'Reggaeton', 'Indie', 'Jazz', 'Salsa', 'Bachata', 'R&B'] },
-        '2000': { global: ['Pop', 'R&B', 'Hip Hop', 'Rock', 'Salsa', 'Latin Pop', 'Jazz', 'Country', 'Techno', 'Reggaeton'], latam: ['Salsa', 'Pop Latino', 'Balada', 'Rock', 'Merengue', 'Cumbia', 'Vallenato', 'Jazz', 'Reggaeton', 'Bolero'], spain: ['Pop Español', 'Rock', 'Flamenco', 'Jazz', 'Salsa', 'Cantautor', 'Pop Latino', 'Reggaeton', 'Bachata', 'Dance'] },
+    genres:{
+        now:{ global:['Pop','Hip Hop / Trap','Reggaeton','K-Pop','EDM','Rock Alt.','R&B','Indie Pop','Afrobeats','Salsa'], latam:['Reggaeton','Trap Latino','Música Mexicana','Pop Latino','Bachata','Salsa','Cumbia','Rock','Vallenato','Merengue'], spain:['Reggaeton','Pop','Trap','Flamenco Urbano','Indie Pop','EDM','Rock','Bachata','Salsa','Hip Hop'], galicia:['Pop','Reggaeton','Indie Pop','Trad. Gallega','Trap','Rock','Folk Celta','EDM','Salsa','Hip Hop'], us:['Pop','Hip Hop','Country','R&B','Rock','Electronic','Latin','K-Pop','Indie','Gospel'] },
+        '2010':{ global:['Electropop','Hip Hop','R&B','Pop Rock','EDM','Indie Rock','Dubstep','Country','Salsa','Reggaeton'], latam:['Pop Latino','Reggaeton','Salsa','Bachata','Rock','Balada','Cumbia','Merengue','Vallenato','Tropical'], spain:['Pop Latino','Pop Rock','Flamenco Pop','Dance','Reggaeton','Indie','Rock','Salsa','Bachata','R&B'], galicia:['Pop Rock','Folk Celta','Dance','Indie','Salsa','Cantautor','Reggaeton','Bachata','Pop Latino','Rock'], us:['Pop','Hip Hop','R&B','Country','Rock','Electronic','Christian','Latin','Metal','Indie'] },
+        '2000':{ global:['Teen Pop','Nu Metal','R&B','Hip Hop','Pop Punk','Trance','Alt. Rock','Salsa','Latin Pop','Eurodance'], latam:['Salsa','Pop Latino','Balada','Rock en Español','Merengue','Cumbia','Vallenato','Bolero','Trova','R&B'], spain:['Pop Español','Pop Latino','Flamenco Pop','Rock Español','Dance','Salsa','Cantautor','Eurobeat','Techno','Rumba'], galicia:['Pop Español','Rock','Folk','Salsa','Dance','Cantautor','Pop Latino','Metal','Techno','Rumba'], us:['Pop','R&B','Hip Hop','Nu Metal','Alt. Rock','Country','Christian','Trance','Pop Punk','Latin'] },
+        '1995':{ global:['Grunge','R&B','Hip Hop','Pop','Alt. Rock','Britpop','Reggae','Techno','Heavy Metal','Salsa'], latam:['Salsa','Bolero','Merengue','Rock en Español','Balada','Cumbia','Vallenato','Pop Latino','Trova','Mariachi'], spain:['Pop Español','Rock Español','Flamenco','Cantautor','Dance','Salsa','Pop Latino','Metal','Indie','Folk'], galicia:['Rock Galego','Folk Celta','Pop Español','Cantautor','Punk','Metal','Salsa','Dance','Rock','Pop Latino'], us:['Grunge','R&B','Hip Hop','Country','Pop','Alt. Rock','Heavy Metal','Rap','New Jack Swing','Gospel'] },
+        '2005':{ global:['Pop','Hip Hop','Rock Alt.','R&B','Electronic','Nu Metal','Latin Pop','Country','Indie Rock','Metal'], latam:['Pop Latino','Reggaeton','Salsa','Bachata','Rock en Español','Balada','Cumbia','Vallenato','Merengue','Tropical'], spain:['Pop Español','Pop Latino','Flamenco Pop','Rock','Dance','Salsa','Cantautor','Reggaeton','R&B','Bachata'], galicia:['Pop Rock','Folk','Rock','Salsa','Cantautor','Pop Latino','Dance','Indie','Metal','Reggaeton'], us:['Pop','Hip Hop','Rock','R&B','Country','Electronic','Christian','Latin','Metal','Indie'] },
+        '2015':{ global:['Pop','Hip Hop','Electronic','R&B','Indie','Country','Reggaeton','K-Pop','Rock','Soul'], latam:['Pop Latino','Reggaeton','Salsa','Bachata','Rock','Balada','Cumbia','Vallenato','Merengue','Tropical'], spain:['Pop','Reggaeton','Rock','Indie Pop','Flamenco Pop','R&B','EDM','Salsa','Hip Hop','Bachata'], galicia:['Pop','Folk Celta','Rock','Indie Pop','Reggaeton','Cantautor','Salsa','EDM','Hip Hop','Bachata'], us:['Pop','Hip Hop','Country','R&B','Rock','Electronic','Latin','Christian','Indie','Metal'] },
+        '2020':{ global:['Pop','Hip Hop / Trap','Reggaeton','K-Pop','EDM','Drill','R&B','Indie','Afrobeats','Bachata'], latam:['Reggaeton','Trap Latino','Pop Latino','Bachata','Salsa','Rock','Cumbia','Vallenato','Merengue','Afrobeats'], spain:['Reggaeton','Pop','Trap','Flamenco Urbano','Indie Pop','EDM','Rock','Bachata','Hip Hop','Salsa'], galicia:['Pop','Reggaeton','Folk Celta','Indie Pop','Trap','Rock','EDM','Salsa','Hip Hop','Bachata'], us:['Pop','Hip Hop','Country','R&B','Electronic','Rock','Latin','K-Pop','Christian','Indie'] },
     }
 };
 
 function renderTopList() {
     const region = document.getElementById('filter-region').value;
-    const year = document.getElementById('filter-year').value;
+    const yearRaw = document.getElementById('filter-year').value;
     const type = document.getElementById('filter-type').value;
+    const year = yearRaw === 'now' ? 'now' : yearRaw;
     const db = historicalData[type];
     const yearData = db[year] || db['now'];
     const items = yearData[region] || yearData['global'];
     const list = document.getElementById('top-list');
-    list.innerHTML = '';
-    items.forEach((item, i) => {
-        const li = document.createElement('li');
-        li.style.cssText = 'display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:8px;cursor:pointer;transition:background 0.15s;border:1px solid transparent;';
-        li.onmouseover = () => li.style.background = 'var(--surface2)';
-        li.onmouseout = () => li.style.background = 'transparent';
-        const isArtist = type === 'artists';
-        const name = isArtist ? item[0] : item;
-        const flag = isArtist ? item[1] : '';
-        li.innerHTML = `<span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);width:16px;text-align:center;">${i+1}</span><span style="flex:1;font-size:12px;color:var(--text2);">${name}</span>${flag ? `<span style="font-size:13px;">${flag}</span>` : ''}`;
-        li.onclick = () => {
-            document.getElementById('global-search').value = name;
-            document.getElementById('global-search').dispatchEvent(new Event('input'));
-        };
+    list.innerHTML='';
+    items.forEach((item,i)=>{
+        const li=document.createElement('li'); li.className='top-item';
+        const isArtist = type==='artists';
+        const name = isArtist?item[0]:item;
+        const flag = isArtist?item[1]:'';
+        li.innerHTML=`<span class="top-rank">${i+1}</span><span style="flex:1;font-size:12px;color:var(--text2);">${name}</span>${flag?`<span style="font-size:13px;">${flag}</span>`:''}`;
+        li.onclick=()=>{ document.getElementById('global-search').value=name; document.getElementById('global-search').dispatchEvent(new Event('input')); };
         list.appendChild(li);
     });
 }
-
-['filter-region', 'filter-year', 'filter-type'].forEach(id => document.getElementById(id).addEventListener('change', renderTopList));
+['filter-region','filter-year','filter-type'].forEach(id=>document.getElementById(id).addEventListener('change',renderTopList));
 
 // ============================================================
-// SEARCH
+// DEPTH & SEARCH
 // ============================================================
 function setDepth(depth, btn) {
-    document.querySelectorAll('.depth-btn').forEach(b => b.style.background = 'transparent');
-    btn.style.background = 'rgba(124,58,237,0.2)';
-    btn.style.borderColor = 'var(--accent)';
-    btn.style.color = 'var(--text)';
+    document.querySelectorAll('.depth-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedNode=null; stopAudio();
     initGraph(depth);
 }
 
-document.getElementById('global-search').addEventListener('input', e => {
-    const val = e.target.value.toLowerCase().trim();
-    if (!val || !currentGraph) return;
-    const data = currentGraph.graphData();
-    const match = data.nodes.find(n => n.searchTarget && n.searchTarget.includes(val));
-    if (match) {
-        currentGraph.centerAt(match.x, match.y, 700);
-        currentGraph.zoom(4, 700);
-        selectedNode = match;
-        updateInspector(match);
-    }
+document.getElementById('global-search').addEventListener('input', e=>{
+    const val=e.target.value.toLowerCase().trim();
+    if (!val||!currentGraph) return;
+    const data=currentGraph.graphData();
+    const match=data.nodes.find(n=>n.searchTarget&&n.searchTarget.includes(val));
+    if (match) { currentGraph.centerAt(match.x,match.y,700); currentGraph.zoom(4,700); selectedNode=match; updateInspector(match); }
 });
-
-// ============================================================
-// THEME TOGGLE
-// ============================================================
-document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
 
 // ============================================================
 // INIT
