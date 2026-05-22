@@ -971,7 +971,7 @@
         </svg>
     </div>
     <span class="logo-text">SonicNodes</span>
-    <span class="logo-ver">v13.1</span>
+    <span class="logo-ver">v13.2</span>
 
     <div class="search-wrap">
         <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -2225,8 +2225,95 @@ function closeTimeMachine() {
 }
 
 // ============================================================
-// ARTIST DISCOGRAPHY VIEW LOGICAL CONTROLLER (v13.1)
+// ARTIST DISCOGRAPHY VIEW LOGICAL CONTROLLER (v13.2)
 // ============================================================
+function findGenreIdForArtist(artistName, artistGenre) {
+    const nameLower = artistName.toLowerCase();
+    const genreLower = (artistGenre || "").toLowerCase();
+
+    // 1. Search in existing GENRE_ARTISTS
+    for (const gid in GENRE_ARTISTS) {
+        const found = GENRE_ARTISTS[gid].find(a => a.name.toLowerCase() === nameLower);
+        if (found) return gid;
+    }
+
+    // 2. Keyword heuristic mapping based on artistName or artistGenre
+    if (genreLower.includes("grime")) return "grime";
+    if (genreLower.includes("reggaeton") || nameLower === "quevedo" || nameLower === "bad gyal") return "reggaeton";
+    if (genreLower.includes("trap") || genreLower.includes("drill")) return "trap";
+    if (genreLower.includes("hip hop") || genreLower.includes("rap")) return "hiphop";
+    if (genreLower.includes("indie rock") || nameLower === "arctic monkeys" || nameLower === "strokes") return "indie_rock";
+    if (genreLower.includes("post-punk")) return "post_punk";
+    if (genreLower.includes("gothic")) return "gothic_rock";
+    if (genreLower.includes("dark wave") || genreLower.includes("witch")) return "dark_wave";
+    if (genreLower.includes("synth") || genreLower.includes("new wave")) return "synthwave";
+    if (genreLower.includes("classic rock") || genreLower.includes("hard rock") || genreLower.includes("glam")) return "rock_clasico";
+    if (genreLower.includes("metal")) return "metal";
+    if (genreLower.includes("psychedelic")) return "psychedelic";
+    if (genreLower.includes("punk")) return "punk";
+    if (genreLower.includes("house")) return "house";
+    if (genreLower.includes("techno")) return "techno";
+    if (genreLower.includes("ambient")) return "ambient";
+    if (genreLower.includes("dnb") || genreLower.includes("drum")) return "drum_bass";
+    if (genreLower.includes("electronic")) return "electronica";
+    if (genreLower.includes("flamenco")) return "flamenco";
+    if (genreLower.includes("salsa")) return "salsa";
+    if (genreLower.includes("cumbia")) return "cumbia";
+    if (genreLower.includes("bossa")) return "bossa_nova";
+    if (genreLower.includes("reggae") || genreLower.includes("dancehall")) return "reggae";
+    if (genreLower.includes("jazz") || genreLower.includes("swing")) return "jazz";
+    if (genreLower.includes("soul")) return "soul";
+    if (genreLower.includes("funk")) return "funk";
+    if (genreLower.includes("copla") || genreLower.includes("rumba") || genreLower.includes("cante") || genreLower.includes("folk") || genreLower.includes("trad.")) return "rumba_espanola";
+    if (genreLower.includes("pop")) return "pop_urbano";
+
+    // Fallback
+    return "pop_urbano";
+}
+
+function focusArtistOnGraph(artistName, genreLabel) {
+    closeTimeMachine();
+    closeArtistDiscography();
+
+    // Dynamic database registration
+    const genreId = findGenreIdForArtist(artistName, genreLabel);
+    if (genreId) {
+        if (!GENRE_ARTISTS[genreId]) {
+            GENRE_ARTISTS[genreId] = [];
+        }
+        const artistId = artistName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        const exists = GENRE_ARTISTS[genreId].some(a => a.id === artistId || a.name.toLowerCase() === artistName.toLowerCase());
+        if (!exists) {
+            GENRE_ARTISTS[genreId].push({
+                id: artistId,
+                name: artistName,
+                q: artistName.toLowerCase()
+            });
+        }
+    }
+
+    // Set graph depth to 'artist'
+    const artistBtn = document.querySelectorAll('.depth-btn')[2];
+    if (artistBtn) {
+        setDepth('artist', artistBtn);
+    } else {
+        initGraph('artist');
+    }
+
+    // Search and focus node
+    setTimeout(() => {
+        if (!currentGraph) return;
+        const data = currentGraph.graphData();
+        const match = data.nodes.find(n => n.searchTarget && (n.searchTarget === artistName.toLowerCase() || n.searchTarget.includes(artistName.toLowerCase())));
+        if (match) {
+            currentGraph.centerAt(match.x, match.y, 700);
+            currentGraph.zoom(4, 700);
+            selectedNode = match;
+            updateInspector(match);
+        }
+    }, 600);
+}
+
 async function openArtistDiscography(artistName, genreLabel) {
     const detailView = document.getElementById('time-artist-detail-view');
     const heroImg = document.getElementById('artist-detail-hero-img');
@@ -2241,11 +2328,7 @@ async function openArtistDiscography(artistName, genreLabel) {
     
     // Wire focus graph button
     focusBtn.onclick = () => {
-        const searchInput = document.getElementById('global-search');
-        searchInput.value = artistName;
-        searchInput.dispatchEvent(new Event('input'));
-        closeTimeMachine();
-        closeArtistDiscography();
+        focusArtistOnGraph(artistName, genreLabel);
     };
 
     // Show detail panel

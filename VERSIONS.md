@@ -2,7 +2,20 @@
 
 ## Releases
 
-### v13.1 (Mayo 2026) - ACTUAL ⭐
+### v13.2 (Mayo 2026) - ACTUAL ⭐
+**Título**: "The ForceGraph Deep-Link Era"
+
+**Cambios Principales**:
+- ✅ **Enlace Profundo e Inteligente con el Grafo ("Ver en el Grafo")**: Se solucionó el problema por el cual el botón en la pantalla de discografía no lograba enfocar a artistas que no estaban cargados por defecto en el grafo. Se inyectó un resolvedor de géneros interactivo con mapeo heurístico multikeyword y registro dinámico en base de datos.
+- ✅ **Mapeo Heurístico e Inyección Dinámica**: Si el artista seleccionado de la Máquina del Tiempo no se encuentra en el grafo, el resolvedor determina su género aproximado (p. ej., Grime, Reggaeton, Trap, Indie, Pop, Metal, etc.) y lo inyecta dinámicamente como un nodo satélite en el grafo real en tiempo real.
+- ✅ **Transición y Enfoque Directo en Artista**: El sistema cambia de forma automática el nivel de profundidad a "Artista" (habilitando la renderización de todos los nodos satélites) y ejecuta una animación de centrado tridimensional, zoom y selección con actualización inmediata de la barra lateral.
+
+**Archivos**:
+- `Sonic_nodes_V13.html` (versión principal y completa de producción)
+
+---
+
+### v13.1 (Mayo 2026) - Anterior
 **Título**: "The Discography & Autoplay Era"
 
 **Cambios Principales**:
@@ -150,20 +163,20 @@
 
 ## 📊 Comparativa de Evolución
 
-| Aspecto | v1.0 | v2.0 | v4.0 | v4.5 | v13.0 | v13.1 |
-|---------|------|------|------|------|-------|-------|
-| **Macro-Géneros** | 5 | 8 | 5 | 21 | 21 | 21 |
-| **Total Nodos** | ~20 | ~40 | 25 | 90+ | 90+ | 90+ |
-| **Profundidades** | 1 | 1 | 2 | 3 | 3 | 3 |
-| **Búsqueda** | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| **iTunes API** | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ (Búsqueda + Discografía) |
-| **Spotify API** | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ |
-| **Temas** | ✗ | Básico | Avanzado | Avanzado + | Premium Glassmorphism | Premium Glassmorphism |
-| **Métricas** | ✗ | ✗ | ✓ | ✓ | Máquina del Tiempo Fullscreen | M. Tiempo + Discografía en vivo |
-| **Auto-expand** | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ |
-| **Bridges** | ✗ | ✗ | Limitados | Completos | Completos | Completos |
-| **Light Mode** | ✗ | ✓ (tenue) | ✓ (tenue) | ✓ (mejorado) | ✓ (espectacular con blur) | ✓ (espectacular con blur) |
-| **Líneas Código** | ~800 | ~1200 | ~2000 | ~2400 | ~2900 | ~3400 |
+| Aspecto | v1.0 | v2.0 | v4.0 | v4.5 | v13.0 | v13.1 | v13.2 |
+|---------|------|------|------|------|-------|-------|-------|
+| **Macro-Géneros** | 5 | 8 | 5 | 21 | 21 | 21 | 21 |
+| **Total Nodos** | ~20 | ~40 | 25 | 90+ | 90+ | 90+ | 90+ (dinámicos) |
+| **Profundidades** | 1 | 1 | 2 | 3 | 3 | 3 | 3 |
+| **Búsqueda** | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| **iTunes API** | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ (Búsqueda + Discografía) | ✓ (Autoplay + Discografía) |
+| **Spotify API** | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| **Temas** | ✗ | Básico | Avanzado | Avanzado + | Premium Glassmorphism | Premium Glassmorphism | Premium Glassmorphism |
+| **Métricas** | ✗ | ✗ | ✓ | ✓ | Máquina del Tiempo Fullscreen | M. Tiempo + Discografía en vivo | Deep-Link + Discografía en vivo |
+| **Auto-expand** | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ |
+| **Bridges** | ✗ | ✗ | Limitados | Completos | Completos | Completos | Completos |
+| **Light Mode** | ✗ | ✓ (tenue) | ✓ (tenue) | ✓ (mejorado) | ✓ (espectacular con blur) | ✓ (espectacular con blur) | ✓ (espectacular con blur) |
+| **Líneas Código** | ~800 | ~1200 | ~2000 | ~2400 | ~2900 | ~3400 | ~3500 |
 
 ---
 

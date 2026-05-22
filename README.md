@@ -1,6 +1,6 @@
 # 🎵 SonicNodes — Visualización Interactiva del Universo Musical
 
-![Version](https://img.shields.io/badge/version-13.1-blue.svg)
+![Version](https://img.shields.io/badge/version-13.2-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Status](https://img.shields.io/badge/status-active-brightgreen.svg)
 
@@ -64,12 +64,12 @@ La aplicación permite explorar la **arquitectura del universo musical moderno**
 - **Zoom y Navegación**: Centrado automático en nodos seleccionados
 - **Auto-expand**: Al hacer clic en macro-género, expande automáticamente a subgéneros
 
-### ⏳ La Máquina del Tiempo Inmersiva (Time Machine v13.1)
+### ⏳ La Máquina del Tiempo Inmersiva (Time Machine v13.2)
 - **Modal a Pantalla Completa (90% Viewport)**: Un menú hamburguesa elegante (`#btn-time-machine`) en el topbar que activa un sofisticado panel superpuesto con diseño esmerilado Premium Glassmorphic y desenfoque de fondo.
 - **Reproducción Automática e Instantánea**: Al hacer clic en cualquier artista de la lista, se reproduce automáticamente una canción preview de iTunes en segundo plano, sincronizada con el reproductor principal.
 - **Pantalla de Detalle de Artista y Discografía**: Transición dinámica hacia una pantalla dedicada que carga y renderiza hasta 25 canciones y álbumes en tiempo real desde la API de iTunes con portadas de alta calidad, ecualizadores interactivos CSS y controles de reproducción locales.
 - **Selector Geográfico en Cascada (OLAP)**: Jerarquía dimensional interactiva. Permite filtrar por **Continente** (Europa, América), lo que habilita y puebla en cascada el selector de **País** (Reino Unido, España / EE.UU., Argentina), junto con la **Década** (2020s, 1980s, 1940s).
-- **Puente Interactivo con ForceGraph**: Conexión interactiva directa. A través del botón "Ver en el Grafo" de la pantalla de discografía, el modal se cierra de forma fluida y enfoca, hace zoom y resalta automáticamente ese nodo en el ForceGraph mediante el sistema de búsqueda interactiva.
+- **Enlace Profundo e Inteligente con el Grafo ("Ver en el Grafo")**: Conexión interactiva total y bidireccional. Si pulsas "Ver en el Grafo", un resolvedor de géneros interactivo determina el subgénero correspondiente y, si el artista no existía en el grafo, lo inyecta dinámicamente en tiempo real en la base de datos de nodos. Luego, cambia automáticamente el modo a "Artista" (para que se muestren los satélites) y realiza una suave animación de centrado, zoom de cámara D3 y selección con actualización inmediata de la barra lateral.
 - **Gráficos de Éxitos Detallados con Tendencias**: Muestra un Top 20 de artistas destacados de la década y país seleccionados, incluyendo tendencia (subida en verde, bajada en rojo y estable en amarillo) e inicial del artista en un avatar circular.
 - **Visualización Limpia**: Optimización del panel lateral derecho, que se reduce a los controles de profundidad del grafo y simbología, delegando las métricas al modal inmersivo a pantalla completa.
 
