@@ -789,6 +789,70 @@
 <!-- GRAPH -->
 <div id="graph-container" style="position:absolute;inset:0;z-index:1;"></div>
 
+<!-- ===== TIME MACHINE GLASSMORPHISM MODAL ===== -->
+<div class="time-modal-overlay" id="time-machine-modal">
+    <div class="time-modal-content">
+        <!-- Close Button -->
+        <button id="btn-close-time-machine" title="Cerrar Máquina del Tiempo" onclick="closeTimeMachine()">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+
+        <!-- Left Controls Column -->
+        <aside class="time-controls">
+            <h2>Máquina del Tiempo</h2>
+            <p style="font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 10px 0;">
+                Viaja por las constelaciones de éxitos históricos para descubrir cómo evolucionaron los géneros.
+            </p>
+
+            <!-- Continent Selector -->
+            <div class="control-group">
+                <label for="time-select-continent">Continente</label>
+                <select id="time-select-continent">
+                    <option value="" disabled selected>Selecciona Continente</option>
+                    <option value="Europa">Europa</option>
+                    <option value="América">América</option>
+                </select>
+            </div>
+
+            <!-- Country Selector -->
+            <div class="control-group">
+                <label for="time-select-country">País</label>
+                <select id="time-select-country" disabled>
+                    <option value="" disabled selected>Elige un continente primero</option>
+                </select>
+            </div>
+
+            <!-- Decade Selector -->
+            <div class="control-group">
+                <label for="time-select-decade">Década</label>
+                <select id="time-select-decade">
+                    <option value="2020s" selected>Década 2020s</option>
+                    <option value="1980s">Década 1980s</option>
+                    <option value="1940s">Década 1940s</option>
+                    <option value="1990s">Década 1990s (Sin datos)</option>
+                    <option value="1970s">Década 1970s (Sin datos)</option>
+                </select>
+            </div>
+        </aside>
+
+        <!-- Right Results Column -->
+        <section class="time-results">
+            <div class="time-results-header">
+                <h3 id="time-results-title">Top Hits Históricos</h3>
+                <span class="results-count" id="time-results-count">0 items</span>
+            </div>
+            
+            <div class="time-cards-container">
+                <div class="time-cards-grid" id="time-cards-grid">
+                    <!-- Cards populated via JS -->
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
 <script>
 // ============================================================
 // THEME
