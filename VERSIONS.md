@@ -15,6 +15,7 @@
   - Los **60+ géneros musicales y biografías completas** renderizados en el grafo D3 ForceGraph (inyectando propiedades `labelEn` y `bioEn` dinámicamente y regenerando el grafo).
   - Mapeo y formateo lingüístico adaptativo en las sugerencias del buscador predictivo.
 - ✅ **Badge de Versión Actualizado**: Distintivo visual actualizado a `v13.4` en la barra superior de la aplicación.
+- ✅ **Optimización de UX en "Lo Más Nuevo"**: Se duplicó el espacio y se aumentó la legibilidad de las tarjetas de canciones en el panel derecho alineándolo simétricamente a 300px (igualando al panel izquierdo). Se incrementaron las dimensiones de las carátulas, espaciados y tamaños de fuentes, y se añadieron tooltips informativos con el título completo al posicionar el cursor sobre cada elemento.
 
 **Archivos**:
 - `Sonic_nodes_V13_3.html` (versión principal y completa de producción v13.4)

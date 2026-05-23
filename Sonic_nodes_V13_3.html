@@ -325,7 +325,7 @@
         /* ===== RIGHT PANEL ===== */
         #right-panel {
             position: absolute; right: 12px; top: 60px; bottom: 12px;
-            width: 272px; z-index: 20; border-radius: 16px;
+            width: 300px; z-index: 20; border-radius: 16px;
             display: flex; flex-direction: column; padding: 14px;
             gap: 10px;
         }
@@ -1057,18 +1057,18 @@
         #actual-songs-container {
             flex: 1;
             overflow-y: auto;
-            max-height: 240px;
+            max-height: 330px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
             padding-right: 2px;
         }
         .actual-song-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 6px;
-            border-radius: 8px;
+            gap: 10px;
+            padding: 8px;
+            border-radius: 10px;
             background: var(--artist-card-bg);
             border: 1px solid var(--border);
             cursor: pointer;
@@ -1088,9 +1088,9 @@
         }
         .actual-song-art-container {
             position: relative;
-            width: 36px;
-            height: 36px;
-            border-radius: 6px;
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
             overflow: hidden;
             flex-shrink: 0;
         }
@@ -1123,7 +1123,7 @@
             min-width: 0;
         }
         .actual-song-name {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--text);
             white-space: nowrap;
@@ -1131,12 +1131,12 @@
             text-overflow: ellipsis;
         }
         .actual-song-artist {
-            font-size: 9px;
+            font-size: 10px;
             color: var(--text2);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            margin-top: 1px;
+            margin-top: 2px;
         }
         .actual-spinner {
             display: none;
@@ -2536,6 +2536,7 @@ function renderActualSongsList(songs) {
         const div = document.createElement('div');
         div.className = 'actual-song-item';
         div.setAttribute('data-preview-url', song.previewUrl || '');
+        div.title = `${song.trackName} - ${song.artistName}`;
         
         const isCurrent = audioEl.src === song.previewUrl && isPlaying;
         if (isCurrent) {
