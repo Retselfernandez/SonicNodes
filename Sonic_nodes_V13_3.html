@@ -1594,6 +1594,7 @@ const GENRES = {
     latinrap:      { label:'Latin Trap Rap', color:'#f59e0b', bio:'Trap latino moderno. Almighty, Yng Lvcas, C.R.O.', tags:['latino','trap','moderno'], itunesQuery:'latin trap music', spotifySearch:'latin trap' },
     afrobeats:     { label:'Afrobeats Modern', color:'#f59e0b', bio:'Afrobeats contemporáneo. Wizkid, Burna Boy, CKay.', tags:['Lagos','Ghana','contemporary'], itunesQuery:'wizkid essence', spotifySearch:'afrobeats' },
     dark_gothic:   { label:'Oscuro & Gótico',  color:'#ef4444', bio:'Corrientes musicales sombrías y experimentales. Del post-punk y rock gótico al noise rock más abrasivo y ruidoso.', tags:['oscuro','noise','gótico','post-punk'], itunesQuery:'bauhaus bela lugosi dead', spotifySearch:'gothic rock' },
+    kpop:          { label:'K-Pop',         color:'#06b6d4', bio:'Korean Pop. Fenómeno global nacido en Corea del Sur que fusiona pop, hip hop, electrónica y R&B con coreografías ultramodernas y producciones de altísimo nivel.', tags:['Corea','global','pop','dance','crossover'], itunesQuery:'kpop hits', spotifySearch:'kpop' },
 };
 
 // Artistas curados por subgénero para expansión en grafo
@@ -1644,6 +1645,7 @@ const GENRE_ARTISTS = {
     disco:         [{id:'bee_gees',name:'Bee Gees',q:'bee gees stayin alive'},{id:'donna_s',name:'Donna Summer',q:'donna summer i feel love'},{id:'gloria_g',name:'Gloria Gaynor',q:'gloria gaynor i will survive'},{id:'kc_sunshine',name:'KC and the Sunshine Band',q:'kc sunshine band get down tonight'},{id:'chic',name:'Chic',q:'chic good times disco'}],
     breakcore:     [{id:'venetian_s',name:'Venetian Snares',q:'venetian snares php 0815'},{id:'kid606',name:'Kid 606',q:'kid606 breakcore'},{id:'autechre',name:'Autechre',q:'autechre breakcore'},{id:'mu_ziq',name:'Mu-Ziq',q:'mu-ziq breakcore'},{id:'ceephax',name:'Ceephax Acid Crew',q:'ceephax acid breakcore'}],
     afrobeats:     [{id:'burna_boy',name:'Burna Boy',q:'burna boy ye afrobeats'},{id:'wizkid',name:'Wizkid',q:'wizkid essence'},{id:'davido',name:'Davido',q:'davido fall afrobeats'},{id:'tiwa_savage',name:'Tiwa Savage',q:'tiwa savage all over'},{id:'ckay',name:'CKay',q:'ckay love nwantiti'}],
+    kpop:          [{id:'bts',name:'BTS',q:'bts dynamite'},{id:'blackpink',name:'BLACKPINK',q:'blackpink how you like that'},{id:'newjeans',name:'NewJeans',q:'newjeans hype boy'},{id:'twice',name:'TWICE',q:'twice fancy'},{id:'psy',name:'PSY',q:'psy gangnam style'}],
 };
 
 // ============================================================
@@ -1677,7 +1679,7 @@ const macroGenres = [
     { id:'indie_alt',      children:['art_rock','post_punk','indie_pop','dark_wave'] },
     { id:'blues_roots',    children:['blues','delta_blues','chicago_blues'] },
     { id:'country_folk',   children:['country','folk','singer_songwriter','folk_punk'] },
-    { id:'world_fusion',   children:['world_music','fusion','ethno_jazz'] },
+    { id:'world_fusion',   children:['world_music','fusion','ethno_jazz','kpop'] },
     { id:'dark_gothic',    children:['noise_rock'] },
 ];
 
@@ -1693,6 +1695,7 @@ function buildGraphData(depth) {
         {s:'dubstep',    t:'drum_bass',  l: 'UK Bass Heritage'},
         {s:'soul',       t:'funk',       l: 'Soul-Funk Groove'},
         {s:'reggae',     t:'lofi',       l: 'Reggae Vibes'},
+        {s:'kpop',       t:'trap',       l: currentLanguage === 'en' ? 'Trap Beats in K-Pop' : 'Bases Trap en K-Pop'},
     ];
 
     macroGenres.forEach(m => {
@@ -2309,7 +2312,8 @@ const GENRES_EN_EXTRA = {
     darkrap: { labelEn: 'Dark Rap', bioEn: 'Dark hip hop. Earl Sweatshirt, Navy Blue, MF DOOM.' },
     latinrap: { labelEn: 'Latin Trap Rap', bioEn: 'Modern Latin trap. Almighty, Yng Lvcas, C.R.O.' },
     afrobeats: { labelEn: 'Modern Afrobeats', bioEn: 'Contemporary Afrobeats. Wizkid, Burna Boy, CKay.' },
-    dark_gothic: { labelEn: 'Dark & Gothic', bioEn: 'Dark and experimental music styles. From post-punk and gothic rock to abrasive noise rock.' }
+    dark_gothic: { labelEn: 'Dark & Gothic', bioEn: 'Dark and experimental music styles. From post-punk and gothic rock to abrasive noise rock.' },
+    kpop: { labelEn: 'K-Pop', bioEn: 'Korean Pop. A global phenomenon born in South Korea that fuses pop, hip hop, electronica, and R&B with ultra-modern choreography and top-tier production values.' }
 };
 
 const TRANSLATIONS = {
