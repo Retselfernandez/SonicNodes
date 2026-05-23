@@ -15,8 +15,8 @@
   - Los **60+ géneros musicales y biografías completas** renderizados en el grafo D3 ForceGraph (inyectando propiedades `labelEn` y `bioEn` dinámicamente y regenerando el grafo).
   - Mapeo y formateo lingüístico adaptativo en las sugerencias del buscador predictivo.
 - ✅ **Badge de Versión Actualizado**: Distintivo visual actualizado a `v13.4` en la barra superior de la aplicación.
-- ✅ **Optimización de UX en "Lo Más Nuevo"**: Se duplicó el espacio y se aumentó la legibilidad de las tarjetas de canciones en el panel derecho alineándolo simétricamente a 300px (igualando al panel izquierdo). Se incrementaron las dimensiones de las carátulas a `44px`, el espaciado interior a `10px 12px` (con espaciados y tamaños de fuentes optimizados).
-- ✅ **Ajuste de Lectura y Envoltura Multilínea**: Se inyectó soporte de envoltura multilínea con truncamiento en la segunda línea (`-webkit-line-clamp: 2` y `white-space: normal`) para títulos de canciones largos, evitando cortes incómodos y permitiendo leer el título entero, complementado por tooltips informativos con el título completo al posicionar el cursor sobre cada elemento.
+- ✅ **Optimización de UX en "Lo Más Nuevo"**: Se duplicó el espacio y se aumentó la legibilidad de las tarjetas de canciones en el panel derecho alineándolo simétricamente a 300px (igualando al panel izquierdo). Se incrementaron las dimensiones de las carátulas a **`48px`**, el espaciado interior a **`12px 14px`** y la altura máxima a **`420px`** (con espaciados y tamaños de fuentes optimizados).
+- ✅ **Ajuste de Lectura y Envoltura Multilínea**: Se inyectó soporte de envoltura multilínea con truncamiento en la segunda línea (`-webkit-line-clamp: 2` y `white-space: normal`) para títulos de canciones largos, y se aplicó **`flex-shrink: 0`** para asegurar que el navegador jamás aplaste verticalmente las tarjetas de canciones, complementado por tooltips informativos con el título completo al posicionar el cursor sobre cada elemento.
 
 **Archivos**:
 - `Sonic_nodes_V13_3.html` (versión principal y completa de producción v13.4)
