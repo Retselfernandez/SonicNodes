@@ -1,6 +1,6 @@
 # 🎵 SonicNodes — Visualización Interactiva del Universo Musical
 
-![Version](https://img.shields.io/badge/version-13.3-blue.svg)
+![Version](https://img.shields.io/badge/version-13.4-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Status](https://img.shields.io/badge/status-active-brightgreen.svg)
 
@@ -272,7 +272,7 @@ Para agregar nuevos géneros, editar:
 - **Auto-expand**: No implementado
 - **Estado**: Versión estable con limitaciones
 
-### v13.4 (Sonic_nodes_V13_3.html / Sonic_nodes_V13.html - ACTUAL) ⭐
+### v13.4 (Sonic_nodes_V13_4.html / Sonic_nodes_V13.html - ACTUAL) ⭐
 - **Géneros**: 21 macro-géneros + 70+ subgéneros + 60+ subgéneros localizados.
 - **Nodos**: 240+ nodos en grafo interactivo, más base de datos dimensional OLAP.
 - **Features Nuevas**:
@@ -281,6 +281,7 @@ Para agregar nuevos géneros, editar:
   - ✅ **Tendencias "Lo Más Nuevo"**: Lista interactiva de 10 canciones del feed de iTunes con selector de país.
   - ✅ **Traducción Bilingüe en Vivo (ES / EN)**: Localización en tiempo real sin recarga de página para interfaz, buscador y ForceGraph.
   - ✅ **Sincronización Total de Reproductor**: Estado play/pause persistente y sincronizado bidireccionalmente.
+  - ✅ **Artistas Similares (V13_4)**: Nueva sección en "Lo Más Nuevo" que muestra artistas similares al artista trending, consultados vía iTunes API al reproducir un tema.
 - **Estado**: Producción premium lista para producción.
 
 ### v4.5 (Sonic_nodes_V4.html - Anterior)
@@ -307,6 +308,7 @@ Para agregar nuevos géneros, editar:
 | Auto-expand | ✗ | ✗ | ✗ | ✓ | ✓ |
 | Light Mode | ✗ | ✓ | ✓ | ✓ (mejorado) | ✓ (Premium) |
 | APIs Externas | 0 | 1 | 2 | 2 | 3 (iTunes, Spotify, RSS) |
+| Similar Artists | ✗ | ✗ | ✗ | ✗ | ✓ |
 
 ---
 
@@ -506,8 +508,8 @@ MIT License - Libre para uso, modificación y distribución
 
 ---
 
-**Última actualización**: Mayo 2026  
-**Versión actual**: 4.5  
+**Última actualización**: Mayo 2026
+**Versión actual**: 13.4  
 **Mantenedor**: Lester Fernandez [@Retselfernandez](https://github.com/Retselfernandez)
 
 ---

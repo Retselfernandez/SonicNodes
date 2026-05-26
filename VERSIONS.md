@@ -3,7 +3,7 @@
 ## Releases
 
 ### v13.4 (Mayo 2026) - ACTUAL ⭐
-**Título**: "Real-Time Trends & Live Bilingual Translation"
+**Título**: "Real-Time Trends, Live Bilingual Translation & Similar Artists"
 
 **Cambios Principales**:
 - ✅ **Sección "Lo Más Nuevo" (Actual)**: Se inyectó una sección dinámica e interactiva en el panel lateral derecho que consume el Feed RSS en tiempo real de iTunes/Apple Music para listar las 10 canciones más populares.
@@ -18,10 +18,12 @@
 - ✅ **Optimización de UX en "Lo Más Nuevo"**: Se duplicó el espacio y se aumentó la legibilidad de las tarjetas de canciones en el panel derecho alineándolo simétricamente a 300px (igualando al panel izquierdo). Se incrementaron las dimensiones de las carátulas a **`48px`**, el espaciado interior a **`12px 14px`** y la altura máxima a **`420px`** (con espaciados y tamaños de fuentes optimizados).
 - ✅ **Ajuste de Lectura y Envoltura Multilínea**: Se inyectó soporte de envoltura multilínea con truncamiento en la segunda línea (`-webkit-line-clamp: 2` y `white-space: normal`) para títulos de canciones largos, y se aplicó **`flex-shrink: 0`** para asegurar que el navegador jamás aplaste verticalmente las tarjetas de canciones, complementado por tooltips informativos con el título completo al posicionar el cursor sobre cada elemento.
 - ✅ **Integración de Subgénero K-Pop**: Inyección de la categoría global **K-Pop** bajo el macro-género **World & Fusion** en la base de datos y en el D3 ForceGraph. Se definieron sus descripciones bilingües y se curaron los 5 artistas pilares más influyentes del género (**BTS, BLACKPINK, NewJeans, TWICE, PSY**) con sus respectivas pistas y previews de iTunes. Además, se tejió un puente transversal (*transversal bridge*) directo entre **K-Pop** y **Trap** en el grafo interactivo para representar visualmente la fuerte influencia rítmica mutua.
+- ✅ **Artistas Similares (V13_4)**: Nueva sección en "Lo Más Nuevo" que muestra artistas similares al artista trending seleccionado. Se activa automáticamente al reproducir un artista del feed trending, consultando la iTunes API para obtener artistas similares. Incluye tarjetas con portada, nombre y botón de reproducción integrado. Traducción bilingüe "Artistas Similares" / "Similar Artists".
 
 **Archivos**:
 - `Sonic_nodes_V13_3.html` (versión principal y completa de producción v13.4)
 - `Sonic_nodes_V13.html` (versión principal y completa de producción v13.4)
+- `Sonic_nodes_V13_4.html` (versión V13_4 con Artistas Similares)
 
 ---
 
@@ -203,20 +205,20 @@
 
 ## 📊 Comparativa de Evolución
 
-| Aspecto | v1.0 | v2.0 | v4.0 | v4.5 | v13.0 | v13.1 | v13.2 | v13.3 |
-|---------|------|------|------|------|-------|-------|-------|-------|
-| **Macro-Géneros** | 5 | 8 | 5 | 21 | 21 | 21 | 21 | 21 |
-| **Total Nodos** | ~20 | ~40 | 25 | 90+ | 90+ | 90+ | 90+ (dinámicos) | 90+ (dinámicos) |
-| **Profundidades** | 1 | 1 | 2 | 3 | 3 | 3 | 3 | 3 |
-| **Búsqueda** | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Universal Predictiva ⭐ |
-| **iTunes API** | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ (Búsqueda + Discografía) | ✓ (Autoplay + Discografía) | ✓ (Autoplay + Discografía) |
-| **Spotify API** | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| **Temas** | ✗ | Básico | Avanzado | Avanzado + | Premium Glassmorphism | Premium Glassmorphism | Premium Glassmorphism | Premium Glassmorphism |
-| **Métricas** | ✗ | ✗ | ✓ | ✓ | Máquina del Tiempo Fullscreen | M. Tiempo + Discografía en vivo | Deep-Link + Discografía en vivo | Deep-Link + Discografía en vivo |
-| **Auto-expand** | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| **Bridges** | ✗ | ✗ | Limitados | Completos | Completos | Completos | Completos | Completos |
-| **Light Mode** | ✗ | ✓ (tenue) | ✓ (tenue) | ✓ (mejorado) | ✓ (espectacular con blur) | ✓ (espectacular con blur) | ✓ (espectacular con blur) | ✓ (espectacular con blur) |
-| **Líneas Código** | ~800 | ~1200 | ~2000 | ~2400 | ~2900 | ~3400 | ~3500 | ~3700 |
+| Aspecto | v1.0 | v2.0 | v4.0 | v4.5 | v13.0 | v13.1 | v13.2 | v13.3 | v13.4 |
+|---------|------|------|------|------|-------|-------|-------|-------|-------|
+| **Macro-Géneros** | 5 | 8 | 5 | 21 | 21 | 21 | 21 | 21 | 21 |
+| **Total Nodos** | ~20 | ~40 | 25 | 90+ | 90+ | 90+ | 90+ (dinámicos) | 90+ (dinámicos) | 90+ (dinámicos) |
+| **Profundidades** | 1 | 1 | 2 | 3 | 3 | 3 | 3 | 3 | 3 |
+| **Búsqueda** | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Universal Predictiva ⭐ | Universal Predictiva ⭐ |
+| **iTunes API** | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ (Búsqueda + Discografía) | ✓ (Autoplay + Discografía) | ✓ (Autoplay + Discografía) | ✓ (Autoplay + Discografía + Similar Artists) |
+| **Spotify API** | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| **Temas** | ✗ | Básico | Avanzado | Avanzado + | Premium Glassmorphism | Premium Glassmorphism | Premium Glassmorphism | Premium Glassmorphism | Premium Glassmorphism |
+| **Métricas** | ✗ | ✗ | ✓ | ✓ | Máquina del Tiempo Fullscreen | M. Tiempo + Discografía en vivo | Deep-Link + Discografía en vivo | Deep-Link + Discografía en vivo | Deep-Link + Discografía en vivo |
+| **Auto-expand** | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| **Bridges** | ✗ | ✗ | Limitados | Completos | Completos | Completos | Completos | Completos | Completos |
+| **Light Mode** | ✗ | ✓ (tenue) | ✓ (tenue) | ✓ (mejorado) | ✓ (espectacular con blur) | ✓ (espectacular con blur) | ✓ (espectacular con blur) | ✓ (espectacular con blur) | ✓ (espectacular con blur) |
+| **Líneas Código** | ~800 | ~1200 | ~2000 | ~2400 | ~2900 | ~3400 | ~3500 | ~3700 | ~3800 |
 
 ---
 

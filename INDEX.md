@@ -13,7 +13,7 @@ SonicNodes/
 ├── Logo.html                  ← Logo (auxiliar)
 ├── grafos_isomorfos.html      ← v1.0 (Prototipo)
 ├── sonic_nodes_v2.html        ← v2.0 (MVP)
-└── Sonic_nodes_V4.html        ← v4.5 (ACTUAL - ABRIR ESTA)
+└── Sonic_nodes_V13_4.html     ← v13.4 (ACTUAL - ABRIR ESTA)
 ```
 
 ---
@@ -23,18 +23,18 @@ SonicNodes/
 ### 1️⃣ Ver la Aplicación
 ```bash
 # Opción A: Abrir directamente
-open Sonic_nodes_V4.html
+open Sonic_nodes_V13_4.html
 
 # Opción B: Con servidor local
 python -m http.server 8000
-# Luego abre: http://localhost:8000/Sonic_nodes_V4.html
+# Luego abre: http://localhost:8000/Sonic_nodes_V13_4.html
 ```
 
 ### 2️⃣ Leer la Documentación
 | Archivo | Propósito |
 |---------|-----------|
 | **README.md** | Qué es, cómo se usa, características |
-| **VERSIONS.md** | Evolución del proyecto v1.0 → v4.5 |
+| **VERSIONS.md** | Evolución del proyecto v1.0 → v13.4 |
 | **API_REFERENCE.md** | Funciones, objetos, configuración |
 | **CONTRIBUTING.md** | Cómo reportar bugs, sugerir géneros |
 
@@ -72,12 +72,13 @@ python -m http.server 8000
 ### En esta Carpeta
 
 #### Aplicación Principal
-- **Sonic_nodes_V4.html** ⭐ (v4.5 - ACTUAL)
+- **Sonic_nodes_V13_4.html** ⭐ (v13.4 - ACTUAL)
   - 21 macro-géneros
   - 90+ subgéneros
   - Auto-expand funcional
   - Light/Dark mode optimizado
   - APIs iTunes + Spotify
+  - Artistas Similares (V13_4)
 
 #### Versiones Anteriores (Referencia)
 - **grafos_isomorfos.html** (v1.0)
@@ -116,7 +117,7 @@ README.md
 
 ### Usar la Aplicación
 ```
-Sonic_nodes_V4.html → Abre en navegador
+Sonic_nodes_V13_4.html → Abre en navegador
 ├─ Vista Macro: 21 géneros principales
 ├─ Vista Sub: 90+ subgéneros
 ├─ Vista Artista: Artistas relacionados
@@ -173,7 +174,7 @@ Jazz → Jazz, Bebop, Jazz Fusion, Soul, Funk
 ### Quiero...
 
 #### ▶️ Usar la aplicación
-→ Abre [Sonic_nodes_V4.html](Sonic_nodes_V4.html)
+→ Abre [Sonic_nodes_V13_4.html](Sonic_nodes_V13_4.html)
 
 #### 📖 Entender qué es SonicNodes
 → Lee [README.md](README.md)
@@ -185,7 +186,7 @@ Jazz → Jazz, Bebop, Jazz Fusion, Soul, Funk
 → Ve a [CONTRIBUTING.md - Reportar Bugs](CONTRIBUTING.md#-reportar-bugs)
 
 #### 💻 Ver el código
-→ Abre `Sonic_nodes_V4.html` en editor
+→ Abre `Sonic_nodes_V13_4.html` en editor
 → Busca función específica en [API_REFERENCE.md](API_REFERENCE.md)
 
 #### 📊 Ver evolución del proyecto
@@ -231,7 +232,7 @@ MIT License - Libre para uso, modificación y distribución
 Antes de empezar a trabajar:
 
 - [ ] Clonaste el repositorio
-- [ ] Abriste `Sonic_nodes_V4.html` en navegador
+- [ ] Abriste `Sonic_nodes_V13_4.html` en navegador
 - [ ] Leíste el README.md
 - [ ] Entiendes la estructura en API_REFERENCE.md
 - [ ] Instalaste Git (si vas a contribuir)
@@ -271,13 +272,14 @@ Antes de empezar a trabajar:
 
 ---
 
-## 🏆 Mejoras en v4.5
+## 🏆 Mejoras en v13.4
 
 ✅ 4x más géneros (5 → 21 macro)
 ✅ 3.5x más nodos (25 → 90+)
 ✅ Auto-expand implementado
 ✅ Líneas visibles en light mode
 ✅ Documentación completa
+✅ Artistas Similares vía iTunes API (V13_4)
 
 ---
 
@@ -287,5 +289,5 @@ Antes de empezar a trabajar:
 ---
 
 **Última actualización**: Mayo 2026  
-**Versión**: 4.5  
+**Versión**: 13.4  
 **Estado**: ✅ Producción
