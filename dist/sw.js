@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sonic-nodes-v2';
+const CACHE_NAME = 'sonic-nodes-v5';
 const ASSETS = [
     '/',
     '/manifest.json',
