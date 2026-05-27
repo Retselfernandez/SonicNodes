@@ -1,8 +1,8 @@
-const CACHE_NAME = 'sonic-nodes-v1';
+const CACHE_NAME = 'sonic-nodes-v2';
 const ASSETS = [
     '/',
     '/manifest.json',
-    '/Sonic_nodes_V13_4.html',
+    '/index.html',
 ];
 
 // Install: cache core assets

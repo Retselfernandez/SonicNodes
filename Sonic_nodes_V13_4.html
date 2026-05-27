@@ -196,6 +196,56 @@
         .about-contact-row a { color: var(--accent); text-decoration: none; }
         .about-contact-row a:hover { text-decoration: underline; }
 
+        /* ===== MAIN MENU ===== */
+        .main-menu-list { display: flex; flex-direction: column; gap: 12px; }
+        .main-menu-item {
+            display: flex; align-items: center; gap: 16px;
+            width: 100%; padding: 16px 20px;
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 12px; cursor: pointer;
+            transition: all 0.2s; text-align: left;
+        }
+        .main-menu-item:hover {
+            background: rgba(124,59,237,0.15); border-color: var(--accent);
+        }
+        .main-menu-item svg { width: 28px; height: 28px; flex-shrink: 0; }
+        .main-menu-item strong {
+            display: block; font-size: 15px; color: var(--text);
+            font-family: 'DM Mono', monospace;
+        }
+        .main-menu-item em {
+            display: block; font-size: 11px; color: var(--muted);
+            font-style: normal; margin-top: 2px;
+        }
+
+        /* ===== ABOUT SUB-PANEL ===== */
+        .about-sub-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 90%; max-width: 640px;
+            max-height: 80vh; overflow-y: auto;
+            padding: 0;
+            animation: slideUp 0.25s ease;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+        }
+        .about-sub-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px; border-bottom: 1px solid var(--border);
+        }
+        .about-sub-header h2 {
+            font-size: 16px; font-weight: 700; margin: 0;
+            flex: 1; text-align: center;
+        }
+        .about-back-btn {
+            width: 30px; height: 30px; border-radius: 8px;
+            background: var(--surface2); border: 1px solid var(--border);
+            color: var(--text); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; font-size: 18px; margin-right: 8px;
+        }
+        .about-back-btn:hover { background: var(--accent); border-color: var(--accent); color: white; }
+
         .logo-mark {
             width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
             background: linear-gradient(135deg, var(--accent), var(--accent2));
@@ -1382,32 +1432,79 @@
             padding: 8px;
         }
 
-        /* ===== GENRE EVOLUTION TIMELINE ===== */
+        /* ===== GENRE EVOLUTION TIMELINE (FULLSCREEN) ===== */
         #timeline-bar {
-            position:fixed;bottom:0;left:0;right:0;z-index:100;
-            background:var(--panel-bg);border-top:1px solid var(--border);
-            transition:transform 0.35s cubic-bezier(.4,0,.2,1);
-            will-change:transform;
+            position:fixed;inset:0;z-index:9999;
+            background:var(--panel-bg);
+            display:none;flex-direction:column;
+            overflow:hidden;
         }
-        #timeline-bar.collapsed { transform:translateY(calc(100% - 32px)); }
-        #timeline-toggle {
-            width:100%;height:32px;background:transparent;border:none;cursor:pointer;
-            display:flex;align-items:center;justify-content:center;gap:8px;
-            color:var(--text2);font-size:11px;font-family:'DM Mono',monospace;
-            letter-spacing:0.05em;text-transform:uppercase;
+        #timeline-bar.active { display:flex; }
+        #timeline-header {
+            display:flex;align-items:center;justify-content:space-between;
+            padding:16px 24px;border-bottom:1px solid var(--border);flex-shrink:0;
         }
-        #timeline-toggle:hover { color:var(--text); }
-        #timeline-toggle svg { transition:transform 0.3s; }
-        #timeline-bar.collapsed #timeline-toggle svg { transform:rotate(180deg); }
+        #timeline-header h2 {
+            font-size:16px;font-weight:700;margin:0;
+            display:flex;align-items:center;gap:8px;
+            font-family:'DM Mono',monospace;
+        }
+        #timeline-close {
+            width:32px;height:32px;border-radius:8px;
+            background:var(--surface2);border:1px solid var(--border);
+            color:var(--text);cursor:pointer;
+            display:flex;align-items:center;justify-content:center;
+            transition:all 0.2s;font-size:18px;
+        }
+        #timeline-close:hover { background:#ef4444;border-color:#ef4444;color:white; }
         #timeline-body {
-            padding:8px 16px 12px;max-height:180px;overflow-x:auto;overflow-y:hidden;
+            flex:1;overflow-x:auto;overflow-y:auto;
+            padding:20px 24px 30px;
         }
-        #timeline-body::-webkit-scrollbar { height:4px; }
+        #timeline-body::-webkit-scrollbar { width:6px;height:6px; }
         #timeline-body::-webkit-scrollbar-track { background:transparent; }
-        #timeline-body::-webkit-scrollbar-thumb { background:var(--border);border-radius:2px; }
+        #timeline-body::-webkit-scrollbar-thumb { background:var(--border);border-radius:3px; }
         #timeline-track {
-            position:relative;height:120px;min-width:1100px;
-            display:flex;align-items:flex-end;padding-bottom:20px;
+            position:relative;min-height:400px;min-width:1100px;
+            margin-top:20px;
+        }
+        .timeline-decade-line {
+            position:absolute;top:0;bottom:0;width:1px;
+            background:var(--border);pointer-events:none;
+        }
+        .timeline-decade-label {
+            position:absolute;top:-2px;transform:translateX(-50%);
+            font-size:11px;font-family:'DM Mono',monospace;
+            color:var(--muted);cursor:pointer;white-space:nowrap;
+            padding:4px 8px;border-radius:4px;transition:all 0.2s;
+        }
+        .timeline-decade-label:hover { color:var(--text); background:var(--surface2); }
+        .timeline-decade-label.active { color:var(--accent); }
+        .genre-dot {
+            position:absolute;width:14px;height:14px;border-radius:50%;
+            cursor:pointer;transition:all 0.2s;transform:translate(-50%,-50%);
+            border:2px solid rgba(255,255,255,0.2);z-index:2;
+        }
+        .genre-dot:hover { transform:translate(-50%,-50%) scale(1.8); z-index:10; }
+        .genre-dot.dimmed { opacity:0.1; }
+        .genre-dot.highlighted { border-color:rgba(255,255,255,0.6); box-shadow:0 0 10px currentColor; }
+        .genre-dot .dot-tooltip {
+            display:none;position:absolute;bottom:calc(100% + 8px);left:50%;
+            transform:translateX(-50%);background:var(--panel-bg);
+            border:1px solid var(--border);border-radius:6px;padding:5px 10px;
+            font-size:11px;white-space:nowrap;color:var(--text);z-index:20;
+            pointer-events:none;font-family:'DM Mono',monospace;
+        }
+        .genre-dot:hover .dot-tooltip { display:block; }
+        .timeline-year-line {
+            position:absolute;top:0;bottom:0;width:2px;
+            background:var(--accent);opacity:0.4;border-radius:1px;
+            pointer-events:none;z-index:5;
+        }
+        .timeline-year-label {
+            position:absolute;top:-22px;left:50%;transform:translateX(-50%);
+            font-size:10px;color:var(--accent);font-family:'DM Mono',monospace;
+            white-space:nowrap;opacity:0.8;
         }
         .timeline-decade {
             position:absolute;bottom:0;text-align:center;cursor:pointer;
@@ -1451,16 +1548,16 @@
             white-space:nowrap;opacity:0.7;
         }
         .timeline-controls {
-            display:flex;gap:6px;margin-bottom:8px;align-items:center;
+            display:flex;gap:6px;margin-bottom:16px;align-items:center;flex-wrap:wrap;
         }
         .timeline-controls button {
-            background:var(--bg);border:1px solid var(--border);color:var(--text2);
-            font-size:10px;font-family:'DM Mono',monospace;padding:3px 8px;
-            border-radius:3px;cursor:pointer;transition:all 0.2s;
+            background:var(--surface2);border:1px solid var(--border);color:var(--text2);
+            font-size:11px;font-family:'DM Mono',monospace;padding:5px 12px;
+            border-radius:6px;cursor:pointer;transition:all 0.2s;
         }
         .timeline-controls button:hover { border-color:var(--accent);color:var(--text); }
-        .timeline-controls button.active { border-color:var(--accent);color:var(--accent); }
-        .timeline-controls span { font-size:9px;color:var(--muted);margin-left:auto; }
+        .timeline-controls button.active { border-color:var(--accent);color:var(--accent); background:rgba(124,59,237,0.1); }
+        .timeline-controls span { font-size:11px;color:var(--muted);margin-left:auto;font-family:'DM Mono',monospace; }
     </style>
 </head>
 <body>
@@ -1470,9 +1567,9 @@
 <!-- ===== TOPBAR ===== -->
 <header id="topbar" class="panel">
     <!-- Hamburger Menu Button -->
-    <button id="btn-hamburger" class="hamburger-btn" title="Acerca de / About" onclick="toggleAboutMenu()">
+    <button id="btn-hamburger" class="hamburger-btn" title="Menú" onclick="toggleMainMenu()">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
     </button>
 
@@ -1531,71 +1628,77 @@
 </header>
 
 <!-- ===== ABOUT US MODAL ===== -->
-<div class="about-overlay" id="about-overlay" onclick="if(event.target===this)closeAboutMenu()">
-    <div class="about-modal">
+<div class="about-overlay" id="about-overlay" onclick="if(event.target===this)closeMainMenu()">
+    <div class="about-modal" id="main-menu">
         <div class="about-modal-header">
             <h2>
-                <svg width="20" height="20" fill="none" stroke="var(--accent)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                About SonicNodes
+                <svg width="20" height="20" fill="none" stroke="var(--accent)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                SonicNodes
             </h2>
-            <button class="about-close-btn" onclick="closeAboutMenu()">&times;</button>
+            <button class="about-close-btn" onclick="closeMainMenu()">&times;</button>
         </div>
         <div class="about-modal-body">
-            <!-- Project Info -->
+            <div class="main-menu-list">
+                <button class="main-menu-item" onclick="openTimeMachineFromMenu(); closeMainMenu();">
+                    <svg width="22" height="22" fill="none" stroke="var(--accent)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>
+                        <strong data-i18n="tm-time-machine">Máquina del Tiempo</strong>
+                        <em data-i18n="tm-time-machine-sub">Explora los éxitos históricos por año</em>
+                    </span>
+                </button>
+                <button class="main-menu-item" onclick="openTimelineFullscreen(); closeMainMenu();">
+                    <svg width="22" height="22" fill="none" stroke="var(--accent)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>
+                        <strong data-i18n="tm-timeline">Evolución de Géneros</strong>
+                        <em data-i18n="tm-timeline-sub">Visualiza cuándo nació cada género musical</em>
+                    </span>
+                </button>
+                <button class="main-menu-item" onclick="openAboutMenu();">
+                    <svg width="22" height="22" fill="none" stroke="var(--accent)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>
+                        <strong data-i18n="about-us">About Us</strong>
+                        <em data-i18n="about-us-sub">Información del proyecto</em>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- About Us sub-panel (hidden initially) -->
+    <div class="about-sub-panel" id="about-sub-panel" style="display:none;">
+        <div class="about-sub-header">
+            <button class="about-back-btn" onclick="closeAboutSub()">&larr;</button>
+            <h2>About SonicNodes</h2>
+            <button class="about-close-btn" onclick="closeAboutSub(); closeMainMenu();">&times;</button>
+        </div>
+        <div class="about-modal-body">
             <div class="about-section">
                 <h3>Project</h3>
                 <p><strong>SonicNodes v13.4</strong> is an interactive web application that visualizes the relationships between musical genres as a dynamic isomorphic graph. It uses network physics (force-directed graph) to create visual constellations where each node represents a musical genre, and connections show influences and mutual relationships between genres.</p>
                 <p>The application allows you to explore the <strong>architecture of the modern musical universe</strong> with more than <strong>90 genres</strong> organized hierarchically and connected through cross-relations (bridges) that represent musical fusions.</p>
             </div>
-
-            <!-- Stats -->
             <div class="about-section">
                 <h3>By the Numbers</h3>
                 <div class="about-stats">
-                    <div class="about-stat">
-                        <div class="about-stat-value">21</div>
-                        <div class="about-stat-label">Macro Genres</div>
-                    </div>
-                    <div class="about-stat">
-                        <div class="about-stat-value">90+</div>
-                        <div class="about-stat-label">Sub-genres</div>
-                    </div>
-                    <div class="about-stat">
-                        <div class="about-stat-value">240+</div>
-                        <div class="about-stat-label">Total Nodes</div>
-                    </div>
+                    <div class="about-stat"><div class="about-stat-value">21</div><div class="about-stat-label">Macro Genres</div></div>
+                    <div class="about-stat"><div class="about-stat-value">90+</div><div class="about-stat-label">Sub-genres</div></div>
+                    <div class="about-stat"><div class="about-stat-value">240+</div><div class="about-stat-label">Total Nodes</div></div>
                 </div>
             </div>
-
-            <!-- Features -->
             <div class="about-section">
                 <h3>Key Features</h3>
                 <p>Three depth levels (Macro / Sub / Artist), real-time iTunes audio previews, predictive universal search, Time Machine for historical hits, mood & energy filtering, bilingual interface (ES/EN), light/dark themes, and Spotify integration.</p>
             </div>
-
-            <!-- Tech Stack -->
             <div class="about-section">
                 <h3>Tech Stack</h3>
                 <div class="about-tech-list">
-                    <span class="about-tech-tag">HTML5</span>
-                    <span class="about-tech-tag">CSS3</span>
-                    <span class="about-tech-tag">JavaScript ES6+</span>
-                    <span class="about-tech-tag">Force-Graph 1.43.5</span>
-                    <span class="about-tech-tag">D3.js v7</span>
-                    <span class="about-tech-tag">Canvas API</span>
-                    <span class="about-tech-tag">iTunes Search API</span>
-                    <span class="about-tech-tag">Spotify API</span>
+                    <span class="about-tech-tag">HTML5</span><span class="about-tech-tag">CSS3</span><span class="about-tech-tag">JavaScript ES6+</span><span class="about-tech-tag">Force-Graph 1.43.5</span><span class="about-tech-tag">D3.js v7</span><span class="about-tech-tag">Canvas API</span><span class="about-tech-tag">iTunes Search API</span><span class="about-tech-tag">Spotify API</span>
                 </div>
             </div>
-
-            <!-- Author -->
             <div class="about-section">
                 <h3>Author</h3>
                 <p><strong>Lester Fernandez Cedeño</strong></p>
                 <p>Master student at Universidad de Vigo. Open-source developer passionate about music, data visualization, and the mathematical relationships that connect artistic expressions.</p>
             </div>
-
-            <!-- Contact -->
             <div class="about-section">
                 <h3>Contact & Source</h3>
                 <div class="about-contact-row">
@@ -1607,8 +1710,6 @@
                     <span><a href="https://github.com/Retselfernandez/SonicNodes" target="_blank">github.com/Retselfernandez/SonicNodes</a></span>
                 </div>
             </div>
-
-            <!-- License -->
             <div class="about-section">
                 <h3>License</h3>
                 <p>MIT License — Free for use, modification and distribution.</p>
@@ -1772,12 +1873,15 @@
 <!-- GRAPH -->
 <div id="graph-container" style="position:absolute;inset:0;z-index:1;"></div>
 
-<!-- GENRE EVOLUTION TIMELINE -->
-<div id="timeline-bar" class="collapsed">
-    <button id="timeline-toggle" onclick="toggleTimeline()">
-        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
-        <span data-i18n="tm-timeline">Evolución de Géneros</span>
-    </button>
+<!-- GENRE EVOLUTION TIMELINE (FULLSCREEN) -->
+<div id="timeline-bar">
+    <div id="timeline-header">
+        <h2>
+            <svg width="16" height="16" fill="none" stroke="var(--accent)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span data-i18n="tm-timeline">Evolución de Géneros</span>
+        </h2>
+        <button id="timeline-close" onclick="closeTimelineFullscreen()">&times;</button>
+    </div>
     <div id="timeline-body">
         <div class="timeline-controls">
             <button id="tl-all" onclick="timelineFilter('all')">All</button>
@@ -2152,8 +2256,8 @@ const GENRES = {
 // GENRE EVOLUTION TIMELINE - decade when genre emerged
 // ============================================================
 const GENRE_DECADES = {
-    rock:1950s, electronica:1950s, hiphop:1970s, reggaeton:1990s, afrobeats_gen:2010s, latina:1960s, jazz:1900s, rock_alt_gen:1980s, metal_gen:1970s, ambient_gen:1970s, drum_bass_gen:1990s, funk_soul_gen:1960s, bossa_latino:1950s, flamenco_span:1970s, reggae_gen:1960s, jazz_avant:1940s, electronic_exp:1980s, indie_alt:1980s, blues_roots:1910s, country_folk:1920s, world_fusion:1970s,
-    rock_clasico:1960s, rock_alt:1980s, punk:1970s, metal:1970s, grunge:1980s, indie_rock:1980s, house:1980s, techno:1980s, drum_bass:1990s, ambient:1970s, synthwave:2000s, dubstep:1990s, rap_east:1980s, trap:2000s, lofi:2010s, salsa:1960s, cumbia:1970s, bossa_nova:1950s, flamenco:1970s, reggae:1960s, bebop:1940s, jazz_fusion:1970s, soul:1950s, funk:1960s, r_and_b:1940s, alternative:1980s, electronic_exp2:1980s, uk_bass:1990s, samba:1920s, rumba_espanola:1970s, cante_jondo:1970s, roots_reggae:1970s, dancehall:1980s, free_jazz:1960s, cool_jazz:1950s, trance:1980s, art_rock:1960s, post_punk:1970s, delta_blues:1920s, chicago_blues:1940s, blues:1910s, country:1920s, folk:1900s, singer_songwriter:1960s, world_music:1960s, fusion:1970s, ethno_jazz:1970s, psychedelic:1960s, stoner_rock:1990s, hard_rock:1960s, glam_rock:1970s, prog_metal:1970s, liquid_drum:1990s, vaporwave:2010s, witch_house:2010s, grime:2000s, west_coast:1980s, conscious_hip:1980s, emo_rap:2010s, pop_urbano:2010s, indie_pop:2000s, dark_wave:1980s, gothic_rock:1980s, nu_metal:1990s, metal_sinfon:1990s, doom_metal:1990s, djent:2000s, noise_rock:1980s, funk_moderno:2010s, disco:1970s, new_wave:1970s, shoegaze:1980s, slowcore:1990s, folk_punk:2000s, dark_folk:2010s, techno_industrial:1980s, breakcore:1990s, chillwave:2000s, future_bass:2010s, darkrap:2010s, latinrap:2010s, afrobeats:2010s, dark_gothic:1980s, kpop:1990s,
+    rock:'1950s', electronica:'1950s', hiphop:'1970s', reggaeton:'1990s', afrobeats_gen:'2010s', latina:'1960s', jazz:'1900s', rock_alt_gen:'1980s', metal_gen:'1970s', ambient_gen:'1970s', drum_bass_gen:'1990s', funk_soul_gen:'1960s', bossa_latino:'1950s', flamenco_span:'1970s', reggae_gen:'1960s', jazz_avant:'1940s', electronic_exp:'1980s', indie_alt:'1980s', blues_roots:'1910s', country_folk:'1920s', world_fusion:'1970s',
+    rock_clasico:'1960s', rock_alt:'1980s', punk:'1970s', metal:'1970s', grunge:'1980s', indie_rock:'1980s', house:'1980s', techno:'1980s', drum_bass:'1990s', ambient:'1970s', synthwave:'2000s', dubstep:'1990s', rap_east:'1980s', trap:'2000s', lofi:'2010s', salsa:'1960s', cumbia:'1970s', bossa_nova:'1950s', flamenco:'1970s', reggae:'1960s', bebop:'1940s', jazz_fusion:'1970s', soul:'1950s', funk:'1960s', r_and_b:'1940s', alternative:'1980s', electronic_exp2:'1980s', uk_bass:'1990s', samba:'1920s', rumba_espanola:'1970s', cante_jondo:'1970s', roots_reggae:'1970s', dancehall:'1980s', free_jazz:'1960s', cool_jazz:'1950s', trance:'1980s', art_rock:'1960s', post_punk:'1970s', delta_blues:'1920s', chicago_blues:'1940s', blues:'1910s', country:'1920s', folk:'1900s', singer_songwriter:'1960s', world_music:'1960s', fusion:'1970s', ethno_jazz:'1970s', psychedelic:'1960s', stoner_rock:'1990s', hard_rock:'1960s', glam_rock:'1970s', prog_metal:'1970s', liquid_drum:'1990s', vaporwave:'2010s', witch_house:'2010s', grime:'2000s', west_coast:'1980s', conscious_hip:'1980s', emo_rap:'2010s', pop_urbano:'2010s', indie_pop:'2000s', dark_wave:'1980s', gothic_rock:'1980s', nu_metal:'1990s', metal_sinfon:'1990s', doom_metal:'1990s', djent:'2000s', noise_rock:'1980s', funk_moderno:'2010s', disco:'1970s', new_wave:'1970s', shoegaze:'1980s', slowcore:'1990s', folk_punk:'2000s', dark_folk:'2010s', techno_industrial:'1980s', breakcore:'1990s', chillwave:'2000s', future_bass:'2010s', darkrap:'2010s', latinrap:'2010s', afrobeats:'2010s', dark_gothic:'1980s', kpop:'1990s',
 };
 
 // ============================================================
@@ -2343,7 +2447,7 @@ function initMoodFilters() {
 }
 
 const GENRE_ARTISTS = {
-    rock_clasico:  [{id:'led_zeppelin',name:'Led Zeppelin',q:'led zeppelin whole lotta love'},{id:'rolling_stones',name:'Rolling Stones',q:'rolling stones paint it black'},{id:'jimi_hendrix',name:'Jimi Hendrix',q:'jimi hendrix purple haze'},{id:'the_who',name:'The Who',q:'the who baba oriley'},{id:'deep_purple',name:'Deep Purple',q:'deep purple smoke on water'}],
+    rock_clasico:  [{id:'led_zeppelin',name:'Led Zeppelin',q:'led zeppelin whole lotta love'},{id:'rolling_stones',name:'Rolling Stones',q:'rolling stones paint it black'},{id:'jimi_hendrix',name:'Jimi Hendrix',q:'jimi hendrix purple haze'},{id:'the_who',name:'The Who',q:'the who baba oreilly'},{id:'deep_purple',name:'Deep Purple',q:'deep purple smoke on water'}],
     rock_alt:      [{id:'radiohead',name:'Radiohead',q:'radiohead creep'},{id:'nirvana_alt',name:'Nirvana',q:'nirvana come as you are'},{id:'rcp',name:'Red Hot Chili Peppers',q:'red hot chili peppers californication'},{id:'foo_fighters',name:'Foo Fighters',q:'foo fighters best of you'},{id:'oasis',name:'Oasis',q:'oasis wonderwall'}],
     punk:          [{id:'ramones',name:'Ramones',q:'ramones blitzkrieg bop'},{id:'sex_pistols',name:'Sex Pistols',q:'sex pistols anarchy uk'},{id:'the_clash',name:'The Clash',q:'the clash london calling'},{id:'dead_kennedys',name:'Dead Kennedys',q:'dead kennedys california uber alles'},{id:'bad_religion',name:'Bad Religion',q:'bad religion punk rock song'}],
     metal:         [{id:'metallica',name:'Metallica',q:'metallica enter sandman'},{id:'iron_maiden',name:'Iron Maiden',q:'iron maiden run to the hills'},{id:'sabbath',name:'Black Sabbath',q:'black sabbath paranoid'},{id:'slayer',name:'Slayer',q:'slayer raining blood'},{id:'megadeth',name:'Megadeth',q:'megadeth symphony destruction'}],
@@ -2763,86 +2867,92 @@ function buildTimeline() {
     const minDecade = decades[0] || 1900;
     const maxDecade = decades[decades.length - 1] || 2020;
     const totalSpan = (maxDecade - minDecade) || 1;
-    const trackWidth = Math.max(track.clientWidth, 1100);
+    const trackWidth = Math.max(track.clientWidth || 1100, 1100);
     track.style.minWidth = `${trackWidth}px`;
-    const stepX = (trackWidth - 40) / totalSpan;
+    track.style.height = '400px';
+    const stepX = (trackWidth - 80) / totalSpan;
 
-    // Year marker (current position)
-    const yearLine = document.createElement('div');
-    yearLine.className = 'timeline-year-line';
-    yearLine.id = 'timeline-year-line';
-    const yearPct = ((2026 - minDecade) / totalSpan);
-    yearLine.style.left = `${20 + yearPct * (trackWidth - 40)}px`;
-    const yearLabel = document.createElement('div');
-    yearLabel.className = 'timeline-year-label';
-    yearLabel.textContent = 'NOW';
-    yearLine.appendChild(yearLabel);
-    track.appendChild(yearLine);
-
+    // Vertical decade lines
     decades.forEach(decade => {
-        const genres = decadeMap[decade];
-        const x = 20 + (decade - minDecade) * stepX;
-
-        const decadeEl = document.createElement('div');
-        decadeEl.className = 'timeline-decade';
-        decadeEl.dataset.decade = decade;
-        decadeEl.style.left = `${x}px`;
+        const x = 40 + (decade - minDecade) * stepX;
+        const line = document.createElement('div');
+        line.className = 'timeline-decade-line';
+        line.style.left = `${x}px`;
+        track.appendChild(line);
 
         const label = document.createElement('div');
-        label.className = 'decade-label';
+        label.className = 'timeline-decade-label';
+        label.dataset.decade = decade;
+        label.style.left = `${x}px`;
         label.textContent = `${decade}s`;
-        decadeEl.appendChild(label);
+        label.addEventListener('click', () => toggleDecadeHighlight(decade));
+        track.appendChild(label);
+    });
 
-        const bar = document.createElement('div');
-        bar.className = 'decade-bar';
-        decadeEl.appendChild(bar);
+    // Genre dots
+    decades.forEach(decade => {
+        const genres = decadeMap[decade];
+        const x = 40 + (decade - minDecade) * stepX;
+        const trackH = 400;
 
-        // Genre dots above the bar
         genres.forEach((g, i) => {
             const dot = document.createElement('div');
             dot.className = 'genre-dot';
             dot.style.backgroundColor = g.genre.color;
-            dot.style.left = `${(i - (genres.length-1)/2) * 14 + 5}px`;
-            dot.style.bottom = `${70 + Math.floor(i / 3) * 18}px`;
+            dot.style.left = `${x}px`;
+            // Stagger vertically with some horizontal spread
+            const row = Math.floor(i / 8);
+            const col = i % 8;
+            const offsetX = (col - 3.5) * 18;
+            const offsetY = 60 + row * 30;
             dot.dataset.genreKey = g.key;
+            dot.dataset.decade = decade;
+            dot.style.top = `${offsetY}px`;
+            dot.style.left = `${x + offsetX}px`;
 
             const tooltip = document.createElement('div');
             tooltip.className = 'dot-tooltip';
-            tooltip.textContent = g.genre.label;
+            tooltip.textContent = `${g.genre.label} (${g.decade})`;
             dot.appendChild(tooltip);
 
-            dot.addEventListener('click', () => {
+            dot.addEventListener('click', (e) => {
+                e.stopPropagation();
                 selectGenreFromTimeline(g.key);
             });
 
-            decadeEl.appendChild(dot);
+            track.appendChild(dot);
         });
-
-        decadeEl.addEventListener('click', (e) => {
-            if (e.target.classList.contains('genre-dot')) return;
-            toggleDecadeHighlight(decade);
-        });
-
-        track.appendChild(decadeEl);
     });
+
+    // NOW year line
+    const yearLine = document.createElement('div');
+    yearLine.className = 'timeline-year-line';
+    yearLine.id = 'timeline-year-line';
+    const yearPct = ((2026 - minDecade) / totalSpan);
+    yearLine.style.left = `${40 + yearPct * (trackWidth - 80)}px`;
+    const yearLabel = document.createElement('div');
+    yearLabel.className = 'timeline-year-label';
+    yearLabel.textContent = 'NOW (2026)';
+    yearLine.appendChild(yearLabel);
+    track.appendChild(yearLine);
 
     updateTimelineCounts(decades);
 }
 
 function toggleDecadeHighlight(decade) {
     const dots = document.querySelectorAll('.genre-dot');
-    const decades = document.querySelectorAll('.timeline-decade');
+    const decadeLabels = document.querySelectorAll('.timeline-decade-label');
 
     if (timelineActiveDecade === decade) {
         timelineActiveDecade = null;
         dots.forEach(d => { d.classList.remove('highlighted','dimmed'); });
-        decades.forEach(d => d.classList.remove('active'));
+        decadeLabels.forEach(d => d.classList.remove('active'));
         if (currentGraph) resetGraphVisuals();
         return;
     }
 
     timelineActiveDecade = decade;
-    decades.forEach(d => d.classList.toggle('active', d.dataset.decade === decade));
+    decadeLabels.forEach(d => d.classList.toggle('active', d.dataset.decade === decade));
 
     dots.forEach(d => {
         const genreKey = d.dataset.genreKey;
@@ -2941,11 +3051,19 @@ function updateTimelineCounts(decades) {
 }
 
 function toggleTimeline() {
+    // Kept for backward compatibility - now opens fullscreen
+    openTimelineFullscreen();
+}
+
+function openTimelineFullscreen() {
     const bar = document.getElementById('timeline-bar');
-    bar.classList.toggle('collapsed');
-    if (!bar.classList.contains('collapsed')) {
-        setTimeout(buildTimeline, 350);
-    }
+    bar.classList.add('active');
+    setTimeout(buildTimeline, 50);
+}
+
+function closeTimelineFullscreen() {
+    const bar = document.getElementById('timeline-bar');
+    bar.classList.remove('active');
 }
 
 // ============================================================
@@ -3334,24 +3452,36 @@ let itunesCache = {};
 async function fetchItunes(query) {
     if (itunesCache[query]) return itunesCache[query];
     try {
-        const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=15&country=ES`;
-        const r = await fetch(url);
-        const data = await r.json();
-        const results = (data.results||[]);
-        const withPreview = results.filter(x => x.previewUrl);
-        const best = withPreview[0] || results[0];
-        if (!best) return null;
-        const result = {
-            previewUrl: best.previewUrl||null,
-            artworkUrl: (best.artworkUrl100||'').replace('100x100bb','400x400bb'),
-            trackName: best.trackName||best.collectionName||'',
-            artistName: best.artistName||'',
-            collectionName: best.collectionName||'',
-            trackViewUrl: best.trackViewUrl||null,
-        };
-        itunesCache[query] = result;
-        return result;
-    } catch(e) { return null; }
+        // Try multiple searches for better results
+        const searches = [
+            `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=20`,
+            `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=20&country=US`,
+            `https://itunes.apple.com/search?term=${encodeURIComponent(query.split(' ').slice(0,2).join(' '))}&media=music&limit=20`,
+        ];
+
+        for (const url of searches) {
+            const r = await fetch(url);
+            const data = await r.json();
+            const results = (data.results||[]);
+            const withPreview = results.filter(x => x.previewUrl);
+            if (withPreview.length > 0) {
+                const best = withPreview[0];
+                const result = {
+                    previewUrl: best.previewUrl||null,
+                    artworkUrl: (best.artworkUrl100||'').replace('100x100bb','400x400bb'),
+                    trackName: best.trackName||best.collectionName||'',
+                    artistName: best.artistName||'',
+                    collectionName: best.collectionName||'',
+                    trackViewUrl: best.trackViewUrl||null,
+                };
+                itunesCache[query] = result;
+                return result;
+            }
+            // If no previews but results exist, try next search
+            if (results.length > 0) continue;
+        }
+        return null;
+    } catch(e) { console.warn('fetchItunes error:', e); return null; }
 }
 
 // ============================================================
@@ -3428,18 +3558,26 @@ async function playArtist(artistId, query, btn) {
     btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
     document.getElementById(`ai_${artistId}`)?.classList.add('playing-now');
 
-    const data = await fetchItunes(query);
-    if (!data) { btn.classList.remove('active'); btn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>'; return; }
+    // Show searching state
+    document.getElementById('source-label').textContent = currentLanguage === 'en' ? 'Searching…' : 'Buscando…';
+    document.getElementById('source-label').style.color = 'var(--muted)';
 
-   stopAudio();
+    const data = await fetchItunes(query);
+    if (!data) {
+        btn.classList.remove('active');
+        btn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>';
+        document.getElementById('source-label').textContent = currentLanguage === 'en' ? 'Not available on iTunes' : 'No disponible en iTunes';
+        document.getElementById('source-label').style.color = '#ef4444';
+        return;
+    }
+
+    stopAudio();
     currentPlayingQuery = query;
-    // Extract artist name from query as fallback (e.g., "led zeppelin whole lotta love" -> "led zeppelin")
     currentPlayingArtistName = data.artistName || query.split(' ')[0] + ' ' + (query.split(' ')[1] || '');
     setPlayerUI(data, query);
 
     if (data.previewUrl) {
         audioEl.src = data.previewUrl;
-        // Connect waveform visualizer (race-condition safe)
         if (typeof window.connectWaveformOnReady === 'function') {
             window.connectWaveformOnReady();
         }
@@ -5578,23 +5716,41 @@ if ('serviceWorker' in navigator) {
 }
 
 // ============================================================
-// ABOUT US MENU
+// ABOUT US MENU / MAIN MENU
 // ============================================================
-function toggleAboutMenu() {
+function toggleMainMenu() {
     const overlay = document.getElementById('about-overlay');
     if (overlay.classList.contains('active')) {
-        closeAboutMenu();
+        closeMainMenu();
     } else {
-        openAboutMenu();
+        openMainMenu();
     }
 }
 
-function openAboutMenu() {
-    document.getElementById('about-overlay').classList.add('active');
+function openMainMenu() {
+    const overlay = document.getElementById('about-overlay');
+    overlay.classList.add('active');
+    document.getElementById('main-menu').style.display = '';
+    document.getElementById('about-sub-panel').style.display = 'none';
 }
 
-function closeAboutMenu() {
+function closeMainMenu() {
     document.getElementById('about-overlay').classList.remove('active');
+}
+
+function openAboutMenu() {
+    document.getElementById('main-menu').style.display = 'none';
+    const sub = document.getElementById('about-sub-panel');
+    sub.style.display = '';
+}
+
+function closeAboutSub() {
+    document.getElementById('about-sub-panel').style.display = 'none';
+    document.getElementById('main-menu').style.display = '';
+}
+
+function openTimeMachineFromMenu() {
+    openTimeMachine();
 }
 </script>
 </body>
